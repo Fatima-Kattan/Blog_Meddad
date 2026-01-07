@@ -1,0 +1,270 @@
+/* RegisterForm.css */
+.register-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: #160728;
+}
+
+.register-card {
+    background: rgba(255, 255, 255, 0); /* شفافية 90% */
+    border: 2px solid #8B5CF6; /* لون بنفسجي */
+    border-radius: 1rem;
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3); /* ظل بنفسجي خفيف */
+    backdrop-filter: blur(10px); /* تأثير ضبابي للخلفية */
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 800px;
+}
+
+.register-title {
+    text-align: center;
+    color: white;
+    /* لون بنفسجي غامق */
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    font-weight: 700;
+}
+
+.register-form {
+    width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.textarea-group {
+    margin-bottom: 1rem;
+}
+
+.textarea-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #cfc3c3;
+    /* لون بنفسجي غامق */
+    font-size: 0.95rem;
+}
+
+.textarea-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #491f73ff;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #22083e;
+    font-family: inherit;
+    resize: vertical;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.textarea-field:focus {
+    outline: none;
+    border-color: #6b21a8;
+    /* لون بنفسجي غامق */
+    box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.register-button {
+    width: 100%;
+    padding: 1rem;
+background-image: linear-gradient(to left, #7028e4 0%, #e5b2ca 100%);    /* ألوان بنفسجية غامقة */
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(45, 27, 105, 0.2);
+}
+
+.register-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(45, 27, 105, 0.3);
+    background: linear-gradient(to right, #5b21b6, #3730a3);
+}
+
+.register-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.register-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.success-message {
+    background: #10b981;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.error-message-global {
+    background: #ef4444;
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #666;
+}
+
+.login-link-text {
+    color: #4c1d95;
+    /* لون بنفسجي غامق */
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-link-text:hover {
+    color: #6b21a8;
+    text-decoration: underline;
+}
+
+/* Input field styles */
+.input-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #22083e;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: rgb(40, 30, 56);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #6b21a8;
+    box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.input-field:hover {
+    border-color: #a78bfa;
+}
+
+.select-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.select-field:focus {
+    outline: none;
+    border-color: #6b21a8;
+    box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.select-field:hover {
+    border-color: #a78bfa;
+}
+
+.date-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.date-field:focus {
+    outline: none;
+    border-color: #6b21a8;
+    box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.date-field:hover {
+    border-color: #a78bfa;
+}
+
+.file-upload-field {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px dashed #e5e7eb;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.file-upload-field:hover {
+    border-color: #6b21a8;
+    background: #faf5ff;
+}
+
+.file-upload-field:focus-within {
+    border-color: #6b21a8;
+    box-shadow: 0 0 0 3px rgba(107, 33, 168, 0.1), 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: rgb(207, 195, 195) !important;
+    font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+    .register-card {
+        padding: 1.5rem;
+    }
+
+    .register-title {
+        font-size: 1.5rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .register-button {
+        padding: 0.875rem;
+    }
+}
+
+.icon-create {
+    width: 40px;
+    height: 40px;
+    color: #edecf0;
+    padding: 0.8rem;
+    border-radius: 50%;
+}

@@ -1,0 +1,124 @@
+/* الزر الأساسي */
+.gradientButton {
+     padding: 14px 28px;
+    border-radius: 10px;
+
+    /* النص */
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+
+    /* التأثيرات */
+    border: none;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+ background-image: none;
+    background-color: black;
+  
+    /* بدل border-image - استخدم box-shadow لتأثير البوردر */
+    border: 1px solid #a03bfe;
+    box-shadow: 
+        0 0 10px rgba(163, 3, 249, 0.542); /* الظل */
+    outline: none;
+    transform: none;
+}
+
+/* تأثير التمرير */
+.gradientButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #b721ff 0%, #21d4fd 100%);
+    border-radius: 10px;
+    z-index: -1;
+    transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* عند التمرير تظهر الطبقة */
+.gradientButton:hover::before {
+    left: 0;
+}
+
+.gradientButton:hover {
+    box-shadow: 
+        0 8px 25px rgba(183, 33, 255, 0.3),
+        0 0 0 1px rgba(33, 212, 253, 0.1);
+    transform: translateY(-2px);
+}
+
+/* تأثير الضغط */
+.gradientButton:active {
+    transform: scale(0.98);
+}
+
+/* المقاسات */
+.small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.medium {
+    padding: 12px 24px;
+    font-size: 16px;
+}
+
+.large {
+    padding: 16px 32px;
+    font-size: 18px;
+}
+
+/* الأيقونات */
+.icon {
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.iconAfter {
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+}
+
+/* الأنيميشن */
+@keyframes pulseSlow {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+}
+
+.animated {
+    animation: pulseSlow 2s infinite;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 10px #b721ff, 0 0 20px #b721ff;
+    }
+    to {
+        box-shadow: 0 0 20px #21d4fd, 0 0 30px #21d4fd;
+    }
+}
+
+.glow {
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+/* الحاوية */
+.buttonContainer {
+    display: inline-block;
+    margin: 4px;
+}
