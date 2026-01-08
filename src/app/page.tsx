@@ -1,7 +1,7 @@
 import Image from "next/image";
 import styles from "./page.module.css";
-import GradientButton from "../../components/shared/btn/GradientButton";
-import RegisterForm from '../../components/auth/register/RegisterForm';
+import GradientButton from "../components/shared/btn/GradientButton";
+import RegisterForm from '../components/auth/register/RegisterForm';
 import { Metadata } from 'next';
 import Link from "next/link";
 
