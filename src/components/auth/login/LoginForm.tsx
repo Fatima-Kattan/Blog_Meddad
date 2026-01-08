@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import InputField from '../../shared/InputField';
-import { loginService, LoginData } from '../../../src/services/api/loginService';
+import { loginService, LoginData } from '../../../services/api/loginService';
 import './LoginForm.css';
 
 const LoginForm: React.FC = () => {

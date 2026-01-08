@@ -1,7 +1,7 @@
 'use client';
 import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { authService, RegisterData } from '../../../src/services/api/authService';
+import { authService, RegisterData } from '../../../services/api/authService';
 import InputField from '../../shared/InputField';
 import SelectField from '../../shared/SelectField';
 import DatePickerField from '../../shared/DatePickerField';
