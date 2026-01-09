@@ -495,7 +495,6 @@
     text-decoration: none;
     transition: all 0.3s ease;
     position: relative;
-    margin-left: 0.5rem;
 }
 
 .login-link-text::after {
