@@ -1,0 +1,373 @@
+/* src/components/shared/navbar/Navbar.module.css */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    padding: 0.75rem 0;
+}
+
+.scrolled {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.98);
+    padding: 0.5rem 0;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* القسم الأيسر */
+.leftSection {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s;
+}
+
+.logo:hover {
+    transform: scale(1.02);
+}
+
+.logoIcon {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+}
+
+.logoIcon svg {
+    width: 28px;
+    height: 28px;
+}
+
+.logoText {
+    display: flex;
+    flex-direction: column;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.logoPrimary {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+.logoSecondary {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* الروابط */
+.desktopLinks {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.navLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    color: #4a5568;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 0.95rem;
+}
+
+.navLink:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.linkIcon {
+    color: #718096;
+    display: flex;
+    align-items: center;
+}
+
+.navLink:hover .linkIcon {
+    color: #667eea;
+}
+
+/* القسم الأيمن */
+.rightSection {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* البحث */
+.searchContainer {
+    position: relative;
+    width: 300px;
+    display: flex;
+}
+
+.searchButton {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #a0aec0;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: #f8f9fa;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: #667eea;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* الأيقونات */
+.iconsContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.iconButton {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: #4a5568;
+    transition: color 0.2s;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.iconButton:hover {
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.notificationBadge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #ed64a6;
+    color: white;
+    font-size: 0.7rem;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.authButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.3s;
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4);
+}
+
+.authButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+/* زر الموبايل */
+.menuButton {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4a5568;
+    padding: 0.5rem;
+    align-items: center;
+}
+
+/* القائمة المنبثقة للموبايل */
+.mobileMenu {
+    display: none;
+    background: white;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.mobileMenuHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mobileMenuHeader h3 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.25rem;
+}
+
+.closeMenuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4a5568;
+    padding: 0.25rem;
+}
+
+.mobileLinks {
+    padding: 1rem 0;
+}
+
+.mobileLink {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 2rem;
+    text-decoration: none;
+    color: #4a5568;
+    transition: all 0.2s;
+}
+
+.mobileLink:hover {
+    background: #f7fafc;
+    color: #667eea;
+}
+
+.mobileAuth {
+    padding: 1rem 2rem;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.mobileLoginButton,
+.mobileRegisterButton {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    padding: 0.75rem;
+    border-radius: 8px;
+    text-align: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+.mobileLoginButton {
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.mobileRegisterButton {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* تصميم متجاوب */
+@media (max-width: 1024px) {
+    .searchContainer {
+        width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .desktopLinks {
+        display: none;
+    }
+
+    .menuButton {
+        display: flex;
+    }
+
+    .searchContainer {
+        display: none;
+    }
+
+    .mobileMenu {
+        display: block;
+    }
+
+    .rightSection {
+        gap: 0.75rem;
+    }
+
+    .authButton span {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .logoText {
+        display: none;
+    }
+
+    .authButton {
+        padding: 0.6rem;
+    }
+
+    .logoIcon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .logoIcon svg {
+        width: 24px;
+        height: 24px;
+    }
+}
