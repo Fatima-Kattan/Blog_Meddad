@@ -1,7 +1,7 @@
 'use client';
-import { Link } from 'react-router-dom';
+
 import React, { useState, useEffect } from 'react';
-import { authService, RegisterData } from '../../../services/api/authService';
+import { authService, RegisterData } from '@/services/api/authService';
 import InputField from '../../shared/InputField';
 import SelectField from '../../shared/SelectField';
 import DatePickerField from '../../shared/DatePickerField';
@@ -147,9 +147,6 @@ const RegisterForm: React.FC = () => {
         return (
             <div className="register-container">
                 <div className="register-card">
-                    <svg className="icon-create" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M6 8c0-2.21 1.79-4 4-4s4 1.79 4 4-1.79 4-4 4-4-1.79-4-4zm6 10H4v-2c0-2.21 1.79-4 4-4h4c2.21 0 4 1.79 4 4v2h-2v-2c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v2h6zm6-10c0-2.21 1.79-4 4-4v2c-1.1 0-2 .9-2 2s.9 2 2 2v2c-2.21 0-4-1.79-4-4z" />
-                    </svg>
                     <h1 className="register-title">Create New Account</h1>
                     <div style={{ textAlign: 'center', padding: '2rem' }}>
                         Loading form...
@@ -162,7 +159,7 @@ const RegisterForm: React.FC = () => {
     return (
         <div className="register-container" suppressHydrationWarning>
             <div className="register-card">
-                <h1 className="register-title">Create New Account</h1>
+                <h1 className="register-title"> Create New Account</h1>
 
                 {successMessage && (
                     <div className="success-message">

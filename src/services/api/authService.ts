@@ -7,7 +7,7 @@ export interface RegisterData {
     phone_number: string;
     bio?: string;
     birth_date: string;
-    gender: 'male' | 'female' | 'other';
+    gender: 'male' | 'female';
     image?: File | null;
 }
 export interface RegisterResponse {
@@ -61,7 +61,7 @@ class AuthService {
         // إذا كان API يطلب JSON فقط، ما راح تقدر ترسل ملفات
         // الحل: إما ترفع الصورة بشكل منفصل أو تستخدم base64
         
-        console.log('📦 JSON Data to send:', jsonData);
+        /* console.log('📦 JSON Data to send:', jsonData); */
         
         try {
             const response = await fetch(url, {
@@ -70,7 +70,7 @@ class AuthService {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify(jsonData),
+                body: JSON.stringify(jsonData),//بتحول لجيسون
             });
             
             const responseText = await response.text();
