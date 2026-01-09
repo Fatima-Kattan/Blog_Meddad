@@ -7,6 +7,7 @@ import SelectField from '../../shared/SelectField';
 import DatePickerField from '../../shared/DatePickerField';
 import FileUploadField from '../../shared/FileUploadField';
 import './RegisterForm.css';
+import { IoPersonAdd } from "react-icons/io5";
 
 const RegisterForm: React.FC = () => {
     const [isClient, setIsClient] = useState(false);
@@ -147,7 +148,7 @@ const RegisterForm: React.FC = () => {
         return (
             <div className="register-container">
                 <div className="register-card">
-                    <h1 className="register-title">Create New Account</h1>
+                    <h1 className="register-title"><IoPersonAdd /> Create New Account</h1>
                     <div style={{ textAlign: 'center', padding: '2rem' }}>
                         Loading form...
                     </div>
@@ -159,7 +160,7 @@ const RegisterForm: React.FC = () => {
     return (
         <div className="register-container" suppressHydrationWarning>
             <div className="register-card">
-                <h1 className="register-title"> Create New Account</h1>
+                <h1 className="register-title"><IoPersonAdd />Create New Account</h1>
 
                 {successMessage && (
                     <div className="success-message">
