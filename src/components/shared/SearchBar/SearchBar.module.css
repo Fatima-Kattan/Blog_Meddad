@@ -1,0 +1,299 @@
+/* src/components/shared/SearchBar/SearchBar.module.css */
+.searchContainer {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+}
+
+.searchForm {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.inputWrapper {
+    position: relative;
+    flex: 1;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a78bfa;
+    z-index: 1;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.75rem 3rem 0.75rem 2.5rem;
+    background: rgba(26, 11, 46, 0.9);
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    background: rgba(40, 20, 70, 0.95);
+    box-shadow:
+        0 0 0 4px rgba(139, 92, 246, 0.15),
+        0 8px 30px rgba(139, 92, 246, 0.2);
+}
+
+.searchInput::placeholder {
+    color: rgba(196, 181, 253, 0.6);
+}
+
+.clearButton {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #a78bfa;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.clearButton:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.searchButton {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+}
+
+.searchButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(139, 92, 246, 0.6);
+}
+
+.searchButton:active {
+    transform: translateY(0);
+}
+
+/* Suggestions Dropdown */
+.suggestionsDropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 0.5rem;
+    background: rgba(22, 7, 40, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.suggestionsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.suggestionsTitle {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.suggestionsCount {
+    color: #a78bfa;
+    font-size: 0.8rem;
+    background: rgba(139, 92, 246, 0.1);
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+}
+
+.suggestionsList {
+    padding: 0.5rem 0;
+}
+
+.suggestionItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    color: #c4b5fd;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.suggestionItem:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #ffffff;
+}
+
+.suggestionIcon {
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 8px;
+}
+
+.suggestionContent {
+    flex: 1;
+}
+
+.suggestionTitle {
+    color: #ffffff;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.suggestionDescription {
+    color: #a78bfa;
+    font-size: 0.85rem;
+}
+
+.searchAllButton {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.searchAllButton button {
+    width: 100%;
+    padding: 0.75rem;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    color: #8b5cf6;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.searchAllButton button:hover {
+    background: rgba(139, 92, 246, 0.2);
+}
+
+/* Loading State */
+.loadingIndicator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+    justify-content: center;
+    color: #a78bfa;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* No Results */
+.noResults {
+    padding: 2rem;
+    text-align: center;
+    color: #a78bfa;
+}
+
+/* Recent Searches */
+.recentSearches {
+    padding: 0.5rem 0;
+}
+
+.clearRecentButton {
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.clearRecentButton:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.recentList {
+    padding: 0.5rem 0;
+}
+
+.recentItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    background: none;
+    border: none;
+    color: #c4b5fd;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    margin: 0.25rem 0;
+}
+
+.recentItem:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .searchForm {
+        flex-direction: column;
+    }
+
+    .searchButton {
+        width: 100%;
+    }
+
+    .suggestionsDropdown {
+        position: fixed;
+        top: 70px;
+        left: 1rem;
+        right: 1rem;
+        margin-top: 0;
+    }
+}

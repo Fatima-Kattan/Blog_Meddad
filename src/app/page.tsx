@@ -13,7 +13,7 @@ import LogoutButton from "@/components/auth/logout/LogoutButton";
 export default function Home() {
   return (
     <>
-      <main style={{ padding: "2rem" }}>
+      {/* <main style={{ padding: "2rem" }}>
         <h1>Welcome to My App 🚀</h1>
         <p>Choose the page you want to go to:</p>
         <nav style={{ display: "flex", gap: "1rem" }}>
@@ -22,7 +22,7 @@ export default function Home() {
           <Link href="/login">Login</Link>
           <Link href="/following">following</Link>
         </nav>
-      </main>
+      </main> */}
     </>
   );
 }
