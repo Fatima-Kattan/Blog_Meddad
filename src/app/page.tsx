@@ -20,6 +20,7 @@ export default function Home() {
           <LogoutButton/>
           <Link href="/register">Register</Link>
           <Link href="/login">Login</Link>
+          <Link href="/following">following</Link>
         </nav>
       </main>
     </>
