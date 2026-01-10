@@ -1,161 +1,405 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from './Navbar.module.css';
-import { 
-  HiSearch, HiUser, HiMenu, HiX, HiHome, 
-  HiBookOpen, HiPencilAlt, HiBell, HiLogin,
-  HiHashtag  // بدل Save - للتسجيل
+import SearchBar from '../SearchBar/SearchBar';
+// أيقونات
+import {
+    HiBell,
+    HiHome,
+    HiUserCircle,
+    HiNewspaper,
+    HiMenu,
+    HiX
 } from 'react-icons/hi';
-import { 
-  FaLayerGroup, 
-  FaInfoCircle,
-  FaFire  // أيقونة مميزة مثل الصورة
+
+import {
+    FaRocket,
+    FaFeatherAlt,
+    FaMagic,
+    FaCompass,
+    FaCrown,
+    FaUserEdit
 } from 'react-icons/fa';
 
+import {
+    RiUserHeartLine,
+    RiSparkling2Fill,
+    RiUserStarLine
+} from 'react-icons/ri';
+
+import { TbUserHexagon } from 'react-icons/tb';
+import { CgProfile } from 'react-icons/cg';
+import { IoMdAddCircleOutline } from "react-icons/io"; // الأيقونة الجديدة
+
 const Navbar = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [activeTab, setActiveTab] = useState('home');
+    const pathname = usePathname();
+    
+    // أضف state لتسجيل الدخول
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // 🔥 **تغيير الروابط لتكون مثل الصورة**
-  const navLinks = [
-    { href: '/', label: 'الرئيسية', icon: <HiHome size={20} /> },
-    { href: '/trending', label: 'رائج', icon: <FaFire size={20} /> }, // بدل Save
-    { href: '/articles', label: 'المقالات', icon: <HiBookOpen size={20} /> },
-    { href: '/categories', label: 'التصنيفات', icon: <HiHashtag size={20} /> }, // Hashtag بدل FlayerGroup
-    { href: '/write', label: 'اكتب مقال', icon: <HiPencilAlt size={20} /> },
-    { href: '/about', label: 'عن المدونة', icon: <FaInfoCircle size={20} /> },
-  ];
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      console.log('بحث عن:', searchQuery);
+    // إخفاء النافبار في صفحات الدخول والتسجيل
+    const hiddenPaths = ['/login', '/register'];
+    if (hiddenPaths.includes(pathname)) {
+        return null;
     }
-  };
 
-  return (
-    <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
-      <div className={styles.container}>
-        {/* القسم الأيسر */}
-        <div className={styles.leftSection}>
-          {/* اللوجو */}
-          <Link href="/" className={styles.logo}>
-            <div className={styles.logoIcon}>
-              <HiBookOpen size={28} />
-            </div>
-            <span className={styles.logoText}>
-              <span className={styles.logoPrimary}>مدونة</span>
-              <span className={styles.logoSecondary}>مــداد</span>
-            </span>
-          </Link>
+    // تأثير التمرير
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 0);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
-          {/* قائمة التنقل */}
-          <div className={styles.desktopLinks}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={styles.navLink}
-              >
-                <span className={styles.linkIcon}>{link.icon}</span>
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
+    // محاكاة التحقق من تسجيل الدخول
+    useEffect(() => {
+        // هنا رح تحقق من localStorage أو session أو API
+        const token = localStorage.getItem('token'); // أو أي طريقة تحقق
+        setIsLoggedIn(!!token);
+        
+        // لمحاكاة التغيير، يمكنك إزالته لاحقاً
+        // setIsLoggedIn(false); // للمستخدم غير المسجل
+        // setIsLoggedIn(true); // للمستخدم المسجل
+    }, []);
 
-        {/* القسم الأيمن */}
-        <div className={styles.rightSection}>
-          {/* شريط البحث */}
-          <form onSubmit={handleSearch} className={styles.searchContainer}>
-            <button type="submit" className={styles.searchButton}>
-              <HiSearch size={20} />
-            </button>
-            <input
-              type="text"
-              placeholder="ابحث عن مقالات..."
-              className={styles.searchInput}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
+    // روابط النافبار
+    const navLinks = [
+        {
+            id: 'home',
+            href: '/',
+            label: 'Home',
+            icon: <HiHome size={24} />
+        },
+        {
+            id: 'trending',
+            href: '/trending',
+            label: 'Trending',
+            icon: <FaRocket size={22} />
+        },
+        {
+            id: 'profile',
+            href: '/profile',
+            label: 'Profile',
+            icon: <CgProfile size={24} style={{ color: '#8b5cf6' }} /> // أيقونة بروفايل أحلى
+        },
+        {
+            id: 'posts',
+            href: '/posts',
+            label: 'Posts',
+            icon: <FaFeatherAlt size={22} />
+        },
+        
+    ];
 
-          {/* أيقونات المستخدم */}
-          <div className={styles.iconsContainer}>
-            {/* زر الإشعارات */}
-            <button className={styles.iconButton}>
-              <HiBell size={22} />
-              <span className={styles.notificationBadge}>3</span>
-            </button>
+    // عند النقر على تب
+    const handleTabClick = (tabId: string) => {
+        setActiveTab(tabId);
+    };
 
-            {/* زر الدخول */}
-            <Link href="/login" className={styles.authButton}>
-              <HiUser size={22} />
-              <span>دخول</span>
-            </Link>
+    // زر إنشاء منشور
+    const handleCreatePost = () => {
+        console.log('Create post clicked');
+        // يمكن توجيه المستخدم لصفحة الإنشاء
+        // router.push('/create-post');
+    };
 
-            {/* زر القائمة للموبايل */}
-            <button
-              className={styles.menuButton}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
-            </button>
-          </div>
-        </div>
-      </div>
+    // معالج الخروج
+    const handleLogout = () => {
+        console.log('Logout clicked');
+        // يمكن إضافة منطق الخروج هنا
+        localStorage.removeItem('token'); // مثال
+        setIsLoggedIn(false);
+        // logout();
+        // router.push('/login');
+    };
 
-      {/* قائمة الموبايل */}
-      {isMenuOpen && (
-        <div className={styles.mobileMenu}>
-          <div className={styles.mobileMenuHeader}>
-            <h3>القائمة</h3>
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className={styles.closeMenuButton}
-            >
-              <HiX size={24} />
-            </button>
-          </div>
+    // معالج الدخول
+    const handleLogin = () => {
+        // سيناريو محاكاة - في الواقع رح يكون هناك صفحة دخول
+        localStorage.setItem('token', 'sample-token');
+        setIsLoggedIn(true);
+    };
 
-          <div className={styles.mobileLinks}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={styles.mobileLink}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span className={styles.mobileLinkIcon}>{link.icon}</span>
-                {link.label}
-              </Link>
-            ))}
+    // معالج التسجيل
+    const handleRegister = () => {
+        // سيناريو محاكاة
+        localStorage.setItem('token', 'sample-token');
+        setIsLoggedIn(true);
+    };
 
-            <div className={styles.mobileAuth}>
-              <Link href="/login" className={styles.mobileLoginButton}>
-                <HiLogin size={20} />
-                <span>تسجيل الدخول</span>
-              </Link>
-              <Link href="/register" className={styles.mobileRegisterButton}>
-                <HiUser size={20} />
-                <span>إنشاء حساب</span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-    </nav>
-  );
+    return (
+        <>
+            <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
+                <div className={styles.container}>
+
+                    {/* الجزء الأيسر: اللوجو */}
+                    <div className={styles.leftSection}>
+                        <Link href="/" className={styles.logo}>
+                            <div className={styles.logoIcon}>
+                                <FaMagic size={24} />
+                            </div>
+                            <span className={styles.logoText}>WeShare</span>
+                        </Link>
+                    </div>
+
+                    {/* الجزء الأوسط: شريط البحث */}
+                    <div className={styles.centerSection}>
+                        <SearchBar />
+                    </div>
+
+                    {/* الجزء الأيمن: أيقونات */}
+                    <div className={styles.rightSection}>
+                        {/* زر إنشاء منشور جديد - يظهر فقط إذا كان مسجل دخول */}
+                        {isLoggedIn && (
+                            <button 
+                                className={styles.createButton}
+                                onClick={handleCreatePost}
+                            >
+                                <IoMdAddCircleOutline size={25} />
+                            </button>
+                        )}
+
+                        {/* إشعارات - تظهر فقط إذا كان مسجل دخول */}
+                        {isLoggedIn && (
+                            <div className={styles.notificationWrapper}>
+                                <button className={styles.iconButton}>
+                                    <HiBell size={22} />
+                                    <span className={styles.notificationBadge}>5</span>
+                                </button>
+                            </div>
+                        )}
+
+                        {/* إذا كان مسجل دخول: عرض البروفايل، وإلا: عرض زرين الدخول والتسجيل */}
+                        {isLoggedIn ? (
+                            <div className={styles.profileDropdown}>
+                                <button 
+                                    className={styles.profileButton}
+                                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                >
+                                    <div className={styles.profileAvatar}>
+                                        <TbUserHexagon size={36} className={styles.profileIcon} />
+                                        <div className={styles.profileStatus}></div>
+                                    </div>
+                                </button>
+
+                                {/* قائمة البروفايل المنسدلة */}
+                                {showProfileMenu && (
+                                    <div className={styles.profileMenu}>
+                                        <div className={styles.profileMenuHeader}>
+                                            <TbUserHexagon size={48} className={styles.menuProfileIcon} />
+                                            <div className={styles.profileInfo}>
+                                                <h4>John Doe</h4>
+                                                <p>@johndoe</p>
+                                            </div>
+                                        </div>
+
+                                        <div className={styles.menuDivider} />
+
+                                        <Link href="/profile" className={styles.menuItem}>
+                                            <RiUserStarLine size={20} />
+                                            <span>My Profile</span>
+                                        </Link>
+                                        <Link href="/posts" className={styles.menuItem}>
+                                            <FaFeatherAlt size={20} />
+                                            <span>My Posts</span>
+                                        </Link>
+                                        {/* <Link href="/settings" className={styles.menuItem}>
+                                            <FaUserEdit size={20} />
+                                            <span>Edit Profile</span>
+                                        </Link> */}
+
+                                        <div className={styles.menuDivider} />
+
+                                        {/* <button className={styles.menuItem}>
+                                            <HiBell size={20} />
+                                            <span>Notifications</span>
+                                            <span className={styles.notificationCount}>5</span>
+                                        </button> */}
+                                        
+
+                                        <div className={styles.menuDivider} />
+
+                                        <button 
+                                            className={styles.logoutButton}
+                                            onClick={handleLogout}
+                                        >
+                                            <span>Log Out</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className={styles.authButtons}>
+                                <Link href="/login" className={styles.loginButton}>
+                                    <HiUserCircle size={20} />
+                                    <span>Login</span>
+                                </Link>
+                                <Link href="/register" className={styles.registerButton}>
+                                    <HiNewspaper size={20} />
+                                    <span>Register</span>
+                                </Link>
+                            </div>
+                        )}
+
+                        {/* زر القائمة للموبايل */}
+                        <button
+                            className={styles.mobileMenuButton}
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                        >
+                            {isMenuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
+                        </button>
+                    </div>
+                </div>
+
+                {/* القائمة السفلية (للأيقونات) */}
+                <div className={styles.bottomNav}>
+                    <div className={styles.bottomNavContainer}>
+                        {navLinks.map((link) => (
+                            <button
+                                key={link.id}
+                                onClick={() => {
+                                    handleTabClick(link.id);
+                                    if (link.id === 'profile') {
+                                        setShowProfileMenu(false);
+                                    }
+                                }}
+                                className={`${styles.bottomNavLink} ${activeTab === link.id ? styles.active : ''}`}
+                                aria-label={link.label}
+                            >
+                                <span className={styles.bottomNavIcon}>{link.icon}</span>
+                                <span className={styles.bottomNavLabel}>{link.label}</span>
+                                {activeTab === link.id && <div className={styles.activeIndicator} />}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </nav>
+
+            {/* قائمة الجوال المنبثقة */}
+            {isMenuOpen && (
+                <div className={styles.mobileMenu}>
+                    <div className={styles.mobileMenuHeader}>
+                        {isLoggedIn ? (
+                            <div className={styles.mobileProfile}>
+                                <TbUserHexagon size={52} className={styles.mobileProfileIcon} />
+                                <div>
+                                    <h4>John Doe</h4>
+                                    <p>@johndoe</p>
+                                    <span className={styles.mobileUserBadge}>
+                                        <FaCrown size={12} /> Premium
+                                    </span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={styles.mobileAuthHeader}>
+                                <h3>Welcome to WeShare</h3>
+                                <p>Sign in to access all features</p>
+                            </div>
+                        )}
+                        <button
+                            onClick={() => setIsMenuOpen(false)}
+                            className={styles.closeMenuButton}
+                            aria-label="Close menu"
+                        >
+                            <HiX size={24} />
+                        </button>
+                    </div>
+
+                    <div className={styles.mobileLinks}>
+                        {isLoggedIn ? (
+                            // إذا مسجل دخول: عرض القائمة العادية
+                            <>
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.id}
+                                        href={link.href}
+                                        className={`${styles.mobileLink} ${activeTab === link.id ? styles.active : ''}`}
+                                        onClick={() => {
+                                            handleTabClick(link.id);
+                                            setIsMenuOpen(false);
+                                        }}
+                                    >
+                                        <span className={styles.mobileLinkIcon}>{link.icon}</span>
+                                        {link.label}
+                                        {activeTab === link.id && <div className={styles.mobileActiveDot} />}
+                                    </Link>
+                                ))}
+
+                                <div className={styles.mobileDivider} />
+
+                                <button className={styles.mobileMenuItem}>
+                                    <IoMdAddCircleOutline size={20} />
+                                    <span>Create Post</span>
+                                </button>
+                                <button className={styles.mobileMenuItem}>
+                                    <HiNewspaper size={20} />
+                                    <span>My Articles</span>
+                                </button>
+                                <button className={styles.mobileMenuItem}>
+                                    <FaUserEdit size={20} />
+                                    <span>Edit Profile</span>
+                                </button>
+                                <button className={styles.mobileMenuItem}>
+                                    <HiBell size={20} />
+                                    <span>Notifications</span>
+                                    <span className={styles.mobileNotificationCount}>5</span>
+                                </button>
+
+                                <div className={styles.mobileDivider} />
+
+                                <button 
+                                    className={styles.mobileLogoutButton}
+                                    onClick={handleLogout}
+                                >
+                                    Log Out
+                                </button>
+                            </>
+                        ) : (
+                            // إذا غير مسجل: عرض أزرار الدخول والتسجيل
+                            <>
+                                <Link
+                                    href="/login"
+                                    className={styles.mobileMenuItem}
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <HiUserCircle size={20} />
+                                    <span>Login</span>
+                                </Link>
+                                <Link
+                                    href="/register"
+                                    className={styles.mobileMenuItem}
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <HiNewspaper size={20} />
+                                    <span>Register</span>
+                                </Link>
+                                
+                                <div className={styles.mobileDivider} />
+                                
+                                <div className={styles.mobileInfo}>
+                                    <p>Create an account to:</p>
+                                    <ul>
+                                        <li>Share posts</li>
+                                        <li>Follow others</li>
+                                        <li>Save articles</li>
+                                        <li>Get notifications</li>
+                                    </ul>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
+        </>
+    );
 };
 
 export default Navbar;
