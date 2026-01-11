@@ -557,3 +557,18 @@
         margin-bottom: 1rem;
     }
 }
+
+.icon_color{
+    color: #915bf6;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.register-icon{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}

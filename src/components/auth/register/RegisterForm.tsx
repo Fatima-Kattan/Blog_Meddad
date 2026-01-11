@@ -148,7 +148,7 @@ const RegisterForm: React.FC = () => {
         return (
             <div className="register-container">
                 <div className="register-card">
-                    <h1 className="register-title"><IoPersonAdd /> Create New Account</h1>
+                    <h1 className="register-title"><IoPersonAdd className='icon_color' /> Create New Account</h1>
                     <div style={{ textAlign: 'center', padding: '2rem' }}>
                         Loading form...
                     </div>
@@ -160,7 +160,10 @@ const RegisterForm: React.FC = () => {
     return (
         <div className="register-container" suppressHydrationWarning>
             <div className="register-card">
-                <h1 className="register-title"><IoPersonAdd />Create New Account</h1>
+                <div className='register-icon'>
+                    <IoPersonAdd className='icon_color'/>
+                    <h1 className="register-title">Create New Account</h1>
+                </div>
 
                 {successMessage && (
                     <div className="success-message">
