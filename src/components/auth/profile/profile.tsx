@@ -16,6 +16,7 @@ import InputField from '@/components/shared/InputField';
 import { errorToJSON } from 'next/dist/server/render';
 import SelectField from '@/components/shared/SelectField';
 import DatePickerField from '@/components/shared/DatePickerField';
+import { MdOutlineEmail } from 'react-icons/md';
 
 type TabType = 'overview' | 'posts' | 'followers' | 'following';
 
@@ -93,7 +94,7 @@ const Profile: React.FC = () => {
         return `${age} years old`;
     };
 
-        const genderOptions = [
+    const genderOptions = [
         { value: 'male', label: 'Male' },
         { value: 'female', label: 'Female' },
     ];
@@ -103,6 +104,7 @@ const Profile: React.FC = () => {
             setEditForm({
                 full_name: user.full_name,
                 bio: user.bio,
+                email:user.email,
                 image: user.image,
                 phone_number: user.phone_number,
                 gender: user.gender,
@@ -243,9 +245,7 @@ const Profile: React.FC = () => {
                     <div className="user-info">
                         <h2 className="user-name">{user.full_name}</h2>
                         <div className="user-email">
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
-                                <path d="M2 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H4zm13 2.383l-4.758 2.855L17 11.114V5.383zm-.034 6.878L9.271 8.82 8 9.583 6.728 8.82l-5.694 3.44A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.739zM1 11.114l4.758-2.876L1 5.383v5.73z" />
-                            </svg>
+                            <MdOutlineEmail className='email_icon'/>
                             <span>{user.email}</span>
                         </div>
                         <div className="member-since">
@@ -687,6 +687,7 @@ const Profile: React.FC = () => {
                                     onChange={handleInputChange}
                                     placeholder="Enter your full name"
                                     required
+                                    error={errors.full_name}
                                 />
                             </div>
 
@@ -699,6 +700,7 @@ const Profile: React.FC = () => {
                                     onChange={handleInputChange}
                                     placeholder="example@email.com"
                                     required
+                                    error={errors.email}
                                 />
                             </div>
 
@@ -720,33 +722,34 @@ const Profile: React.FC = () => {
                                     name="phone_number"
                                     value={editForm.phone_number || ''}
                                     onChange={handleInputChange}
-                                    placeholder="+963 234 567 8900"
+                                    placeholder="+963 234 567 89"
                                     required
+                                    error={errors.phone_number}
                                 />
                             </div>
 
                             <div className="form-group">
                                 <SelectField
-                            label="Gender"
-                            name="gender"
-                            value={editForm.gender || ''}
-                            onChange={handleInputChange}
-                            options={genderOptions}
-                            required
-                            error={errors.gender}
-                        />
+                                    label="Gender"
+                                    name="gender"
+                                    value={editForm.gender || ''}
+                                    onChange={handleInputChange}
+                                    options={genderOptions}
+                                    required
+                                    error={errors.gender}
+                                />
                             </div>
 
                             <div className="form-group">
                                 <DatePickerField
-                            label="Birth Date"
-                            name="birth_date"
-                            value={editForm.birth_date || ''}
-                            onChange={handleInputChange}
-                            required
-                            max={today}
-                            error={errors.birth_date}
-                        />
+                                    label="Birth Date"
+                                    name="birth_date"
+                                    value={editForm.birth_date || ''}
+                                    onChange={handleInputChange}
+                                    required
+                                    max={today}
+                                    error={errors.birth_date}
+                                />
                             </div>
 
                             <div className="form-actions">

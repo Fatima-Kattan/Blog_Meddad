@@ -2,50 +2,50 @@
 import React from 'react';
 
 interface SelectFieldProps {
-    label: string;
-    name: string;
-    value: string;
-    onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-    options: { value: string; label: string }[];
-    required?: boolean;
-    error?: string;
-    disabled?: boolean;
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: { value: string; label: string }[];
+  required?: boolean;
+  error?: string;
+  disabled?: boolean;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
-    label,
-    name,
-    value,
-    onChange,
-    options,
-    required = false,
-    error,
-    disabled = false,
+  label,
+  name,
+  value,
+  onChange,
+  options,
+  required = false,
+  error,
+  disabled = false,
 }) => {
-    return (
-        <div className="select-group">
-            <label htmlFor={name} className="select-label">
-                {label} {required && <span className="text-red-500">*</span>}
-            </label>
-            <select
-                id={name}
-                name={name}
-                value={value}
-                onChange={onChange}
-                required={required}
-                disabled={disabled}
-                className={`select-field ${error ? 'select-error' : ''}`}
-            >
-                <option value="">Select {label}</option>
-                {options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-            </select>
-            {error && <p className="error-message">{error}</p>}
+  return (
+    <div className="select-group">
+      <label htmlFor={name} className="select-label">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <select
+        id={name}
+        name={name}
+        value={value}
+        onChange={onChange}
+        required={required}
+        disabled={disabled}
+        className={`select-field ${error ? 'select-error' : ''}`}
+      >
+        <option value="">Select {label}</option>
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {error && <p className="error-message">{error}</p>}
 
-            <style jsx>{`
+      <style jsx>{`
         .select-group {
           margin-bottom: 1rem;
           width: 100%;
@@ -85,9 +85,12 @@ const SelectField: React.FC<SelectFieldProps> = ({
           font-size: 0.875rem;
           margin-top: 0.25rem;
         }
+          .text-red-500{
+          color:red
+          }  
       `}</style>
-        </div>
-    );
+    </div>
+  );
 };
 
 export default SelectField;

@@ -80,6 +80,9 @@ const DatePickerField: React.FC<DatePickerFieldProps> = ({
           font-size: 0.875rem;
           margin-top: 0.25rem;
         }
+
+        .text-red-500{
+        color:red}
       `}</style>
         </div>
     );

@@ -20,7 +20,7 @@ const RegisterForm: React.FC = () => {
         bio: '',
         birth_date: '',
         gender: 'male',
-        image: null,
+        image: '',
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
@@ -47,12 +47,12 @@ const RegisterForm: React.FC = () => {
         }
     };
 
-    const handleImageChange = (file: File | null) => {
-        setFormData(prev => ({
-            ...prev,
-            image: file
-        }));
-    };
+    /*  const handleImageChange = (file: File | null) => {
+         setFormData(prev => ({
+             ...prev,
+             image: file
+         }));
+     }; */
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -116,7 +116,7 @@ const RegisterForm: React.FC = () => {
                     bio: '',
                     birth_date: '',
                     gender: 'male',
-                    image: null,
+                    image: '',
                 });
 
                 if (isClient) {
@@ -161,7 +161,7 @@ const RegisterForm: React.FC = () => {
         <div className="register-container" suppressHydrationWarning>
             <div className="register-card">
                 <div className='register-icon'>
-                    <IoPersonAdd className='icon_color'/>
+                    <IoPersonAdd className='icon_color' />
                     <h1 className="register-title">Create New Account</h1>
                 </div>
 
@@ -252,6 +252,14 @@ const RegisterForm: React.FC = () => {
                             error={errors.gender}
                         />
 
+                        <InputField
+                            label="Profile Picture (Optional)"
+                            name="image"
+                            value={formData.image || ''}  // أضف هذا لتجنب مشاكل undefined/null
+                            onChange={handleChange}
+                            placeholder="enter image url ..."
+                            error={errors.image}  // غير من errors.phone_number إلى errors.image
+                        />
                         <div className="textarea-group">
                             <label htmlFor="bio" className="textarea-label">
                                 About You (Optional)
@@ -267,12 +275,13 @@ const RegisterForm: React.FC = () => {
                             />
                         </div>
 
-                        <FileUploadField
+                        {/* <FileUploadField
                             label="Profile Picture (Optional)"
                             name="image"
                             onChange={handleImageChange}
                             error={errors.image}
-                        />
+                        /> */}
+
                     </div>
 
                     <button
