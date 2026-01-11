@@ -1,4 +1,5 @@
-import Followers from '@/components/follow/followers/Followers'
+
+import Followers from '@/components/follow/followers/followers'
 import React from 'react'
 // import LoginForm from '../../components/auth/login/LoginForm'
 
