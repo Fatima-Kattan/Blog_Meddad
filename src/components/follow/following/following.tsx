@@ -5,18 +5,19 @@ import { useEffect, useState } from "react";
 import { followingService, FollowingResponse } from "@/services/api/follow_api/following";
 import UserCard from '@/components/shared/UserCard/UserCard'; 
 import FollowLayout from '@/components/follow/FollowLayout';
+import { followsService } from '@/services/api/follow_api/deleteFollow';
 
 function Following() {
   const [followings, setFollowings] = useState<FollowingResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const storedUser = localStorage.getItem("user");
+  const userId = storedUser ? JSON.parse(storedUser).id : null;
   useEffect(() => {
     const fetchFollowings = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("token") || "";
-        const userId = 2;
 
         const data = await followingService.getFollowings(userId, token);
         setFollowings(data);
@@ -32,29 +33,48 @@ function Following() {
     fetchFollowings();
   }, []);
 
+  
+  // const handleUnfollow = async (userId: number | string) => {
+  //   try {
+  //     const token = localStorage.getItem("token") || "";
+  //     await followsService.deleteFollow(Number(userId), token);
+  
+  //     // تحديث القائمة بعد الحذف
+  //     setFollowings(prev => {
+  //       if (!prev) return prev;
+  //       return {
+  //         ...prev,
+  //         count: prev.count - 1,
+  //         data: prev.data.filter(f => f.following.id !== userId),
+  //       };
+  //     });
+  //   } catch (error) {
+  //     console.error("Failed to unfollow:", error);
+  //   }
+  // };
   const handleUnfollow = async (userId: number | string) => {
     try {
+      // ✅ نافذة تأكيد من المتصفح
+      const confirmed = window.confirm("Are you sure you want to unfollow this user?");
+      if (!confirmed) return; // إذا كبس Cancel ما بيكمل
+  
       const token = localStorage.getItem("token") || "";
-      
-      // استدعاء API لإلغاء المتابعة
-      await followingService.unfollowUser(userId, token);
-      
-      // تحديث القائمة
+      await followsService.deleteFollow(Number(userId), token);
+  
+      // تحديث القائمة بعد الحذف
       setFollowings(prev => {
         if (!prev) return prev;
         return {
           ...prev,
           count: prev.count - 1,
-          data: prev.data.filter(f => f.following.id !== userId)
+          data: prev.data.filter(f => f.following.id !== userId),
         };
       });
-      
     } catch (error) {
       console.error("Failed to unfollow:", error);
-      throw error;
     }
   };
-
+  
   return (
     <FollowLayout
       title="Your Followings"

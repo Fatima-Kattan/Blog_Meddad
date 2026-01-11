@@ -47,7 +47,7 @@ export default function UserCard({
   };
 
   return (
-    <div className={styles.card} onClick={handleCardClick}>
+    <div className={styles.card}>
       <div className={styles.avatarWrapper}>
         <img
           src={user.image}
@@ -64,45 +64,11 @@ export default function UserCard({
           <p className={styles.bio}>{user.bio}</p>
         )}
       </div>
-
-      {/* زر Unfollow - يظهر فقط إذا showUnfollowButton = true */}
-      {/* {showUnfollowButton && (
-        <div className={styles.unfollowContainer}>
-          <button 
-            className={`${styles.unfollowButton} ${isUnfollowing ? styles.loading : ''}`}
-            onClick={handleUnfollowClick}
-            disabled={isUnfollowing}
-            title="إلغاء المتابعة"
-          >
-            {isUnfollowing ? (
-              <div className={styles.unfollowSpinner}></div>
-            ) : (
-              <span className={styles.unfollowText}>إلغاء المتابعة</span>
-            )}
-          </button>
-        </div>
-      )} */}
-      {/* {showUnfollowButton && (
-        <div className={styles.unfollowContainer}>
-          <button 
-            className={`${styles.unfollowButton} ${isUnfollowing ? styles.loading : ''}`}
-            onClick={handleUnfollowClick}
-            disabled={isUnfollowing}
-            title="إلغاء المتابعة"
-          >
-            {isUnfollowing ? (
-              <div className={styles.unfollowSpinner}></div>
-            ) : (
-              <>
-                <RiUserUnfollowLine className={styles.unfollowIcon} />
-                <span className={styles.unfollowText}>إلغاء المتابعة</span>
-              </>
-            )}
-          </button>
-        </div>
-      )} */}
       {showUnfollowButton && (
-        <RiUserUnfollowLine className={styles.unfollowIcon} />
+        <RiUserUnfollowLine 
+        className={styles.unfollowIcon} 
+        onClick={handleUnfollowClick}
+        />
 )}
     </div>
   );

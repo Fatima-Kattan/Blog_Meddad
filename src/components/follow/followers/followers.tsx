@@ -8,13 +8,13 @@ function Followers() {
   const [followers, setFollowers] = useState<FollowersResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const storedUser = localStorage.getItem("user");
+  const userId = storedUser ? JSON.parse(storedUser).id : null;
   useEffect(() => {
     const fetchFollowers = async () => {
       try {
         setLoading(true);
         const token = localStorage.getItem("token") || "";
-        const userId = 2;
 
         const data = await followersService.getFollowers(userId, token);
         setFollowers(data);
