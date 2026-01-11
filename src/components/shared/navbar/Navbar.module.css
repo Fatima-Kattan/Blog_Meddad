@@ -782,3 +782,213 @@
         justify-content: center;
     }
 }
+/* في Navbar.module.css - أضف هذه الأنماط */
+
+/* للـ loading state */
+.searchPlaceholder {
+    width: 100%;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.authButtonsPlaceholder {
+    width: 160px;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* للصور الشخصية */
+.profileImage {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8b5cf6;
+}
+
+.menuProfileImage {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8b5cf6;
+}
+
+.mobileProfileImage {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8b5cf6;
+}
+
+.mobileBio {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+/* في Navbar.module.css */
+
+/* أنماط الصور */
+.profileImage {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8b5cf6;
+    background-color: #f3f4f6;
+}
+
+.menuProfileImage {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8b5cf6;
+    background-color: #f3f4f6;
+}
+
+.mobileProfileImage {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8b5cf6;
+    background-color: #f3f4f6;
+}
+
+/* حاويات الأيقونات (fallback) */
+.profileIconContainer,
+.menuProfileIconContainer,
+.mobileProfileIconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8b5cf6;
+}
+
+.fallbackIcon,
+.menuFallbackIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+}
+
+/* حالة التحميل */
+.searchPlaceholder {
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 20px;
+}
+
+.authButtonsPlaceholder {
+    width: 160px;
+    height: 40px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.mobileBio {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* مؤشر النشاط في البروفايل */
+.profileStatus {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #10b981;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+/* في Navbar.module.css */
+
+/* الصور الشخصية */
+.profileImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8b5cf6;
+}
+
+.menuProfileImage {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8b5cf6;
+}
+
+.mobileProfileImage {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #8b5cf6;
+}
+
+.userBio {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    max-width: 200px;
+}
+
+.profileStatus {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    background-color: #10b981;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* للتحميل */
+.searchPlaceholder {
+    width: 100%;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 20px;
+}
+
+.authButtonsPlaceholder {
+    width: 160px;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}

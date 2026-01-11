@@ -1,10 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
 import SearchBar from '../SearchBar/SearchBar';
-// أيقونات
+import api from '@/services/api/api';
+
+// الأيقونات الأساسية فقط
 import {
     HiBell,
     HiHome,
@@ -17,37 +19,32 @@ import {
 import {
     FaRocket,
     FaFeatherAlt,
-    FaMagic,
-    FaCompass,
-    FaCrown,
-    FaUserEdit
+    FaMagic
 } from 'react-icons/fa';
 
 import {
-    RiUserHeartLine,
-    RiSparkling2Fill,
     RiUserStarLine
 } from 'react-icons/ri';
 
-import { TbUserHexagon } from 'react-icons/tb';
-import { CgProfile } from 'react-icons/cg';
-import { IoMdAddCircleOutline } from "react-icons/io"; // الأيقونة الجديدة
+import { IoMdAddCircleOutline } from "react-icons/io";
+import { IoLogInOutline } from 'react-icons/io5';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [activeTab, setActiveTab] = useState('home');
-    const pathname = usePathname();
+    const [isLoading, setIsLoading] = useState(true);
     
-    // أضف state لتسجيل الدخول
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const pathname = usePathname();
+    const router = useRouter();
+    
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const [userImage, setUserImage] = useState<string>('');
+    const [userFromDB, setUserFromDB] = useState<any>(null);
 
-    // إخفاء النافبار في صفحات الدخول والتسجيل
-    const hiddenPaths = ['/login', '/register'];
-    if (hiddenPaths.includes(pathname)) {
-        return null;
-    }
+    const profileMenuRef = useRef<HTMLDivElement>(null);
 
     // تأثير التمرير
     useEffect(() => {
@@ -58,87 +55,265 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // محاكاة التحقق من تسجيل الدخول
-    useEffect(() => {
-        // هنا رح تحقق من localStorage أو session أو API
-        const token = localStorage.getItem('token'); // أو أي طريقة تحقق
-        setIsLoggedIn(!!token);
+    // ⭐⭐ **دالة لجلب بيانات المستخدم من قاعدة البيانات** ⭐⭐
+    const fetchUserFromDatabase = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setIsAuthenticated(false);
+                return;
+            }
+
+            // جلب بيانات المستخدم من API
+            const response = await api.get('/user', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.data && response.data.data && response.data.data.user) {
+                const userData = response.data.data.user;
+                setUserFromDB(userData);
+                setIsAuthenticated(true);
+                
+                // تحديث localStorage بالبيانات المحدثة
+                localStorage.setItem('user', JSON.stringify(userData));
+                
+                // معالجة الصورة
+                processUserImage(userData);
+            } else {
+                setIsAuthenticated(false);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+        } catch (error) {
+            console.error('Error fetching user from database:', error);
+            setIsAuthenticated(false);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        }
+    };
+
+    // ⭐⭐ **دالة لمعالجة صورة المستخدم** ⭐⭐
+    const processUserImage = (userData: any) => {
+        let imageUrl = '';
         
-        // لمحاكاة التغيير، يمكنك إزالته لاحقاً
-        // setIsLoggedIn(false); // للمستخدم غير المسجل
-        // setIsLoggedIn(true); // للمستخدم المسجل
+        if (!userData.image || 
+            userData.image === 'null' || 
+            userData.image === null || 
+            userData.image.trim() === '') {
+            
+            // إنشاء صورة افتراضية
+            const name = userData.full_name || userData.email || 'User';
+            const initials = name
+                .split(' ')
+                .map((word: string) => word[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+            
+            imageUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=100`;
+        } else {
+            // إذا كانت هناك صورة
+            imageUrl = userData.image;
+            
+            // تحويل المسار النسبي إلى مسار كامل
+            if (imageUrl.startsWith('/')) {
+                imageUrl = `http://localhost:8000${imageUrl}`;
+            } else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+                // إذا كانت مجرد اسم ملف
+                imageUrl = `http://localhost:8000/uploads/${imageUrl}`;
+            }
+        }
+        
+        setUserImage(imageUrl);
+        setUser(userData);
+    };
+
+    // ⭐⭐ **التحقق من تسجيل الدخول وجلب البيانات** ⭐⭐
+    useEffect(() => {
+        const checkAuthAndFetchData = async () => {
+            if (typeof window !== 'undefined') {
+                const token = localStorage.getItem('token');
+                const storedUser = localStorage.getItem('user');
+                
+                if (token) {
+                    if (storedUser) {
+                        try {
+                            const parsedUser = JSON.parse(storedUser);
+                            setUser(parsedUser);
+                            processUserImage(parsedUser);
+                            setIsAuthenticated(true);
+                            
+                            // ⭐⭐ **جلب البيانات المحدثة من قاعدة البيانات** ⭐⭐
+                            fetchUserFromDatabase();
+                        } catch (error) {
+                            console.error('Error parsing stored user:', error);
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('token');
+                            setIsAuthenticated(false);
+                        }
+                    } else {
+                        // ⭐⭐ **لا يوجد بيانات في localStorage، جلب من قاعدة البيانات** ⭐⭐
+                        await fetchUserFromDatabase();
+                    }
+                } else {
+                    setIsAuthenticated(false);
+                    setUser(null);
+                    setUserImage('');
+                }
+                setIsLoading(false);
+            }
+        };
+
+        checkAuthAndFetchData();
     }, []);
+
+    // ⭐⭐ **جلب بيانات محدثة عند فتح البروفايل** ⭐⭐
+    const refreshUserData = async () => {
+        if (isAuthenticated) {
+            await fetchUserFromDatabase();
+        }
+    };
+
+    // ⭐⭐ **فتح قائمة البروفايل مع تحديث البيانات** ⭐⭐
+    const handleProfileMenuClick = async () => {
+        await refreshUserData();
+        setShowProfileMenu(!showProfileMenu);
+    };
+
+    // إغلاق القائمة عند النقر خارجها
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (profileMenuRef.current && 
+                !profileMenuRef.current.contains(event.target as Node)) {
+                setShowProfileMenu(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
+    // ⭐ **دالة للحصول على صورة المستخدم (من قاعدة البيانات أولاً)** ⭐
+    const getUserImage = (size: 'small' | 'large' = 'small') => {
+        // استخدم البيانات من قاعدة البيانات أولاً
+        const currentUser = userFromDB || user;
+        
+        if (userImage && userImage !== '') return userImage;
+        
+        if (currentUser) {
+            const name = currentUser.full_name || currentUser.email || 'User';
+            const initials = name
+                .split(' ')
+                .map((word: string) => word[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+            
+            const imageSize = size === 'small' ? '100' : '200';
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=${imageSize}`;
+        }
+        
+        // صورة افتراضية
+        return `https://ui-avatars.com/api/?name=US&background=8b5cf6&color=fff&bold=true&size=${size === 'small' ? '100' : '200'}`;
+    };
+
+    // معالجة أخطاء تحميل الصور
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        const imgElement = e.currentTarget;
+        const currentUser = userFromDB || user;
+        const name = currentUser?.full_name || currentUser?.email || 'User';
+        const initials = name
+            .split(' ')
+            .map((word: string) => word[0])
+            .join('')
+            .toUpperCase()
+            .slice(0, 2);
+        
+        imgElement.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=100`;
+    };
 
     // روابط النافبار
     const navLinks = [
-        {
-            id: 'home',
-            href: '/',
-            label: 'Home',
-            icon: <HiHome size={24} />
-        },
-        {
-            id: 'trending',
-            href: '/trending',
-            label: 'Trending',
-            icon: <FaRocket size={22} />
-        },
-        {
-            id: 'profile',
-            href: '/profile',
-            label: 'Profile',
-            icon: <CgProfile size={24} style={{ color: '#8b5cf6' }} /> // أيقونة بروفايل أحلى
-        },
-        {
-            id: 'posts',
-            href: '/posts',
-            label: 'Posts',
-            icon: <FaFeatherAlt size={22} />
-        },
-        
+        { id: 'home', href: '/', label: 'Home', icon: <HiHome size={24} /> },
+        { id: 'trending', href: '/trending', label: 'Trending', icon: <FaRocket size={22} /> },
+        { id: 'profile', href: '/profile', label: 'Profile', icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} /> },
+        { id: 'posts', href: '/posts', label: 'Posts', icon: <FaFeatherAlt size={22} /> },
     ];
 
-    // عند النقر على تب
-    const handleTabClick = (tabId: string) => {
+    const handleTabClick = async (tabId: string, href: string) => {
         setActiveTab(tabId);
+        if (tabId === 'profile') {
+            await refreshUserData();
+        }
+        router.push(href);
+        setIsMenuOpen(false);
+        setShowProfileMenu(false);
     };
 
-    // زر إنشاء منشور
     const handleCreatePost = () => {
-        console.log('Create post clicked');
-        // يمكن توجيه المستخدم لصفحة الإنشاء
-        // router.push('/create-post');
+        router.push('/create-post');
     };
 
-    // معالج الخروج
-    const handleLogout = () => {
-        console.log('Logout clicked');
-        // يمكن إضافة منطق الخروج هنا
-        localStorage.removeItem('token'); // مثال
-        setIsLoggedIn(false);
-        // logout();
-        // router.push('/login');
+    const handleLogout = async () => {
+        try {
+            await api.post('/logout');
+        } catch (error: any) {
+            console.log('Logout API response:', error?.response?.data);
+        } finally {
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+            
+            setIsAuthenticated(false);
+            setUser(null);
+            setUserFromDB(null);
+            setUserImage('');
+            setShowProfileMenu(false);
+            setIsMenuOpen(false);
+            
+            router.push('/');
+        }
     };
 
-    // معالج الدخول
-    const handleLogin = () => {
-        // سيناريو محاكاة - في الواقع رح يكون هناك صفحة دخول
-        localStorage.setItem('token', 'sample-token');
-        setIsLoggedIn(true);
+    // ⭐⭐ **دالة للحصول على بيانات المستخدم الحالية** ⭐⭐
+    const getCurrentUser = () => {
+        return userFromDB || user;
     };
 
-    // معالج التسجيل
-    const handleRegister = () => {
-        // سيناريو محاكاة
-        localStorage.setItem('token', 'sample-token');
-        setIsLoggedIn(true);
-    };
+    if (isLoading) {
+        return (
+            <nav className={styles.navbar}>
+                <div className={styles.container}>
+                    <div className={styles.leftSection}>
+                        <div className={styles.logo}>
+                            <div className={styles.logoIcon}>
+                                <FaMagic size={24} />
+                            </div>
+                            <span className={styles.logoText}>WeShare</span>
+                        </div>
+                    </div>
+                    <div className={styles.centerSection}>
+                        <div className={styles.searchPlaceholder}></div>
+                    </div>
+                    <div className={styles.rightSection}>
+                        <div className={styles.authButtonsPlaceholder}></div>
+                    </div>
+                </div>
+            </nav>
+        );
+    }
+
+    const currentUser = getCurrentUser();
 
     return (
         <>
             <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
                 <div className={styles.container}>
-
                     {/* الجزء الأيسر: اللوجو */}
                     <div className={styles.leftSection}>
                         <Link href="/" className={styles.logo}>
@@ -156,35 +331,43 @@ const Navbar = () => {
 
                     {/* الجزء الأيمن: أيقونات */}
                     <div className={styles.rightSection}>
-                        {/* زر إنشاء منشور جديد - يظهر فقط إذا كان مسجل دخول */}
-                        {isLoggedIn && (
+                        {/* زر إنشاء منشور جديد */}
+                        {isAuthenticated && (
                             <button 
                                 className={styles.createButton}
                                 onClick={handleCreatePost}
+                                aria-label="Create post"
                             >
                                 <IoMdAddCircleOutline size={25} />
                             </button>
                         )}
 
-                        {/* إشعارات - تظهر فقط إذا كان مسجل دخول */}
-                        {isLoggedIn && (
+                        {/* إشعارات */}
+                        {isAuthenticated && (
                             <div className={styles.notificationWrapper}>
-                                <button className={styles.iconButton}>
+                                <button className={styles.iconButton} aria-label="Notifications">
                                     <HiBell size={22} />
                                     <span className={styles.notificationBadge}>5</span>
                                 </button>
                             </div>
                         )}
 
-                        {/* إذا كان مسجل دخول: عرض البروفايل، وإلا: عرض زرين الدخول والتسجيل */}
-                        {isLoggedIn ? (
-                            <div className={styles.profileDropdown}>
+                        {/* عرض البروفايل أو أزرار الدخول */}
+                        {isAuthenticated ? (
+                            <div className={styles.profileDropdown} ref={profileMenuRef}>
                                 <button 
                                     className={styles.profileButton}
-                                    onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                    onClick={handleProfileMenuClick}
+                                    aria-label="Profile menu"
+                                    aria-expanded={showProfileMenu ? "true" : "false"}
                                 >
                                     <div className={styles.profileAvatar}>
-                                        <TbUserHexagon size={36} className={styles.profileIcon} />
+                                        <img 
+                                            src={getUserImage('small')}
+                                            alt={currentUser?.full_name || 'User'}
+                                            className={styles.profileImage}
+                                            onError={handleImageError}
+                                        />
                                         <div className={styles.profileStatus}></div>
                                     </div>
                                 </button>
@@ -193,42 +376,46 @@ const Navbar = () => {
                                 {showProfileMenu && (
                                     <div className={styles.profileMenu}>
                                         <div className={styles.profileMenuHeader}>
-                                            <TbUserHexagon size={48} className={styles.menuProfileIcon} />
+                                            <img 
+                                                src={getUserImage('large')}
+                                                alt={currentUser?.full_name || 'User'}
+                                                className={styles.menuProfileImage}
+                                                onError={handleImageError}
+                                            />
                                             <div className={styles.profileInfo}>
-                                                <h4>John Doe</h4>
-                                                <p>@johndoe</p>
+                                                <h4>{currentUser?.full_name || 'User'}</h4>
+                                                <p>{currentUser?.email || 'No email'}</p>
+                                                {currentUser?.bio && (
+                                                    <p className={styles.userBio}>{currentUser.bio}</p>
+                                                )}
                                             </div>
                                         </div>
 
                                         <div className={styles.menuDivider} />
 
-                                        <Link href="/profile" className={styles.menuItem}>
+                                        <Link 
+                                            href="/profile" 
+                                            className={styles.menuItem}
+                                            onClick={() => setShowProfileMenu(false)}
+                                        >
                                             <RiUserStarLine size={20} />
                                             <span>My Profile</span>
                                         </Link>
-                                        <Link href="/posts" className={styles.menuItem}>
+                                        <Link 
+                                            href="/posts" 
+                                            className={styles.menuItem}
+                                            onClick={() => setShowProfileMenu(false)}
+                                        >
                                             <FaFeatherAlt size={20} />
                                             <span>My Posts</span>
                                         </Link>
-                                        {/* <Link href="/settings" className={styles.menuItem}>
-                                            <FaUserEdit size={20} />
-                                            <span>Edit Profile</span>
-                                        </Link> */}
-
-                                        <div className={styles.menuDivider} />
-
-                                        {/* <button className={styles.menuItem}>
-                                            <HiBell size={20} />
-                                            <span>Notifications</span>
-                                            <span className={styles.notificationCount}>5</span>
-                                        </button> */}
-                                        
 
                                         <div className={styles.menuDivider} />
 
                                         <button 
                                             className={styles.logoutButton}
                                             onClick={handleLogout}
+                                            aria-label="Log out"
                                         >
                                             <span>Log Out</span>
                                         </button>
@@ -238,7 +425,7 @@ const Navbar = () => {
                         ) : (
                             <div className={styles.authButtons}>
                                 <Link href="/login" className={styles.loginButton}>
-                                    <HiUserCircle size={20} />
+                                    <IoLogInOutline size={20}/>
                                     <span>Login</span>
                                 </Link>
                                 <Link href="/register" className={styles.registerButton}>
@@ -259,18 +446,13 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* القائمة السفلية (للأيقونات) */}
+                {/* القائمة السفلية */}
                 <div className={styles.bottomNav}>
                     <div className={styles.bottomNavContainer}>
                         {navLinks.map((link) => (
                             <button
                                 key={link.id}
-                                onClick={() => {
-                                    handleTabClick(link.id);
-                                    if (link.id === 'profile') {
-                                        setShowProfileMenu(false);
-                                    }
-                                }}
+                                onClick={() => handleTabClick(link.id, link.href)}
                                 className={`${styles.bottomNavLink} ${activeTab === link.id ? styles.active : ''}`}
                                 aria-label={link.label}
                             >
@@ -287,15 +469,17 @@ const Navbar = () => {
             {isMenuOpen && (
                 <div className={styles.mobileMenu}>
                     <div className={styles.mobileMenuHeader}>
-                        {isLoggedIn ? (
+                        {isAuthenticated && currentUser ? (
                             <div className={styles.mobileProfile}>
-                                <TbUserHexagon size={52} className={styles.mobileProfileIcon} />
+                                <img 
+                                    src={getUserImage('large')}
+                                    alt={currentUser.full_name}
+                                    className={styles.mobileProfileImage}
+                                    onError={handleImageError}
+                                />
                                 <div>
-                                    <h4>John Doe</h4>
-                                    <p>@johndoe</p>
-                                    <span className={styles.mobileUserBadge}>
-                                        <FaCrown size={12} /> Premium
-                                    </span>
+                                    <h4>{currentUser.full_name || 'User'}</h4>
+                                    <p>{currentUser.email || 'No email'}</p>
                                 </div>
                             </div>
                         ) : (
@@ -314,8 +498,7 @@ const Navbar = () => {
                     </div>
 
                     <div className={styles.mobileLinks}>
-                        {isLoggedIn ? (
-                            // إذا مسجل دخول: عرض القائمة العادية
+                        {isAuthenticated ? (
                             <>
                                 {navLinks.map((link) => (
                                     <Link
@@ -323,47 +506,42 @@ const Navbar = () => {
                                         href={link.href}
                                         className={`${styles.mobileLink} ${activeTab === link.id ? styles.active : ''}`}
                                         onClick={() => {
-                                            handleTabClick(link.id);
+                                            setActiveTab(link.id);
                                             setIsMenuOpen(false);
+                                            setShowProfileMenu(false);
                                         }}
                                     >
                                         <span className={styles.mobileLinkIcon}>{link.icon}</span>
                                         {link.label}
-                                        {activeTab === link.id && <div className={styles.mobileActiveDot} />}
                                     </Link>
                                 ))}
 
                                 <div className={styles.mobileDivider} />
 
-                                <button className={styles.mobileMenuItem}>
+                                <button 
+                                    className={styles.mobileMenuItem}
+                                    onClick={() => {
+                                        handleCreatePost();
+                                        setIsMenuOpen(false);
+                                    }}
+                                >
                                     <IoMdAddCircleOutline size={20} />
                                     <span>Create Post</span>
-                                </button>
-                                <button className={styles.mobileMenuItem}>
-                                    <HiNewspaper size={20} />
-                                    <span>My Articles</span>
-                                </button>
-                                <button className={styles.mobileMenuItem}>
-                                    <FaUserEdit size={20} />
-                                    <span>Edit Profile</span>
-                                </button>
-                                <button className={styles.mobileMenuItem}>
-                                    <HiBell size={20} />
-                                    <span>Notifications</span>
-                                    <span className={styles.mobileNotificationCount}>5</span>
                                 </button>
 
                                 <div className={styles.mobileDivider} />
 
                                 <button 
                                     className={styles.mobileLogoutButton}
-                                    onClick={handleLogout}
+                                    onClick={() => {
+                                        handleLogout();
+                                        setIsMenuOpen(false);
+                                    }}
                                 >
                                     Log Out
                                 </button>
                             </>
                         ) : (
-                            // إذا غير مسجل: عرض أزرار الدخول والتسجيل
                             <>
                                 <Link
                                     href="/login"
@@ -381,18 +559,6 @@ const Navbar = () => {
                                     <HiNewspaper size={20} />
                                     <span>Register</span>
                                 </Link>
-                                
-                                <div className={styles.mobileDivider} />
-                                
-                                <div className={styles.mobileInfo}>
-                                    <p>Create an account to:</p>
-                                    <ul>
-                                        <li>Share posts</li>
-                                        <li>Follow others</li>
-                                        <li>Save articles</li>
-                                        <li>Get notifications</li>
-                                    </ul>
-                                </div>
                             </>
                         )}
                     </div>
