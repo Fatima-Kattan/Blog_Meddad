@@ -9,9 +9,9 @@ import ProfileService, {
     UpdateProfileData
 } from '@/services/api/auth/profileService';
 import { FaRegLightbulb } from "react-icons/fa6";
-import Following from '@/components/follow/following/following';
+import Following from '../../follow/following/following'
 import { HiOutlineLightBulb } from 'react-icons/hi';
-import Followers from '@/components/follow/followers/followers';
+import Followers from '@/components/follow/followers/Followers';
 import InputField from '@/components/shared/InputField';
 import { errorToJSON } from 'next/dist/server/render';
 import SelectField from '@/components/shared/SelectField';
