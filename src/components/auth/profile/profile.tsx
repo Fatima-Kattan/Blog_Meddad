@@ -7,7 +7,7 @@ import ProfileService, {
     ProfileStats,
     Post,
     UpdateProfileData
-} from '../../../services/api/profileService';
+} from '@/services/api/auth/profileService';
 
 type TabType = 'overview' | 'posts' | 'followers' | 'following';
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
 import SearchBar from '../SearchBar/SearchBar';
-import api from '@/services/api/api';
+import api from '@/services/api/auth/api';
 
 // الأيقونات الأساسية فقط
 import {
