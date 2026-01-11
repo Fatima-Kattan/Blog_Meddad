@@ -1,4 +1,4 @@
-import Following from '@/components/follow/following/following'
+import Following from '@/components/follow/following/Following'
 import React from 'react'
 // import LoginForm from '../../components/auth/login/LoginForm'
 
