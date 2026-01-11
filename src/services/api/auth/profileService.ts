@@ -84,6 +84,7 @@ export interface PostDetailResponse {
 
 export interface UpdateProfileData {
     full_name?: string;
+    email?: string;
     bio?: string;
     image?: string;
     phone_number?: string;

@@ -8,6 +8,14 @@ import ProfileService, {
     Post,
     UpdateProfileData
 } from '@/services/api/auth/profileService';
+import { FaRegLightbulb } from "react-icons/fa6";
+import Following from '@/components/follow/following/following';
+import { HiOutlineLightBulb } from 'react-icons/hi';
+import Followers from '@/components/follow/followers/followers';
+import InputField from '@/components/shared/InputField';
+import { errorToJSON } from 'next/dist/server/render';
+import SelectField from '@/components/shared/SelectField';
+import DatePickerField from '@/components/shared/DatePickerField';
 
 type TabType = 'overview' | 'posts' | 'followers' | 'following';
 
@@ -22,6 +30,8 @@ const Profile: React.FC = () => {
     const [editForm, setEditForm] = useState<UpdateProfileData>({});
     const [isSaving, setIsSaving] = useState(false);
     const [saveError, setSaveError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
+    const [today, setToday] = useState('');
 
     useEffect(() => {
         fetchProfileData();
@@ -82,6 +92,11 @@ const Profile: React.FC = () => {
 
         return `${age} years old`;
     };
+
+        const genderOptions = [
+        { value: 'male', label: 'Male' },
+        { value: 'female', label: 'Female' },
+    ];
 
     const handleEditClick = () => {
         if (user) {
@@ -200,10 +215,10 @@ const Profile: React.FC = () => {
                     <p className="profile-subtitle">Manage your account and settings</p>
                 </div>
             </div> */}
-    
+
             {/* المحتوى الرئيسي */}
             <div className="profile-content">
-                
+
                 {/* الشريط الجانبي */}
                 <div className="profile-sidebar">
                     <div className='display'>
@@ -221,7 +236,7 @@ const Profile: React.FC = () => {
                             className="profile-avatar"
                         />
                         {/*  <div className="avatar-status"></div> */}
-                        
+
                     </div>
 
                     {/* معلومات المستخدم */}
@@ -308,12 +323,12 @@ const Profile: React.FC = () => {
                 <div className="profile-main">
                     {/* التبويبات */}
                     <div className="profile-tabs">
-                        <button
+                        {/* <button
                             className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
                             onClick={() => setActiveTab('overview')}
                         >
                             Overview
-                        </button>
+                        </button> */}
 
                         <button
                             className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
@@ -345,264 +360,259 @@ const Profile: React.FC = () => {
                         <div className="recent-activity">
                             <h3 className="activity-title">Recent Activity</h3>
 
-<div className="posts-list">
-    {posts.length > 0 ? (
-        posts.map((post) => (
-            <div key={post.id} className="post-item">
-                {/* عرض جميع صور البوست */}
-                {post.images && post.images.length > 0 && (
-                    <div className={`post-images-grid ${
-                        post.images.length === 1 ? 'single-image' : 
-                        post.images.length === 2 ? 'two-images' : 
-                        post.images.length === 3 ? 'three-images' : 
-                        'four-or-more'
-                    }`}>
-                        {post.images.map((image, index) => (
-                            <div 
-                                key={index} 
-                                className="post-image-item"
-                                style={{
-                                    gridColumn: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1',
-                                    gridRow: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1'
-                                }}
-                            >
-                                <img
-                                    src={image}
-                                    alt={`${post.title} - Image ${index + 1}`}
-                                    className="post-grid-image"
-                                />
-                                {index === 0 && post.images.length > 1 && (
-                                    <div className="images-count-badge">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm16 2H4v10h16V7zm-8 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-                                        </svg>
-                                        {post.images.length} photos
+                            <div className="posts-list">
+                                {posts.length > 0 ? (
+                                    posts.map((post) => (
+                                        <div key={post.id} className="post-item">
+                                            {/* عرض جميع صور البوست */}
+                                            {post.images && post.images.length > 0 && (
+                                                <div className={`post-images-grid ${post.images.length === 1 ? 'single-image' :
+                                                    post.images.length === 2 ? 'two-images' :
+                                                        post.images.length === 3 ? 'three-images' :
+                                                            'four-or-more'
+                                                    }`}>
+                                                    {post.images.map((image, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="post-image-item"
+                                                            style={{
+                                                                gridColumn: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1',
+                                                                gridRow: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1'
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={image}
+                                                                alt={`${post.title} - Image ${index + 1}`}
+                                                                className="post-grid-image"
+                                                            />
+                                                            {index === 0 && post.images.length > 1 && (
+                                                                <div className="images-count-badge">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm16 2H4v10h16V7zm-8 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+                                                                    </svg>
+                                                                    {post.images.length} photos
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            <div className="post-header">
+                                                <h4 className="post-title">{post.title}</h4>
+                                                <span className="post-date">{formatDate(post.created_at)}</span>
+                                            </div>
+
+                                            <p className="post-content">
+                                                {post.caption || 'No content provided...'}
+                                            </p>
+
+                                            {/* إحصائيات المنشور */}
+                                            <div className="post-stats">
+                                                <div className="post-stat likes-stat">
+                                                    <div className="post-stat-icon">
+                                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="post-stat-info">
+                                                        <div className="post-stat-number">{post.likes_count}</div>
+                                                        <div className="post-stat-label">Likes</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="post-stat comments-stat">
+                                                    <div className="post-stat-icon">
+                                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M12 2.25c-2.429 0-4.817.178-7.152.521C2.87 3.061 1.5 4.795 1.5 6.741v6.018c0 1.946 1.37 3.68 3.348 3.97.877.129 1.761.234 2.652.316V21a.75.75 0 001.28.53l4.184-4.183a.39.39 0 01.266-.112c2.006-.05 3.982-.22 5.922-.506 1.978-.29 3.348-2.023 3.348-3.97V6.741c0-1.947-1.37-3.68-3.348-3.97A49.145 49.145 0 0012 2.25zM8.25 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zm2.625 1.125a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="post-stat-info">
+                                                        <div className="post-stat-number">{post.comments_count}</div>
+                                                        <div className="post-stat-label">Comments</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* المعجبين */}
+                                            {post.likes && post.likes.length > 0 && (
+                                                <div className="post-likers">
+                                                    <div className="likers-title">
+                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
+                                                        </svg>
+                                                        Liked by
+                                                    </div>
+                                                    <div className="likers-list">
+                                                        {post.likes.slice(0, 5).map((like) => (
+                                                            <div key={like.id} className="liker-item">
+                                                                <img
+                                                                    src={like.user.image}
+                                                                    alt={like.user.full_name}
+                                                                    className="liker-avatar"
+                                                                />
+                                                                <span className="liker-name">{like.user.full_name}</span>
+                                                            </div>
+                                                        ))}
+                                                        {post.likes.length > 5 && (
+                                                            <div className="liker-item">
+                                                                <span className="liker-name" style={{ color: '#7c3aed' }}>
+                                                                    +{post.likes.length - 5} more
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="no-posts">
+                                        <div className="no-posts-icon">📝</div>
+                                        <h3 style={{ color: 'white', marginBottom: '12px' }}>
+                                            No Recent Activity
+                                        </h3>
+                                        <p style={{ color: '#94a3b8' }}>
+                                            Start creating posts to see them here!
+                                        </p>
                                     </div>
                                 )}
                             </div>
-                        ))}
-                    </div>
-                )}
-                
-                <div className="post-header">
-                    <h4 className="post-title">{post.title}</h4>
-                    <span className="post-date">{formatDate(post.created_at)}</span>
-                </div>
-
-                <p className="post-content">
-                    {post.caption || 'No content provided...'}
-                </p>
-
-                {/* إحصائيات المنشور */}
-                <div className="post-stats">
-                    <div className="post-stat likes-stat">
-                        <div className="post-stat-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
-                            </svg>
-                        </div>
-                        <div className="post-stat-info">
-                            <div className="post-stat-number">{post.likes_count}</div>
-                            <div className="post-stat-label">Likes</div>
-                        </div>
-                    </div>
-
-                    <div className="post-stat comments-stat">
-                        <div className="post-stat-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2.25c-2.429 0-4.817.178-7.152.521C2.87 3.061 1.5 4.795 1.5 6.741v6.018c0 1.946 1.37 3.68 3.348 3.97.877.129 1.761.234 2.652.316V21a.75.75 0 001.28.53l4.184-4.183a.39.39 0 01.266-.112c2.006-.05 3.982-.22 5.922-.506 1.978-.29 3.348-2.023 3.348-3.97V6.741c0-1.947-1.37-3.68-3.348-3.97A49.145 49.145 0 0012 2.25zM8.25 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zm2.625 1.125a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" />
-                            </svg>
-                        </div>
-                        <div className="post-stat-info">
-                            <div className="post-stat-number">{post.comments_count}</div>
-                            <div className="post-stat-label">Comments</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* المعجبين */}
-                {post.likes && post.likes.length > 0 && (
-                    <div className="post-likers">
-                        <div className="likers-title">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
-                            </svg>
-                            Liked by
-                        </div>
-                        <div className="likers-list">
-                            {post.likes.slice(0, 5).map((like) => (
-                                <div key={like.id} className="liker-item">
-                                    <img
-                                        src={like.user.image}
-                                        alt={like.user.full_name}
-                                        className="liker-avatar"
-                                    />
-                                    <span className="liker-name">{like.user.full_name}</span>
-                                </div>
-                            ))}
-                            {post.likes.length > 5 && (
-                                <div className="liker-item">
-                                    <span className="liker-name" style={{ color: '#7c3aed' }}>
-                                        +{post.likes.length - 5} more
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-        ))
-    ) : (
-        <div className="no-posts">
-            <div className="no-posts-icon">📝</div>
-            <h3 style={{ color: 'white', marginBottom: '12px' }}>
-                No Recent Activity
-            </h3>
-            <p style={{ color: '#94a3b8' }}>
-                Start creating posts to see them here!
-            </p>
-        </div>
-    )}
-</div>
                         </div>
                     )}
 
                     {activeTab === 'posts' && (
                         <div className="recent-activity">
                             <h3 className="activity-title">My Posts ({posts.length})</h3>
-                   <div className="posts-list">
-    {posts.length > 0 ? (
-        posts.map((post) => (
-            <div key={post.id} className="post-item">
-                {/* عرض جميع صور البوست */}
-                {post.images && post.images.length > 0 && (
-                    <div className={`post-images-grid ${
-                        post.images.length === 1 ? 'single-image' : 
-                        post.images.length === 2 ? 'two-images' : 
-                        post.images.length === 3 ? 'three-images' : 
-                        'four-or-more'
-                    }`}>
-                        {post.images.map((image, index) => (
-                            <div 
-                                key={index} 
-                                className="post-image-item"
-                                style={{
-                                    gridColumn: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1',
-                                    gridRow: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1'
-                                }}
-                            >
-                                <img
-                                    src={image}
-                                    alt={`${post.title} - Image ${index + 1}`}
-                                    className="post-grid-image"
-                                />
-                                {index === 0 && post.images.length > 1 && (
-                                    <div className="images-count-badge">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm16 2H4v10h16V7zm-8 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-                                        </svg>
-                                        {post.images.length} photos
+                            <div className="posts-list">
+                                {posts.length > 0 ? (
+                                    posts.map((post) => (
+                                        <div key={post.id} className="post-item">
+                                            {/* عرض جميع صور البوست */}
+                                            {post.images && post.images.length > 0 && (
+                                                <div className={`post-images-grid ${post.images.length === 1 ? 'single-image' :
+                                                    post.images.length === 2 ? 'two-images' :
+                                                        post.images.length === 3 ? 'three-images' :
+                                                            'four-or-more'
+                                                    }`}>
+                                                    {post.images.map((image, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="post-image-item"
+                                                            style={{
+                                                                gridColumn: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1',
+                                                                gridRow: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1'
+                                                            }}
+                                                        >
+                                                            <img
+                                                                src={image}
+                                                                alt={`${post.title} - Image ${index + 1}`}
+                                                                className="post-grid-image"
+                                                            />
+                                                            {index === 0 && post.images.length > 1 && (
+                                                                <div className="images-count-badge">
+                                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                                                        <path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm16 2H4v10h16V7zm-8 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
+                                                                    </svg>
+                                                                    {post.images.length} photos
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            <div className="post-header">
+                                                <h4 className="post-title">{post.title}</h4>
+                                                <span className="post-date">{formatDate(post.created_at)}</span>
+                                            </div>
+
+                                            <p className="post-content">
+                                                {post.caption || 'No content provided...'}
+                                            </p>
+
+                                            {/* إحصائيات المنشور */}
+                                            <div className="post-stats">
+                                                <div className="post-stat likes-stat">
+                                                    <div className="post-stat-icon">
+                                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="post-stat-info">
+                                                        <div className="post-stat-number">{post.likes_count}</div>
+                                                        <div className="post-stat-label">Likes</div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="post-stat comments-stat">
+                                                    <div className="post-stat-icon">
+                                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                                            <path d="M12 2.25c-2.429 0-4.817.178-7.152.521C2.87 3.061 1.5 4.795 1.5 6.741v6.018c0 1.946 1.37 3.68 3.348 3.97.877.129 1.761.234 2.652.316V21a.75.75 0 001.28.53l4.184-4.183a.39.39 0 01.266-.112c2.006-.05 3.982-.22 5.922-.506 1.978-.29 3.348-2.023 3.348-3.97V6.741c0-1.947-1.37-3.68-3.348-3.97A49.145 49.145 0 0012 2.25zM8.25 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zm2.625 1.125a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="post-stat-info">
+                                                        <div className="post-stat-number">{post.comments_count}</div>
+                                                        <div className="post-stat-label">Comments</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* المعجبين */}
+                                            {post.likes && post.likes.length > 0 && (
+                                                <div className="post-likers">
+                                                    <div className="likers-title">
+                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
+                                                        </svg>
+                                                        Liked by
+                                                    </div>
+                                                    <div className="likers-list">
+                                                        {post.likes.slice(0, 5).map((like) => (
+                                                            <div key={like.id} className="liker-item">
+                                                                <img
+                                                                    src={like.user.image}
+                                                                    alt={like.user.full_name}
+                                                                    className="liker-avatar"
+                                                                />
+                                                                <span className="liker-name">{like.user.full_name}</span>
+                                                            </div>
+                                                        ))}
+                                                        {post.likes.length > 5 && (
+                                                            <div className="liker-item">
+                                                                <span className="liker-name" style={{ color: '#7c3aed' }}>
+                                                                    +{post.likes.length - 5} more
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="no-posts">
+                                        <div className="no-posts-icon">📝</div>
+                                        <h3 style={{ color: 'white', marginBottom: '12px' }}>
+                                            No Recent Activity
+                                        </h3>
+                                        <p style={{ color: '#94a3b8' }}>
+                                            Start creating posts to see them here!
+                                        </p>
                                     </div>
                                 )}
                             </div>
-                        ))}
-                    </div>
-                )}
-                
-                <div className="post-header">
-                    <h4 className="post-title">{post.title}</h4>
-                    <span className="post-date">{formatDate(post.created_at)}</span>
-                </div>
-
-                <p className="post-content">
-                    {post.caption || 'No content provided...'}
-                </p>
-
-                {/* إحصائيات المنشور */}
-                <div className="post-stats">
-                    <div className="post-stat likes-stat">
-                        <div className="post-stat-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
-                            </svg>
-                        </div>
-                        <div className="post-stat-info">
-                            <div className="post-stat-number">{post.likes_count}</div>
-                            <div className="post-stat-label">Likes</div>
-                        </div>
-                    </div>
-
-                    <div className="post-stat comments-stat">
-                        <div className="post-stat-icon">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2.25c-2.429 0-4.817.178-7.152.521C2.87 3.061 1.5 4.795 1.5 6.741v6.018c0 1.946 1.37 3.68 3.348 3.97.877.129 1.761.234 2.652.316V21a.75.75 0 001.28.53l4.184-4.183a.39.39 0 01.266-.112c2.006-.05 3.982-.22 5.922-.506 1.978-.29 3.348-2.023 3.348-3.97V6.741c0-1.947-1.37-3.68-3.348-3.97A49.145 49.145 0 0012 2.25zM8.25 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zm2.625 1.125a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" />
-                            </svg>
-                        </div>
-                        <div className="post-stat-info">
-                            <div className="post-stat-number">{post.comments_count}</div>
-                            <div className="post-stat-label">Comments</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* المعجبين */}
-                {post.likes && post.likes.length > 0 && (
-                    <div className="post-likers">
-                        <div className="likers-title">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
-                            </svg>
-                            Liked by
-                        </div>
-                        <div className="likers-list">
-                            {post.likes.slice(0, 5).map((like) => (
-                                <div key={like.id} className="liker-item">
-                                    <img
-                                        src={like.user.image}
-                                        alt={like.user.full_name}
-                                        className="liker-avatar"
-                                    />
-                                    <span className="liker-name">{like.user.full_name}</span>
-                                </div>
-                            ))}
-                            {post.likes.length > 5 && (
-                                <div className="liker-item">
-                                    <span className="liker-name" style={{ color: '#7c3aed' }}>
-                                        +{post.likes.length - 5} more
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-        ))
-    ) : (
-        <div className="no-posts">
-            <div className="no-posts-icon">📝</div>
-            <h3 style={{ color: 'white', marginBottom: '12px' }}>
-                No Recent Activity
-            </h3>
-            <p style={{ color: '#94a3b8' }}>
-                Start creating posts to see them here!
-            </p>
-        </div>
-    )}
-</div>
                         </div>
                     )}
 
                     {activeTab === 'followers' && (
                         <div className="recent-activity">
                             <h3 className="activity-title">My Followers ({stats.followers_count})</h3>
-                            <div className="no-posts">
-                                <div className="no-posts-icon">👥</div>
-                                <h3 style={{ color: 'white', marginBottom: '12px' }}>
-                                    Followers List
-                                </h3>
-                                <p style={{ color: '#94a3b8' }}>
-                                    Your followers will appear here
+                            <div className="">
+                                <p className='activity_follow'>
+                                    <HiOutlineLightBulb className='icon-follow' />Your followers will appear here
                                 </p>
+                                <Followers />
                             </div>
                         </div>
                     )}
@@ -610,14 +620,11 @@ const Profile: React.FC = () => {
                     {activeTab === 'following' && (
                         <div className="recent-activity">
                             <h3 className="activity-title">Following ({stats.following_count})</h3>
-                            <div className="no-posts">
-                                <div className="no-posts-icon">✨</div>
-                                <h3 style={{ color: 'white', marginBottom: '12px' }}>
-                                    Following List
-                                </h3>
-                                <p style={{ color: '#94a3b8' }}>
-                                    People you follow will appear here
+                            <div className="border-dev">
+                                <p className='activity_follow'>
+                                    <HiOutlineLightBulb className='icon-follow' /> People you follow will appear here
                                 </p>
+                                <Following />
                             </div>
                         </div>
                     )}
@@ -673,14 +680,24 @@ const Profile: React.FC = () => {
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Full Name</label>
-                                <input
-                                    type="text"
+                                <InputField
+                                    label="Full Name"
                                     name="full_name"
                                     value={editForm.full_name || ''}
                                     onChange={handleInputChange}
-                                    className="form-input"
                                     placeholder="Enter your full name"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <InputField
+                                    label="Email"
+                                    name="email"
+                                    type="email"
+                                    value={editForm.email || ''}
+                                    onChange={handleInputChange}
+                                    placeholder="example@email.com"
                                     required
                                 />
                             </div>
@@ -698,42 +715,38 @@ const Profile: React.FC = () => {
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Phone Number</label>
-                                <input
-                                    type="tel"
-                                    name="phone"
+                                <InputField
+                                    label="Phone Number"
+                                    name="phone_number"
                                     value={editForm.phone_number || ''}
                                     onChange={handleInputChange}
-                                    className="form-input"
-                                    placeholder="+963123456789"
+                                    placeholder="+963 234 567 8900"
+                                    required
                                 />
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Gender</label>
-                                <select
-                                    name="gender"
-                                    value={editForm.gender || ''}
-                                    onChange={handleInputChange}
-                                    className="form-input"
-                                >
-                                    <option value="">Select gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
-                                    <option value="prefer-not-to-say">Prefer not to say</option>
-                                </select>
+                                <SelectField
+                            label="Gender"
+                            name="gender"
+                            value={editForm.gender || ''}
+                            onChange={handleInputChange}
+                            options={genderOptions}
+                            required
+                            error={errors.gender}
+                        />
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Birth Date</label>
-                                <input
-                                    type="date"
-                                    name="birth_date"
-                                    value={editForm.birth_date || ''}
-                                    onChange={handleInputChange}
-                                    className="form-input"
-                                />
+                                <DatePickerField
+                            label="Birth Date"
+                            name="birth_date"
+                            value={editForm.birth_date || ''}
+                            onChange={handleInputChange}
+                            required
+                            max={today}
+                            error={errors.birth_date}
+                        />
                             </div>
 
                             <div className="form-actions">
