@@ -95,10 +95,7 @@ a.secondary {
 /* page.module.css */
 .mainContent {
   display: flex;
-  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
-  gap: 20px;
   padding-top: 20px;
 }
 
@@ -130,10 +127,8 @@ a.secondary {
 }
 .mainContent {
     display: flex;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-    gap: 24px;
+    padding: 20px 10px;
+    gap: 15px;
     min-height: calc(100vh - 140px); /* ارتفاع مناسب */
     align-items: flex-start; /* ✅ هذا مهم */
 }
