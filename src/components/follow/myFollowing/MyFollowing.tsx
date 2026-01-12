@@ -1,4 +1,4 @@
-//  app/following/page.tsx
+// app/following/page.tsx
 "use client";
 import React from 'react'
 import { useEffect, useState } from "react";
@@ -7,7 +7,7 @@ import UserCard from '@/components/shared/UserCard/UserCard';
 import FollowLayout from '@/components/follow/FollowLayout';
 import { followsService } from '@/services/api/follow_api/deleteFollow';
 
-function Following() {
+function MyFollowing() {
     const [followings, setFollowings] = useState<FollowingResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -79,4 +79,4 @@ function Following() {
     );
 }
 
-export default Following;
+export default MyFollowing;

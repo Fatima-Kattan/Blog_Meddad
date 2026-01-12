@@ -1,10 +1,10 @@
-//  app/followers/page.tsx .
+// app/followers/page.tsx .
 "use client";
 import React, { useEffect, useState } from "react";
 import { followersService, FollowersResponse } from "@/services/api/follow_api/followers";
 import FollowLayout from "@/components/follow/FollowLayout";
 
-function Followers() {
+function MyFollowers() {
     const [followers, setFollowers] = useState<FollowersResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -52,4 +52,4 @@ function Followers() {
     );
 }
 
-export default Followers;
+export default MyFollowers;

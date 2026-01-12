@@ -9,9 +9,9 @@ import ProfileService, {
     UpdateProfileData
 } from '@/services/api/auth/profileService';
 import { FaRegLightbulb } from "react-icons/fa6";
-import Following from '../../follow/following/Following'
+import MyFollowing from '../../follow/myFollowing/MyFollowing'
 import { HiOutlineLightBulb } from 'react-icons/hi';
-import Followers from '@/components/follow/followers/Followers';
+import MyFollowers from '@/components/follow/myFollowers/MyFollowers';
 import InputField from '@/components/shared/InputField';
 import { errorToJSON } from 'next/dist/server/render';
 import SelectField from '@/components/shared/SelectField';
@@ -612,7 +612,7 @@ const Profile: React.FC = () => {
                                 <p className='activity_follow'>
                                     <HiOutlineLightBulb className='icon-follow' />Your followers will appear here
                                 </p>
-                                <Followers />
+                                <MyFollowers />
                             </div>
                         </div>
                     )}
@@ -624,7 +624,7 @@ const Profile: React.FC = () => {
                                 <p className='activity_follow'>
                                     <HiOutlineLightBulb className='icon-follow' /> People you follow will appear here
                                 </p>
-                                <Following />
+                                <MyFollowing />
                             </div>
                         </div>
                     )}
