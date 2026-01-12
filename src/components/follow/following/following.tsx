@@ -7,7 +7,7 @@ import UserCard from '@/components/shared/UserCard/UserCard';
 import FollowLayout from '@/components/follow/FollowLayout';
 import { followsService } from '@/services/api/follow_api/deleteFollow';
 
-function following() {
+function Following() {
     const [followings, setFollowings] = useState<FollowingResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -33,25 +33,6 @@ function following() {
         fetchFollowings();
     }, []);
 
-
-    // const handleUnfollow = async (userId: number | string) => {
-    //   try {
-    //     const token = localStorage.getItem("token") || "";
-    //     await followsService.deleteFollow(Number(userId), token);
-
-    //     // تحديث القائمة بعد الحذف
-    //     setFollowings(prev => {
-    //       if (!prev) return prev;
-    //       return {
-    //         ...prev,
-    //         count: prev.count - 1,
-    //         data: prev.data.filter(f => f.following.id !== userId),
-    //       };
-    //     });
-    //   } catch (error) {
-    //     console.error("Failed to unfollow:", error);
-    //   }
-    // };
     const handleUnfollow = async (userId: number | string) => {
         try {
             // ✅ نافذة تأكيد من المتصفح
@@ -98,4 +79,4 @@ function following() {
     );
 }
 
-export default following;
+export default Following;

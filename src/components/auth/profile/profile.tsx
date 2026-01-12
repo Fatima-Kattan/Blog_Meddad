@@ -9,7 +9,7 @@ import ProfileService, {
     UpdateProfileData
 } from '@/services/api/auth/profileService';
 import { FaRegLightbulb } from "react-icons/fa6";
-import Following from '../../follow/following/following'
+import Following from '../../follow/following/Following'
 import { HiOutlineLightBulb } from 'react-icons/hi';
 import Followers from '@/components/follow/followers/Followers';
 import InputField from '@/components/shared/InputField';
