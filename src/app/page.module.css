@@ -92,6 +92,81 @@ a.primary {
 a.secondary {
   border-color: var(--button-secondary-border);
 }
+/* page.module.css */
+.mainContent {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  gap: 20px;
+  padding-top: 20px;
+}
+
+/* الشريط الجانبي الأيسر */
+.leftSidebar {
+  flex: 0 0 280px;
+  position: sticky;
+  top: 160px; /* النافبار + الهيدر */
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+}
+
+/* المحتوى الرئيسي */
+.contentSection {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* الشريط الجانبي الأيمن */
+.rightSidebar {
+  flex: 0 0 320px;
+  position: sticky;
+  top: 160px; /* النافبار + الهيدر */
+  height: calc(100vh - 180px);
+  overflow-y: auto;
+}
+.mainContent {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 24px;
+    min-height: calc(100vh - 140px); /* ارتفاع مناسب */
+    align-items: flex-start; /* ✅ هذا مهم */
+}
+
+/* تأكد أن الـ Header ليس position: fixed أو absolute */
+.header {
+    position: static !important; /* أو relative */
+}
+/* تصميم متجاوب */
+@media (max-width: 1200px) {
+  .rightSidebar {
+    display: none;
+  }
+  
+  .leftSidebar {
+    flex: 0 0 250px;
+  }
+}
+
+@media (max-width: 900px) {
+  .mainContent {
+    flex-direction: column;
+    padding: 15px;
+  }
+  
+  .leftSidebar {
+    display: none;
+  }
+  
+  .contentSection {
+    width: 100%;
+  }
+}
 
 /* Enable hover only on non-touch devices */
 @media (hover: hover) and (pointer: fine) {

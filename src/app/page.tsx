@@ -5,6 +5,9 @@ import RegisterForm from '../components/auth/register/RegisterForm';
 import { Metadata } from 'next';
 import Link from "next/link";
 import LogoutButton from "@/components/auth/logout/LogoutButton";
+import LeftSidebar from "@/components/sidebar/LeftSidebar";
+import RightSidebar from "@/components/sidebar/RightSidebar";
+import CreatePost from "@/components/posts/create post/CreatePost";
 
 /* export const metadata: Metadata = {
   title: 'تسجيل حساب جديد',
@@ -13,17 +16,25 @@ import LogoutButton from "@/components/auth/logout/LogoutButton";
 export default function Home() {
   return (
     <>
-      {/* <main style={{ padding: "2rem" }}>
-        <h1>Welcome to My App 🚀</h1>
-        <p>Choose the page you want to go to:</p>
-        <nav style={{ display: "flex", gap: "1rem" }}>
-          <LogoutButton/>
-          <Link href="/register">Register</Link>
-          <Link href="/login">Login</Link>
-           <Link href="/following">following</Link>
-           <Link href="/profile">Profile</Link>
-        </nav>
-      </main> */}
+      {/* <Header /> */}
+      
+      <main className={styles.mainContent}>
+        {/* الشريط الجانبي الأيسر */}
+        <aside className={styles.leftSidebar}>
+          <LeftSidebar />
+        </aside>
+        
+        {/* المحتوى الرئيسي */}
+        <section className={styles.contentSection}>
+          <CreatePost />
+          {/* <PostFeed /> */}
+        </section>
+        
+        {/* الشريط الجانبي الأيمن */}
+        <aside className={styles.rightSidebar}>
+          <RightSidebar />
+        </aside>
+      </main>
     </>
   );
 }
