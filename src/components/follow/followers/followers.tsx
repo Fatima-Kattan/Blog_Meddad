@@ -1,4 +1,4 @@
-// app/followers/page.tsx .
+//  app/followers/page.tsx .
 "use client";
 import React, { useEffect, useState } from "react";
 import { followersService, FollowersResponse } from "@/services/api/follow_api/followers";
