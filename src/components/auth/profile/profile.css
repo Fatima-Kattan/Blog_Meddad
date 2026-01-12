@@ -79,8 +79,8 @@
 }
 
 .profile-avatar {
-    width: 160px;
-    height: 160px;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     object-fit: cover;
     margin: 0 auto 24px;
@@ -108,7 +108,7 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    background:#6007ee67;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
     border: none;
     padding: 14px 14px;
@@ -149,10 +149,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 3px;
     color: #94a3b8;
     font-size: 1rem;
     margin-bottom: 16px;
+}
+.email_icon{
+    width: 20px;
+    height: 20px;
 }
 
 .member-since {
@@ -425,6 +429,9 @@
     border-radius: 20px;
     padding: 40px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.border-dev{
+    border-radius: 12px;
 }
 
 .activity-title {
@@ -1076,7 +1083,7 @@
     padding: 32px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    height: 1117px;
+    height: 1137px;
     display: flex;
     flex-direction: column;
 }
@@ -1174,3 +1181,59 @@
 .four-or-more {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 }
+
+.activity_follow{
+    background: 
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(198, 36, 227, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(109, 40, 217, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    padding: 20px;
+    color: '#94a3b8';
+    font-size: medium;
+    border: 1px solid  #7c3aed;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: white;
+    filter: drop-shadow(0 1px 5px rgba(124, 58, 237, 0.3));
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.icon-follow{
+    width: 20px;
+    height: 20px;
+}
+
+/* .input-field{
+    color: #fff !important;
+    background: #ffffff0d !important;
+    border: 2px solid #ffffff1a !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    padding: 18px 20px !important;
+    font-size: 1.05rem !important;
+    transition: all .3s !important;
+} */
+
+/* .select-field{
+    background: #293445 !important;
+    border: 2px solid #ffffff1a !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    padding: 18px 20px !important;
+    font-size: 1.05rem !important;
+    transition: all .3s !important;
+}
+
+.date-field{
+    background: #293445 !important;
+    border: 2px solid #ffffff1a !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    padding: 18px 20px !important;
+    font-size: 1.05rem !important;
+    transition: all .3s !important;
+} */

@@ -88,6 +88,9 @@ const InputField: React.FC<InputFieldProps> = ({
           font-size: 0.875rem;
           margin-top: 0.25rem;
         }
+          .text-red-500{
+          color:red
+          }
       `}</style>
         </div>
     );

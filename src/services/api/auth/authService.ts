@@ -8,7 +8,7 @@ export interface RegisterData {
     bio?: string;
     birth_date: string;
     gender: 'male' | 'female';
-    image?: File | null;
+    image?: string;
 }
 export interface RegisterResponse {
     success: boolean;
@@ -56,7 +56,12 @@ class AuthService {
         if (data.bio && data.bio.trim() !== '') {
             jsonData.bio = data.bio;
         }
-        
+        if (data.image && data.image.trim() !== '') {
+        jsonData.image = data.image;
+        console.log('🖼️ Image URL included:', data.image);
+    } else {
+        console.log('⚠️ No image URL provided');
+    }
         // ⚠️ مشكلة: الصورة ما بتقدر ترسلها في JSON
         // إذا كان API يطلب JSON فقط، ما راح تقدر ترسل ملفات
         // الحل: إما ترفع الصورة بشكل منفصل أو تستخدم base64
