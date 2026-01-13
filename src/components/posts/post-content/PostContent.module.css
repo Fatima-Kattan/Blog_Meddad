@@ -1,0 +1,64 @@
+/* components/posts/post-content/PostContent.module.css */
+.postContent {
+    margin-bottom: 16px;
+}
+
+.postTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #f0f0f0;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+}
+
+.captionContainer {
+    margin-top: 8px;
+}
+
+.captionText {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #e0e0e0;
+    margin: 0;
+    white-space: pre-line; /* Preserve line breaks */
+}
+
+.captionText.truncated {
+    max-height: 72px; /* 3 lines */
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.toggleButton {
+    background: none;
+    border: none;
+    color: #8b5cf6;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-top: 4px;
+    transition: color 0.2s;
+}
+
+.toggleButton:hover {
+    color: #7c3aed;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .postTitle {
+        font-size: 16px;
+    }
+    
+    .captionText {
+        font-size: 14px;
+    }
+    
+    .toggleButton {
+        font-size: 13px;
+    }
+}

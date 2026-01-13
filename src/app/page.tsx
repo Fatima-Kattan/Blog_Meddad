@@ -8,6 +8,7 @@ import LogoutButton from "@/components/auth/logout/LogoutButton";
 import LeftSidebar from "@/components/sidebar/LeftSidebar";
 import RightSidebar from "@/components/sidebar/RightSidebar";
 import CreatePost from "@/components/posts/create post/CreatePost";
+import PostFeed from "@/components/posts/post-feed/PostFeed";
 
 /* export const metadata: Metadata = {
   title: 'تسجيل حساب جديد',
@@ -27,7 +28,7 @@ export default function Home() {
         {/* المحتوى الرئيسي */}
         <section className={styles.contentSection}>
           <CreatePost />
-          {/* <PostFeed /> */}
+          <PostFeed />
         </section>
         
         {/* الشريط الجانبي الأيمن */}
