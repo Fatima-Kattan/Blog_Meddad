@@ -3,6 +3,8 @@
 import { useState } from "react";
 import styles from "./UserCard.module.css";
 import { RiUserUnfollowLine } from "react-icons/ri";
+import FollowIcon from "@/components/shared/follow_icon/FollowIcon";
+
 interface User {
   id: number | string;
   name: string;
@@ -13,23 +15,27 @@ interface User {
 interface UserCardProps {
   user: User;
   onClick?: () => void;
-  showUnfollowButton?: boolean; // جديد
-  onUnfollow?: (userId: number | string) => Promise<void> | void; // جديد
+  showUnfollowButton?: boolean; 
+  onUnfollow?: (userId: number | string) => Promise<void> | void;
+  showFollowButton?: boolean; // جديد
+  token?: string;             // جديد: تمرير التوكن
+  setFollowings?: React.Dispatch<React.SetStateAction<any>>; // جديد: تحديث القائمة
 }
 
 export default function UserCard({ 
   user, 
   onClick,
-  showUnfollowButton = false, // جديد
-  onUnfollow 
+  showUnfollowButton = false,
+  onUnfollow,
+  showFollowButton = false, // جديد
+  token,
+  setFollowings
 }: UserCardProps) {
   const [isUnfollowing, setIsUnfollowing] = useState(false);
 
   const handleUnfollowClick = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // لمنع تنفيذ onClick الخاص بالكارد
-    
+    e.stopPropagation(); 
     if (isUnfollowing || !onUnfollow) return;
-    
     setIsUnfollowing(true);
     try {
       await onUnfollow(user.id);
@@ -47,7 +53,7 @@ export default function UserCard({
   };
 
   return (
-    <div className={styles.card}>
+    <div className={styles.card} onClick={handleCardClick}>
       <div className={styles.avatarWrapper}>
         <img
           src={user.image}
@@ -64,12 +70,23 @@ export default function UserCard({
           <p className={styles.bio}>{user.bio}</p>
         )}
       </div>
+
+      {/* زر Unfollow */}
       {showUnfollowButton && (
         <RiUserUnfollowLine 
-        className={styles.unfollowIcon} 
-        onClick={handleUnfollowClick}
+          className={styles.unfollowIcon} 
+          onClick={handleUnfollowClick}
         />
-)}
+      )}
+
+      {/* زر Follow */}
+      {showFollowButton && token && (
+        <FollowIcon 
+          token={token} 
+          followingId={Number(user.id)} 
+          setFollowings={setFollowings} 
+        />
+      )}
     </div>
   );
 }

@@ -1,0 +1,257 @@
+/* components/posts/post-item/PostItem.module.css */
+.postContainer {
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #333;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    padding: 40px;
+}
+
+.postContainer:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    border-color: #444;
+}
+
+/* Post Stats */
+.postStats {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 0;
+    border-top: 1px solid #333;
+    margin-top: 12px;
+}
+
+.statItem {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.statItem:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.statIcon {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.statCount {
+    font-weight: 600;
+    color: #f0f0f0;
+    font-size: 15px;
+}
+
+.statLabel {
+    color: #888;
+    font-size: 14px;
+}
+
+/* Comment Placeholder */
+.commentPlaceholder {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #333;
+}
+
+.commentButton {
+    width: 100%;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #888;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.commentButton:hover {
+    background: #333;
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .postContainer {
+        padding: 12px;
+        margin-bottom: 16px;
+        border-radius: 8px;
+    }
+    
+    .postStats {
+        gap: 16px;
+        padding: 10px 0;
+    }
+    
+    .statItem {
+        gap: 4px;
+        padding: 3px 6px;
+    }
+    
+    .statCount {
+        font-size: 14px;
+    }
+    
+    .statLabel {
+        font-size: 13px;
+    }
+    
+    .commentButton {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .postContainer {
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+    
+    .postStats {
+        gap: 12px;
+    }
+}
+/* components/posts/post-item/PostItem.module.css */
+.postContainer {
+    background: #1a0b2e;
+    border-radius: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.postContainer:hover {
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
+}
+
+/* قسم زر التعديل */
+.editSection {
+    padding: 12px 20px;
+    border-top: 1px solid rgba(139, 92, 246, 0.1);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.editButton {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+}
+
+.editButton:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    transform: translateY(-1px);
+}
+
+.editIcon {
+    font-size: 1rem;
+}
+
+.postStats {
+    display: flex;
+    padding: 12px 20px;
+    border-top: 1px solid rgba(139, 92, 246, 0.1);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+}
+
+.statItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 4px 12px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+}
+
+.statItem:first-child:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.statIcon {
+    font-size: 1.2rem;
+}
+
+.statCount {
+    font-weight: 600;
+    color: #fff;
+}
+
+.statLabel {
+    color: #a78bfa;
+    font-size: 0.875rem;
+}
+
+.commentPlaceholder {
+    padding: 16px 20px;
+}
+
+.commentButton {
+    width: 100%;
+    padding: 12px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 12px;
+    color: #c4b5fd;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.commentButton:hover {
+    background: rgba(139, 92, 246, 0.2);
+    color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .postContainer {
+        border-radius: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .editSection {
+        padding: 10px 16px;
+    }
+    
+    .editButton {
+        padding: 8px 14px;
+        font-size: 0.85rem;
+    }
+    
+    .postStats {
+        padding: 10px 16px;
+    }
+    
+    .statItem {
+        padding: 4px 10px;
+    }
+}

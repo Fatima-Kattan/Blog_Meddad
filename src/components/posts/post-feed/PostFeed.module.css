@@ -1,0 +1,133 @@
+/* components/posts/post-feed/PostFeed.module.css */
+.feedContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 845px;
+    /* margin: 0 auto;
+    padding: 20px 0; */
+}
+
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid #ff4444;
+}
+
+.errorMessage {
+    color: #ff4444;
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.retryButton {
+    background: #8b5cf6;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.retryButton:hover {
+    background: #7c3aed;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 60px 20px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    border: 1px solid #333;
+}
+
+.emptyMessage {
+    color: #888;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.emptySubtitle {
+    color: #666;
+    font-size: 14px;
+}
+
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    gap: 12px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #333;
+    border-top: 3px solid #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loadingContainer p {
+    color: #888;
+    font-size: 14px;
+}
+
+.loadMoreTrigger {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.loadMoreButton {
+    background: #2a2a2a;
+    color: #ccc;
+    border: 1px solid #444;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.loadMoreButton:hover {
+    background: #333;
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+}
+
+.endMessage {
+    text-align: center;
+    padding: 30px;
+    color: #666;
+    font-size: 14px;
+    border-top: 1px solid #333;
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .feedContainer {
+        padding: 10px;
+        gap: 16px;
+    }
+    
+    .emptyState {
+        padding: 40px 20px;
+    }
+}

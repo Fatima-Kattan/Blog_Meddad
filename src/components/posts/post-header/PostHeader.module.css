@@ -1,0 +1,492 @@
+/* components/posts/post-header/PostHeader.module.css */
+.postHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.avatarContainer {
+    position: relative;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8b5cf6;
+    background: #2a2a2a;
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.userName {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #f0f0f0;
+}
+
+.postDate {
+    font-size: 13px;
+    color: #888;
+    font-weight: 500;
+}
+
+/* القائمة المنسدلة */
+.dropdownContainer {
+    position: relative;
+}
+
+.threeDots {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.threeDots:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.dotsIcon {
+    display: inline-block;
+    transform: rotate(90deg);
+    font-weight: bold;
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    min-width: 160px;
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropdownAppear 0.2s ease;
+}
+
+@keyframes dropdownAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: #f0f0f0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: right;
+}
+
+.dropdownItem:hover {
+    background: #333;
+}
+
+.dropdownItem.deleteItem {
+    color: #ff6b6b;
+}
+
+.dropdownItem.deleteItem:hover {
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.editIcon,
+.deleteIcon {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .userName {
+        font-size: 14px;
+    }
+
+    .postDate {
+        font-size: 12px;
+    }
+
+    .dropdownMenu {
+        min-width: 140px;
+    }
+
+    .dropdownItem {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}
+/* components/posts/post-header/PostHeader.module.css */
+.postHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.avatarContainer {
+    position: relative;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #8b5cf6;
+    background: #2a2a2a;
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.userName {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #f0f0f0;
+}
+
+.postDate {
+    font-size: 13px;
+    color: #888;
+    font-weight: 500;
+}
+
+/* Dropdown Menu */
+.dropdownContainer {
+    position: relative;
+}
+
+.threeDots {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+}
+
+.threeDots:hover:not(:disabled) {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.threeDots:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dotsIcon {
+    display: inline-block;
+    transform: rotate(90deg);
+    font-weight: bold;
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    min-width: 180px;
+    z-index: 1000;
+    overflow: hidden;
+    animation: dropdownAppear 0.2s ease;
+}
+
+@keyframes dropdownAppear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: #f0f0f0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: left;
+}
+
+.dropdownItem:hover:not(:disabled) {
+    background: #333;
+}
+
+.dropdownItem:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.dropdownItem.deleteItem {
+    color: #ff6b6b;
+}
+
+.dropdownItem.deleteItem:hover:not(:disabled) {
+    background: rgba(255, 107, 107, 0.1);
+}
+
+.editIcon, .deleteIcon, .addImageIcon {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Add Images Modal */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.modalContent {
+    background: #1a1a1a;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #444;
+    overflow: hidden;
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #444;
+}
+
+.modalHeader h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #f0f0f0;
+}
+
+.closeButton {
+    background: transparent;
+    border: none;
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.closeButton:hover:not(:disabled) {
+    background: #333;
+    color: #fff;
+}
+
+.modalBody {
+    padding: 20px;
+}
+
+.imageCountInfo {
+    color: #8b5cf6;
+    font-size: 14px;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.inputGroup {
+    margin-bottom: 16px;
+}
+
+.inputGroup label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ccc;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.urlInput {
+    width: 100%;
+    padding: 10px 12px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #f0f0f0;
+    font-size: 14px;
+}
+
+.urlInput:focus {
+    outline: none;
+    border-color: #8b5cf6;
+}
+
+.urlInput:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.errorMessage {
+    color: #ff6b6b;
+    font-size: 14px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.successMessage {
+    color: #10b981;
+    font-size: 14px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 6px;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.modalFooter {
+    display: flex;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #444;
+    background: #222;
+}
+
+.cancelButton {
+    flex: 1;
+    padding: 10px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.cancelButton:hover:not(:disabled) {
+    background: #333;
+}
+
+.submitButton {
+    flex: 1;
+    padding: 10px;
+    background: #8b5cf6;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.submitButton:hover:not(:disabled) {
+    background: #7c3aed;
+}
+
+.submitButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dropdownMenu {
+        min-width: 160px;
+    }
+    
+    .dropdownItem {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+    
+    .modalContent {
+        max-width: 90%;
+    }
+}
