@@ -8,6 +8,7 @@ import { addImagesToPost } from '@/services/api/posts/add-images';
 import { removeImageFromPost } from '@/services/api/posts/remove-image';
 import { useUserData } from '@/hooks/useUserData';
 import styles from './PostHeader.module.css';
+import Link from 'next/link';
 
 interface PostHeaderProps {
     user: {
@@ -23,10 +24,10 @@ interface PostHeaderProps {
     onEditPost?: () => void; // ⬅️ أضفنا هذا
 }
 
-const PostHeader = ({ 
-    user, 
-    postDate, 
-    postId, 
+const PostHeader = ({
+    user,
+    postDate,
+    postId,
     imagesCount = 0,
     onPostDeleted,
     onImagesUpdated,
@@ -38,7 +39,7 @@ const PostHeader = ({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-    
+
     const { userData } = useUserData();
     const isCurrentUser = userData?.id === user.id;
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -76,11 +77,11 @@ const PostHeader = ({
             setIsLoading(true);
             await deletePost(postId);
             setSuccess('Post deleted successfully');
-            
+
             if (onPostDeleted) {
                 onPostDeleted(postId);
             }
-            
+
             setTimeout(() => {
                 setSuccess(null);
             }, 3000);
@@ -102,16 +103,16 @@ const PostHeader = ({
         try {
             setIsLoading(true);
             setError(null);
-            
+
             await addImagesToPost(postId, [imageUrl]);
-            
+
             setSuccess('Image added successfully');
             setImageUrl('');
-            
+
             if (onImagesUpdated) {
                 onImagesUpdated();
             }
-            
+
             setTimeout(() => {
                 setSuccess(null);
                 setShowAddImagesModal(false);
@@ -129,11 +130,15 @@ const PostHeader = ({
         <>
             <div className={styles.postHeader}>
                 {/* User Info */}
-                <div className={styles.userInfo}>
+                <Link
+                    href={`/profile/${user?.id || ''}`}
+                    className={styles.userInfo}
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <div className={styles.avatarContainer}>
                         <Image
-                            src={user.image || '/default-avatar.png'}
-                            alt={user.full_name}
+                            src={user?.image || '/default-avatar.png'}
+                            alt={user?.full_name || 'User'}
                             width={40}
                             height={40}
                             className={styles.avatar}
@@ -142,17 +147,17 @@ const PostHeader = ({
                             }}
                         />
                     </div>
-                    
+
                     <div className={styles.userDetails}>
-                        <h3 className={styles.userName}>{user.full_name}</h3>
+                        <h3 className={styles.userName}>{user?.full_name || 'Unknown User'}</h3>
                         <span className={styles.postDate}>{postDate}</span>
                     </div>
-                </div>
-                
+                </Link>
+
                 {/* Dropdown Menu (Three Dots) */}
                 {isCurrentUser && (
                     <div className={styles.dropdownContainer} ref={dropdownRef}>
-                        <button 
+                        <button
                             className={styles.threeDots}
                             onClick={() => setShowDropdown(!showDropdown)}
                             aria-label="Post options"
@@ -160,11 +165,11 @@ const PostHeader = ({
                         >
                             <span className={styles.dotsIcon}>⋮</span>
                         </button>
-                        
+
                         {showDropdown && (
                             <div className={styles.dropdownMenu}>
                                 {/* Edit Post - زر التعديل */}
-                                <button 
+                                <button
                                     className={styles.dropdownItem}
                                     onClick={handleEdit}
                                     disabled={isLoading}
@@ -172,10 +177,10 @@ const PostHeader = ({
                                     <span className={styles.editIcon}>✏️</span>
                                     Edit Post
                                 </button>
-                                
+
                                 {/* Add Images (only if less than 4) */}
                                 {canAddMoreImages && (
-                                    <button 
+                                    <button
                                         className={styles.dropdownItem}
                                         onClick={handleAddImages}
                                         disabled={isLoading}
@@ -184,9 +189,9 @@ const PostHeader = ({
                                         Add Image ({imagesCount}/4)
                                     </button>
                                 )}
-                                
+
                                 {/* Delete Post */}
-                                <button 
+                                <button
                                     className={`${styles.dropdownItem} ${styles.deleteItem}`}
                                     onClick={handleDelete}
                                     disabled={isLoading}
@@ -206,7 +211,7 @@ const PostHeader = ({
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
                             <h3>Add Image to Post</h3>
-                            <button 
+                            <button
                                 className={styles.closeButton}
                                 onClick={() => setShowAddImagesModal(false)}
                                 disabled={isLoading}
@@ -214,12 +219,12 @@ const PostHeader = ({
                                 ×
                             </button>
                         </div>
-                        
+
                         <div className={styles.modalBody}>
                             <p className={styles.imageCountInfo}>
                                 Current images: {imagesCount}/4
                             </p>
-                            
+
                             <div className={styles.inputGroup}>
                                 <label htmlFor="imageUrl">Image URL</label>
                                 <input
@@ -232,20 +237,20 @@ const PostHeader = ({
                                     disabled={isLoading}
                                 />
                             </div>
-                            
+
                             {error && (
                                 <div className={styles.errorMessage}>
                                     {error}
                                 </div>
                             )}
-                            
+
                             {success && (
                                 <div className={styles.successMessage}>
                                     {success}
                                 </div>
                             )}
                         </div>
-                        
+
                         <div className={styles.modalFooter}>
                             <button
                                 className={styles.cancelButton}
