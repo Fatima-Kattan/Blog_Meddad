@@ -26,6 +26,22 @@
   border: 1px solid rgba(167, 139, 250, 0.2);
 }
 
+.cardSecond{
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  width: 100%;
+  max-width: 28rem;
+  height: 5rem;
+  position: relative;
+  overflow: hidden;
+
+}
+
 /* إطار أرجواني متحرك */
 .card::before {
   content: "";

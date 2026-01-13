@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "./UserCard.module.css";
 import { RiUserUnfollowLine } from "react-icons/ri";
 import FollowIcon from "@/components/shared/follow_icon/FollowIcon";
+import Link from "next/link";
 
 interface User {
   id: number | string;
@@ -15,15 +16,15 @@ interface User {
 interface UserCardProps {
   user: User;
   onClick?: () => void;
-  showUnfollowButton?: boolean; 
+  showUnfollowButton?: boolean;
   onUnfollow?: (userId: number | string) => Promise<void> | void;
   showFollowButton?: boolean; // جديد
   token?: string;             // جديد: تمرير التوكن
   setFollowings?: React.Dispatch<React.SetStateAction<any>>; // جديد: تحديث القائمة
 }
 
-export default function UserCard({ 
-  user, 
+export default function UserCard({
+  user,
   onClick,
   showUnfollowButton = false,
   onUnfollow,
@@ -34,7 +35,7 @@ export default function UserCard({
   const [isUnfollowing, setIsUnfollowing] = useState(false);
 
   const handleUnfollowClick = async (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     if (isUnfollowing || !onUnfollow) return;
     setIsUnfollowing(true);
     try {
@@ -54,37 +55,45 @@ export default function UserCard({
 
   return (
     <div className={styles.card} onClick={handleCardClick}>
-      <div className={styles.avatarWrapper}>
-        <img
-          src={user.image}
-          alt={user.name}
-          width={64}
-          height={64}
-          className={styles.avatar}
-        />
-      </div>
-      
-      <div className={styles.userInfo}>
-        <h3 className={styles.name}>{user.name}</h3>
-        {user.bio && (
-          <p className={styles.bio}>{user.bio}</p>
-        )}
-      </div>
+      <Link
+        /* className={styles.UserCard} */
+        className={styles.cardSecond}
+        href={`/profile/${user?.id || ''}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <>
+          <div className={styles.avatarWrapper}>
+            <img
+              src={user.image}
+              alt={user.name}
+              width={64}
+              height={64}
+              className={styles.avatar}
+            />
+          </div>
+
+          <div className={styles.userInfo}>
+            <h3 className={styles.name}>{user.name}</h3>
+            {user.bio && (
+              <p className={styles.bio}>{user.bio}</p>
+            )}
+          </div></>
+      </Link>
 
       {/* زر Unfollow */}
       {showUnfollowButton && (
-        <RiUserUnfollowLine 
-          className={styles.unfollowIcon} 
+        <RiUserUnfollowLine
+          className={styles.unfollowIcon}
           onClick={handleUnfollowClick}
         />
       )}
 
       {/* زر Follow */}
       {showFollowButton && token && (
-        <FollowIcon 
-          token={token} 
-          followingId={Number(user.id)} 
-          setFollowings={setFollowings} 
+        <FollowIcon
+          token={token}
+          followingId={Number(user.id)}
+          setFollowings={setFollowings}
         />
       )}
     </div>
