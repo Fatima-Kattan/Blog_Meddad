@@ -67,25 +67,25 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         try {
             setLoading(true);
             setError(null);
-            console.log('🔄 جلب بيانات البروفايل لـ ID:', targetUserId);
-
+            /*             console.log('🔄 جلب بيانات البروفايل لـ ID:', targetUserId);
+             */
             let profileResponse: ProfileResponse | UserProfileResponse;
 
             if (targetUserId) {
-                console.log(`📋 جلب بروفايل للمستخدم: ${targetUserId}`);
-                try {
+/*                 console.log(`📋 جلب بروفايل للمستخدم: ${targetUserId}`);
+ */                try {
                     profileResponse = await ProfileService.getUserProfileById(targetUserId);
 
                     const currentUserId = localStorage.getItem('user_id');
-                    console.log('🔍 ID الحالي من localStorage:', currentUserId);
-                    console.log('🔍 الـ ID المستهدف:', targetUserId);
+                    /*   console.log('🔍 ID الحالي من localStorage:', currentUserId);
+                      console.log('🔍 الـ ID المستهدف:', targetUserId); */
 
                     if (currentUserId && currentUserId === targetUserId.toString()) {
                         setIsOwnProfile(true);
-                        console.log('✅ هذا البروفايل الخاص بالمستخدم الحالي');
-                    } else {
+/*                         console.log('✅ هذا البروفايل الخاص بالمستخدم الحالي');
+ */                    } else {
                         setIsOwnProfile(false);
-                        console.log('👀 هذا بروفايل مستخدم آخر');
+                      /*   console.log('👀 هذا بروفايل مستخدم آخر'); */
                     }
 
                 } catch (fetchError) {
@@ -94,19 +94,19 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 }
             } else {
                 // ⬇️ جلب البروفايل الشخصي بدون ID
-                console.log('🔄 جلب البروفايل الشخصي...');
-                profileResponse = await ProfileService.getUserProfile();
+/*                 console.log('🔄 جلب البروفايل الشخصي...');
+ */                profileResponse = await ProfileService.getUserProfile();
                 setIsOwnProfile(true);
 
                 // ⬇️ احفظ الـ ID في localStorage
                 if (profileResponse.data.user.id) {
                     localStorage.setItem('user_id', profileResponse.data.user.id.toString());
-                    console.log('💾 تم حفظ الـ ID:', profileResponse.data.user.id);
-                }
+/*                     console.log('💾 تم حفظ الـ ID:', profileResponse.data.user.id);
+ */                }
             }
 
-            console.log('📦 بيانات البروفايل الكاملة:', profileResponse);
-
+/*             console.log('📦 بيانات البروفايل الكاملة:', profileResponse);
+ */
             if (!profileResponse.success) {
                 throw new Error(profileResponse.message || 'فشل في تحميل البروفايل');
             }
@@ -114,10 +114,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             // تحويل البيانات إلى الشكل الصحيح
             const userData = profileResponse.data.user;
             const statsData = profileResponse.data.stats;
-
+/* 
             console.log('👤 بيانات المستخدم:', userData);
             console.log('📊 الإحصائيات:', statsData);
-
+ */
             // تحويل UserProfileResponse إلى UserProfile
             const formattedUser: UserProfile = {
                 id: userData.id,
@@ -147,8 +147,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
             // جلب المنشورات مع تفاصيل اللايكات
             const userPosts = userData.posts || [];
-            console.log('📝 المنشورات من API:', userPosts.length);
-
+/*             console.log('📝 المنشورات من API:', userPosts.length);
+ */
             if (userPosts.length > 0) {
                 const postsWithLikes = await Promise.all(
                     userPosts.map(async (post) => {
@@ -175,8 +175,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 setPosts([]);
             }
 
-            console.log('✅ تم تحميل بيانات البروفايل بنجاح');
-
+/*             console.log('✅ تم تحميل بيانات البروفايل بنجاح');
+ */
         } catch (err) {
             console.error('🔥 خطأ في جلب البيانات:', err);
             const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في جلب البيانات';
@@ -501,7 +501,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 </button>
                             </>
                         ) : (
-                            <button 
+                            <button
                                 className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
                                 onClick={() => setActiveTab('posts')}
                             >

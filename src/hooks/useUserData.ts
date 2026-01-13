@@ -164,7 +164,7 @@ export const useUserData = (options: UserDataOptions = {}): UseUserDataReturn =>
             
             const timeoutId = setTimeout(() => {
                 controller.abort();
-                console.log('API request timed out');
+                /* console.log('API request timed out'); */
             }, 5000);
 
             const response = await fetch('http://localhost:8000/api/user', {
@@ -206,7 +206,7 @@ export const useUserData = (options: UserDataOptions = {}): UseUserDataReturn =>
             return null;
         } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
-                console.log('API request was aborted');
+                /* console.log('API request was aborted'); */
             } else {
                 console.log('Error fetching user from API:', error);
             }

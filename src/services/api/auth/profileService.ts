@@ -164,8 +164,8 @@ class ProfileService {
     async getUserProfileById(userId: number | string): Promise<UserProfileResponse> {
         try {
             const response = await api.get(`/users/profile/${userId}`);
-            console.log('✅ تم جلب بروفايل المستخدم:', response.data);
-            return response.data;
+/*             console.log('✅ تم جلب بروفايل المستخدم:', response.data);
+ */            return response.data;
         } catch (error: any) {
             console.error('❌ فشل في جلب بروفايل المستخدم:', error);
             if (error.response?.status === 404) {
@@ -187,10 +187,10 @@ class ProfileService {
 // 4. قد تحتاج إلى رابط مختلف
 async getPostDetails(postId: number): Promise<PostDetailResponse> {
     try {
-        console.log(`🔍 جلب تفاصيل المنشور ${postId}...`);
+        /* console.log(`🔍 جلب تفاصيل المنشور ${postId}...`); */
         
         // ⬇️ تحقق من base URL أولاً
-        console.log('🌐 Base URL للـ api:', api.defaults.baseURL);
+        /* console.log('🌐 Base URL للـ api:', api.defaults.baseURL); */
         
         // ⬇️ جرب endpoints مختلفة
         const endpoints = [
@@ -203,17 +203,17 @@ async getPostDetails(postId: number): Promise<PostDetailResponse> {
         
         for (const endpoint of endpoints) {
             try {
-                console.log(`🔄 جرب endpoint: ${endpoint}`);
-                const response = await api.get(endpoint);
+/*                 console.log(`🔄 جرب endpoint: ${endpoint}`);
+ */                const response = await api.get(endpoint);
                 
                 if (response.data) {
-                    console.log(`✅ نجح مع endpoint: ${endpoint}`);
-                    console.log('📦 البيانات المستلمة:', response.data);
+                    /* console.log(`✅ نجح مع endpoint: ${endpoint}`);
+                    console.log('📦 البيانات المستلمة:', response.data); */
                     return response.data;
                 }
             } catch (err: any) {
-                console.log(`❌ فشل مع ${endpoint}:`, err.response?.status || err.message);
-                continue;
+/*                 console.log(`❌ فشل مع ${endpoint}:`, err.response?.status || err.message);
+ */                continue;
             }
         }
         
@@ -281,7 +281,7 @@ async getUserPostsWithDetails(userId?: number | string): Promise<Post[]> {
             // ⬇️ جلب بروفايل المستخدم المحدد
             const profileResponse = await this.getUserProfileById(userId);
             posts = profileResponse.data.user.posts || [];
-            console.log(`📝 منشورات المستخدم ${userId}:`, posts.length);
+            /* console.log(`📝 منشورات المستخدم ${userId}:`, posts.length); */
         } else {
             // ⬇️ جلب بروفايل المستخدم الحالي
             const profileResponse = await this.getUserProfile();
