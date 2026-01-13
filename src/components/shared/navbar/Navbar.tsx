@@ -10,7 +10,6 @@ import api from '@/services/api/auth/api';
 
 // الأيقونات
 import {
-    HiBell,
     HiHome,
     HiUserCircle,
     HiNewspaper,
@@ -30,6 +29,7 @@ import { IoLogInOutline } from 'react-icons/io5';
 
 // ⭐⭐ استيراد الهوك ⭐⭐
 import { useUserData } from '@/hooks/useUserData';
+import NotificationIcon from '@/components/notification_icon/NotificationIcon';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState<boolean>(false);
@@ -269,12 +269,7 @@ const Navbar = () => {
 
                         {/* إشعارات */}
                         {isAuthenticated && (
-                            <div className={styles.notificationWrapper}>
-                                <button className={styles.iconButton} aria-label="Notifications">
-                                    <HiBell size={22} />
-                                    <span className={styles.notificationBadge}>5</span>
-                                </button>
-                            </div>
+                            <NotificationIcon/>
                         )}
 
                         {/* عرض البروفايل أو أزرار الدخول */}

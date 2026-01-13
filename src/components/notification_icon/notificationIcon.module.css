@@ -1,0 +1,37 @@
+.iconButton {
+    position: relative;
+    background: rgba(139, 92, 246, 0.1);
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.iconButton:hover {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--color-primary);
+}
+
+.notificationBadge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #ff4757;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-background);
+}
+
