@@ -1,6 +1,4 @@
-// components/Navbar.tsx
 'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -8,7 +6,7 @@ import styles from './Navbar.module.css';
 import SearchBar from '../SearchBar/SearchBar';
 import api from '@/services/api/auth/api';
 
-// الأيقونات
+// الأيقونات الأساسية فقط
 import {
     HiBell,
     HiHome,
@@ -17,46 +15,34 @@ import {
     HiMenu,
     HiX
 } from 'react-icons/hi';
+
 import {
     FaRocket,
     FaFeatherAlt,
     FaMagic
 } from 'react-icons/fa';
+
 import {
     RiUserStarLine
 } from 'react-icons/ri';
+
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { IoLogInOutline } from 'react-icons/io5';
 
-// ⭐⭐ استيراد الهوك ⭐⭐
-import { useUserData } from '@/hooks/useUserData';
-
 const Navbar = () => {
-    const [isScrolled, setIsScrolled] = useState<boolean>(false);
-    const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-    const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
-    const [activeTab, setActiveTab] = useState<string>('home');
-    const [menuReady, setMenuReady] = useState<boolean>(false);
-    
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [activeTab, setActiveTab] = useState('home');
+    const [isLoading, setIsLoading] = useState(true);
+
     const pathname = usePathname();
     const router = useRouter();
-    
-    // ⭐⭐ استخدام الهوك ⭐⭐
-    const {
-        userData,
-        userImage,
-        userName,
-        userImageLarge,
-        isLoading: userLoading,
-        isAuthenticated,
-        logout: hookLogout,
-        refreshData, 
-        isRefreshing, 
-        getStoredUser 
-    } = useUserData({
-        fetchFromAPI: true,
-        useCache: true
-    }); // ⭐⭐ أضف options هنا ⭐⭐
+
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState<any>(null);
+    const [userImage, setUserImage] = useState<string>('');
+    const [userFromDB, setUserFromDB] = useState<any>(null);
 
     const profileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -69,31 +55,137 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // ⭐⭐ دالة محسنة لتحديث البيانات ⭐⭐
-    const handleProfileMenuClick = async () => {
-        const willOpen = !showProfileMenu;
-        
-        if (willOpen) {
-            // افتح القائمة فوراً
-            setShowProfileMenu(true);
-            
-            // ثم حدث البيانات في الخلفية بدون انتظار
-            setTimeout(async () => {
-                try {
-                    await refreshData();
-                } catch (error) {
-                    console.log('Background refresh failed:', error);
+    // ⭐⭐ **دالة لجلب بيانات المستخدم من قاعدة البيانات** ⭐⭐
+    const fetchUserFromDatabase = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setIsAuthenticated(false);
+                return;
+            }
+
+            // جلب بيانات المستخدم من API
+            const response = await api.get('/user', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            }, 0);
-        } else {
-            setShowProfileMenu(false);
+            });
+
+            if (response.data && response.data.data && response.data.data.user) {
+                const userData = response.data.data.user;
+                setUserFromDB(userData);
+                setIsAuthenticated(true);
+
+                // تحديث localStorage بالبيانات المحدثة
+                localStorage.setItem('user', JSON.stringify(userData));
+
+                // معالجة الصورة
+                processUserImage(userData);
+            } else {
+                setIsAuthenticated(false);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+        } catch (error) {
+            console.error('Error fetching user from database:', error);
+            setIsAuthenticated(false);
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
         }
+    };
+
+    // ⭐⭐ **دالة لمعالجة صورة المستخدم** ⭐⭐
+    const processUserImage = (userData: any) => {
+        let imageUrl = '';
+
+        if (!userData.image ||
+            userData.image === 'null' ||
+            userData.image === null ||
+            userData.image.trim() === '') {
+
+            // إنشاء صورة افتراضية
+            const name = userData.full_name || userData.email || 'User';
+            const initials = name
+                .split(' ')
+                .map((word: string) => word[0])
+                .join('')
+                .toUpperCase()
+                .slice(0, 2);
+
+            imageUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=100`;
+        } else {
+            // إذا كانت هناك صورة
+            imageUrl = userData.image;
+
+            // تحويل المسار النسبي إلى مسار كامل
+            if (imageUrl.startsWith('/')) {
+                imageUrl = `http://localhost:8000${imageUrl}`;
+            } else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+                // إذا كانت مجرد اسم ملف
+                imageUrl = `http://localhost:8000/uploads/${imageUrl}`;
+            }
+        }
+
+        setUserImage(imageUrl);
+        setUser(userData);
+    };
+
+    // ⭐⭐ **التحقق من تسجيل الدخول وجلب البيانات** ⭐⭐
+    useEffect(() => {
+        const checkAuthAndFetchData = async () => {
+            if (typeof window !== 'undefined') {
+                const token = localStorage.getItem('token');
+                const storedUser = localStorage.getItem('user');
+
+                if (token) {
+                    if (storedUser) {
+                        try {
+                            const parsedUser = JSON.parse(storedUser);
+                            setUser(parsedUser);
+                            processUserImage(parsedUser);
+                            setIsAuthenticated(true);
+
+                            // ⭐⭐ **جلب البيانات المحدثة من قاعدة البيانات** ⭐⭐
+                            fetchUserFromDatabase();
+                        } catch (error) {
+                            console.error('Error parsing stored user:', error);
+                            localStorage.removeItem('user');
+                            localStorage.removeItem('token');
+                            setIsAuthenticated(false);
+                        }
+                    } else {
+                        // ⭐⭐ **لا يوجد بيانات في localStorage، جلب من قاعدة البيانات** ⭐⭐
+                        await fetchUserFromDatabase();
+                    }
+                } else {
+                    setIsAuthenticated(false);
+                    setUser(null);
+                    setUserImage('');
+                }
+                setIsLoading(false);
+            }
+        };
+
+        checkAuthAndFetchData();
+    }, []);
+
+    // ⭐⭐ **جلب بيانات محدثة عند فتح البروفايل** ⭐⭐
+    const refreshUserData = async () => {
+        if (isAuthenticated) {
+            await fetchUserFromDatabase();
+        }
+    };
+
+    // ⭐⭐ **فتح قائمة البروفايل مع تحديث البيانات** ⭐⭐
+    const handleProfileMenuClick = async () => {
+        await refreshUserData();
+        setShowProfileMenu(!showProfileMenu);
     };
 
     // إغلاق القائمة عند النقر خارجها
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (profileMenuRef.current && 
+            if (profileMenuRef.current &&
                 !profileMenuRef.current.contains(event.target as Node)) {
                 setShowProfileMenu(false);
             }
@@ -105,76 +197,81 @@ const Navbar = () => {
         };
     }, []);
 
-    // ⭐⭐ دالة محسنة للحصول على الصورة ⭐⭐
-    const getUserImage = (size: 'small' | 'large' = 'small'): string => {
-        // استخدم البيانات المحلية أولاً
-        const storedUser = getStoredUser?.();
-        
-        if (storedUser) {
-            const name = storedUser.full_name || storedUser.email || 'User';
-            
-            if (storedUser.image && storedUser.image.trim() !== '' && storedUser.image !== 'null') {
-                let img = storedUser.image;
-                if (img.startsWith('/')) {
-                    img = `http://localhost:8000${img}`;
-                }
-                return img;
-            }
-            
-            // صورة افتراضية من الحروف
+    // ⭐ **دالة للحصول على صورة المستخدم (من قاعدة البيانات أولاً)** ⭐
+    const getUserImage = (size: 'small' | 'large' = 'small') => {
+        // استخدم البيانات من قاعدة البيانات أولاً
+        const currentUser = userFromDB || user;
+
+        if (userImage && userImage !== '') return userImage;
+
+        if (currentUser) {
+            const name = currentUser.full_name || currentUser.email || 'User';
             const initials = name
                 .split(' ')
                 .map((word: string) => word[0])
                 .join('')
                 .toUpperCase()
                 .slice(0, 2);
-            
-            const sizeValue = size === 'small' ? '100' : '200';
-            return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=${sizeValue}`;
+
+            const imageSize = size === 'small' ? '100' : '200';
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=${imageSize}`;
         }
-        
-        // استخدم البيانات من الهوك
-        if (userImage && userImage !== '') {
-            return size === 'large' ? userImageLarge : userImage;
-        }
-        
-        // أخيراً صورة افتراضية
-        const sizeValue = size === 'small' ? '100' : '200';
-        return `https://ui-avatars.com/api/?name=${encodeURIComponent(userName || 'US')}&background=8b5cf6&color=fff&bold=true&size=${sizeValue}`;
+
+        // صورة افتراضية
+        return `https://ui-avatars.com/api/?name=US&background=8b5cf6&color=fff&bold=true&size=${size === 'small' ? '100' : '200'}`;
     };
 
     // معالجة أخطاء تحميل الصور
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         const imgElement = e.currentTarget;
-        const storedUser = getStoredUser?.();
-        const name = storedUser?.full_name || storedUser?.email || userName || 'User';
+        const currentUser = userFromDB || user;
+        const name = currentUser?.full_name || currentUser?.email || 'User';
         const initials = name
             .split(' ')
             .map((word: string) => word[0])
             .join('')
             .toUpperCase()
             .slice(0, 2);
-        
+
         imgElement.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=100`;
     };
 
-    // روابط النافبار
+    // ⭐⭐ **دالة للحصول على الـ ID للمستخدم الحالي** ⭐⭐
+const getCurrentUserId = () => {
+    const currentUser = userFromDB || user;
+    return currentUser?.id || null;
+};
     const navLinks = [
         { id: 'home', href: '/', label: 'Home', icon: <HiHome size={24} /> },
         { id: 'trending', href: '/trending', label: 'Trending', icon: <FaRocket size={22} /> },
-        { id: 'profile', href: '/profile', label: 'Profile', icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} /> },
+        {
+            id: 'profile',
+            href: `/profile/${getCurrentUserId()}`,
+            label: 'Profile',
+            icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
+        },
         { id: 'posts', href: '/posts', label: 'Posts', icon: <FaFeatherAlt size={22} /> },
     ];
 
     const handleTabClick = async (tabId: string, href: string) => {
         setActiveTab(tabId);
         if (tabId === 'profile') {
-            // تحديث في الخلفية فقط
-            setTimeout(() => {
-                refreshData().catch(console.error);
-            }, 0);
+            await refreshUserData();
         }
-        router.push(href);
+
+        // إذا كان الرابط يحتوي على ID ديناميكي، تأكد من وجوده
+        if (tabId === 'profile' && href.includes('/profile/')) {
+            const userId = getCurrentUserId();
+            if (!userId) {
+                // إذا لم يكن هناك userId، اذهب إلى صفحة تسجيل الدخول
+                router.push('/login');
+                return;
+            }
+            router.push(`/profile/${userId}`);
+        } else {
+            router.push(href);
+        }
+
         setIsMenuOpen(false);
         setShowProfileMenu(false);
     };
@@ -183,34 +280,34 @@ const Navbar = () => {
         router.push('/create-post');
     };
 
-    // ⭐⭐ دالة تسجيل الخروج المعدلة ⭐⭐
     const handleLogout = async () => {
         try {
             await api.post('/logout');
         } catch (error: any) {
             console.log('Logout API response:', error?.response?.data);
         } finally {
-            hookLogout();
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+
+            setIsAuthenticated(false);
+            setUser(null);
+            setUserFromDB(null);
+            setUserImage('');
             setShowProfileMenu(false);
             setIsMenuOpen(false);
+
             router.push('/');
         }
     };
 
-    // ⭐⭐ الحصول على البيانات الحالية ⭐⭐
-    const getCurrentUserData = () => {
-        const storedUser = getStoredUser?.();
-        return storedUser || userData;
+    // ⭐⭐ **دالة للحصول على بيانات المستخدم الحالية** ⭐⭐
+    const getCurrentUser = () => {
+        return userFromDB || user;
     };
 
-    // ⭐⭐ الحصول على الاسم الحالي ⭐⭐
-    const getCurrentUserName = () => {
-        const currentUser = getCurrentUserData();
-        return currentUser?.full_name || currentUser?.email || userName || 'User';
-    };
-
-    // ⭐⭐ حالة التحميل ⭐⭐
-    if (userLoading) {
+    if (isLoading) {
         return (
             <nav className={styles.navbar}>
                 <div className={styles.container}>
@@ -233,7 +330,7 @@ const Navbar = () => {
         );
     }
 
-    const currentUserName = getCurrentUserName();
+    const currentUser = getCurrentUser();
 
     return (
         <>
@@ -258,7 +355,7 @@ const Navbar = () => {
                     <div className={styles.rightSection}>
                         {/* زر إنشاء منشور جديد */}
                         {isAuthenticated && (
-                            <button 
+                            <button
                                 className={styles.createButton}
                                 onClick={handleCreatePost}
                                 aria-label="Create post"
@@ -280,16 +377,16 @@ const Navbar = () => {
                         {/* عرض البروفايل أو أزرار الدخول */}
                         {isAuthenticated ? (
                             <div className={styles.profileDropdown} ref={profileMenuRef}>
-                                <button 
+                                <button
                                     className={styles.profileButton}
                                     onClick={handleProfileMenuClick}
                                     aria-label="Profile menu"
                                     aria-expanded={showProfileMenu ? "true" : "false"}
                                 >
                                     <div className={styles.profileAvatar}>
-                                        <img 
+                                        <img
                                             src={getUserImage('small')}
-                                            alt={currentUserName}
+                                            alt={currentUser?.full_name || 'User'}
                                             className={styles.profileImage}
                                             onError={handleImageError}
                                         />
@@ -301,30 +398,33 @@ const Navbar = () => {
                                 {showProfileMenu && (
                                     <div className={styles.profileMenu}>
                                         <div className={styles.profileMenuHeader}>
-                                            <img 
+                                            <img
                                                 src={getUserImage('large')}
-                                                alt={currentUserName}
+                                                alt={currentUser?.full_name || 'User'}
                                                 className={styles.menuProfileImage}
                                                 onError={handleImageError}
                                             />
                                             <div className={styles.profileInfo}>
-                                                <h4>{currentUserName}</h4>
-                                                <p>{userData?.email || 'No email'}</p>
+                                                <h4>{currentUser?.full_name || 'User'}</h4>
+                                                <p>{currentUser?.email || 'No email'}</p>
+                                                {currentUser?.bio && (
+                                                    <p className={styles.userBio}>{currentUser.bio}</p>
+                                                )}
                                             </div>
                                         </div>
 
                                         <div className={styles.menuDivider} />
 
-                                        <Link 
-                                            href="/profile" 
+                                        <Link
+                                            href={`/profile/${getCurrentUserId()}`}
                                             className={styles.menuItem}
                                             onClick={() => setShowProfileMenu(false)}
                                         >
                                             <RiUserStarLine size={20} />
                                             <span>My Profile</span>
                                         </Link>
-                                        <Link 
-                                            href="/posts" 
+                                        <Link
+                                            href="/posts"
                                             className={styles.menuItem}
                                             onClick={() => setShowProfileMenu(false)}
                                         >
@@ -334,7 +434,7 @@ const Navbar = () => {
 
                                         <div className={styles.menuDivider} />
 
-                                        <button 
+                                        <button
                                             className={styles.logoutButton}
                                             onClick={handleLogout}
                                             aria-label="Log out"
@@ -347,7 +447,7 @@ const Navbar = () => {
                         ) : (
                             <div className={styles.authButtons}>
                                 <Link href="/login" className={styles.loginButton}>
-                                    <IoLogInOutline size={20}/>
+                                    <IoLogInOutline size={20} />
                                     <span>Login</span>
                                 </Link>
                                 <Link href="/register" className={styles.registerButton}>
@@ -391,17 +491,17 @@ const Navbar = () => {
             {isMenuOpen && (
                 <div className={styles.mobileMenu}>
                     <div className={styles.mobileMenuHeader}>
-                        {isAuthenticated && userData ? (
+                        {isAuthenticated && currentUser ? (
                             <div className={styles.mobileProfile}>
-                                <img 
+                                <img
                                     src={getUserImage('large')}
-                                    alt={currentUserName}
+                                    alt={currentUser.full_name}
                                     className={styles.mobileProfileImage}
                                     onError={handleImageError}
                                 />
                                 <div>
-                                    <h4>{currentUserName}</h4>
-                                    <p>{userData?.email || 'No email'}</p>
+                                    <h4>{currentUser.full_name || 'User'}</h4>
+                                    <p>{currentUser.email || 'No email'}</p>
                                 </div>
                             </div>
                         ) : (
@@ -440,7 +540,7 @@ const Navbar = () => {
 
                                 <div className={styles.mobileDivider} />
 
-                                <button 
+                                <button
                                     className={styles.mobileMenuItem}
                                     onClick={() => {
                                         handleCreatePost();
@@ -453,7 +553,7 @@ const Navbar = () => {
 
                                 <div className={styles.mobileDivider} />
 
-                                <button 
+                                <button
                                     className={styles.mobileLogoutButton}
                                     onClick={() => {
                                         handleLogout();
