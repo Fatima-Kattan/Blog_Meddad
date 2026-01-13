@@ -14,7 +14,10 @@ function FollowIcon({ token, followingId, setFollowings }: FollowIconProps) {
 
   const handleFollow = async () => {
     try {
-      // تنفيذ العملية مباشرة بدون نافذة تأكيد
+      // ✅ نافذة تأكيد قبل الإضافة
+      const confirmed = window.confirm("You are about to follow this user. Are you sure?");
+      if (!confirmed) return;
+
       const response = await followService.createFollow(token, followingId);
       console.log("✅ Success:", response.message);
 
@@ -29,6 +32,10 @@ function FollowIcon({ token, followingId, setFollowings }: FollowIconProps) {
           };
         });
       }
+
+      // ✅ إعادة تحميل الصفحة حتى يختفي الشخص من القائمة
+      window.location.reload();
+
     } catch (error: any) {
       console.error("❌ Error:", error.message);
     }
