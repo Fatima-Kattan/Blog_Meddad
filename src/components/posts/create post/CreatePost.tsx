@@ -1,4 +1,3 @@
-// components/CreatePost.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -7,20 +6,42 @@ import CreatePostModal from '../create post model/CreatePostModal';
 import { IoMdAddCircleOutline } from 'react-icons/io';
 import { useUserData } from '@/hooks/useUserData';
 
-const CreatePost = () => {
+// أضف interface
+interface CreatePostProps {
+  onPostCreated?: (newPost: any) => void;
+}
+
+const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { userImage, userName, isLoading } = useUserData();
 
     const handleCreateClick = (e?: React.MouseEvent) => {
         if (e) {
-            e.stopPropagation(); // لمنع انتشار الحدث
+            e.stopPropagation();
         }
         setIsModalOpen(true);
     };
 
-    const handlePostCreated = () => {
-        console.log('Post created successfully!');
+    // غير هذه الدالة - إضافة auto refresh
+    const handlePostCreated = (newPost: any) => {
+        console.log('✅ Post created:', newPost);
         setIsModalOpen(false);
+        
+        // مرر البوست لل parent
+        if (onPostCreated) {
+            onPostCreated(newPost);
+        }
+        
+        // أرسل إشارة refresh للصفحة الرئيسية
+        window.dispatchEvent(new CustomEvent('postCreatedSuccess', { 
+            detail: newPost 
+        }));
+        
+        // إعادة تحميل الصفحة بعد تأخير (حل مؤكد)
+        setTimeout(() => {
+            console.log('🔄 Auto-refreshing page after post creation');
+            window.location.reload();
+        }, 1500);
     };
 
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -28,7 +49,6 @@ const CreatePost = () => {
         imgElement.src = 'https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff&size=40';
     };
 
-    // عرض مؤقت للتحميل
     if (isLoading) {
         return (
             <div className={styles.createPost} onClick={handleCreateClick}>
@@ -67,7 +87,6 @@ const CreatePost = () => {
 
     return (
         <>
-            {/* ⭐⭐ onClick على الكارد كامل ⭐⭐ */}
             <div className={styles.createPost} onClick={() => setIsModalOpen(true)}>
                 <div className={styles.createHeader}>
                     <div className={styles.userAvatar}>

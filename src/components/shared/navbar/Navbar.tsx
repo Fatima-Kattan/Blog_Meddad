@@ -1,5 +1,6 @@
+// src/components/shared/navbar/Navbar.tsx
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
@@ -27,9 +28,6 @@ import {
 
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { IoLogInOutline } from 'react-icons/io5';
-
-// ⭐⭐ استيراد الهوك ⭐⭐
-import { useUserData } from '@/hooks/useUserData';
 import NotificationIcon from '@/components/notification_icon/NotificationIcon';
 
 const Navbar = () => {
@@ -38,6 +36,7 @@ const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [activeTab, setActiveTab] = useState('home');
     const [isLoading, setIsLoading] = useState(true);
+    const [lastDataRefresh, setLastDataRefresh] = useState<Date | null>(null);
 
     const pathname = usePathname();
     const router = useRouter();
@@ -179,10 +178,20 @@ const Navbar = () => {
         }
     };
 
-    // ⭐⭐ **فتح قائمة البروفايل مع تحديث البيانات** ⭐⭐
-    const handleProfileMenuClick = async () => {
-        await refreshUserData();
+    // ⭐⭐ **التعديل هنا: فتح قائمة البروفايل بدون تأخير** ⭐⭐
+    const handleProfileMenuClick = () => {
+        // افتح القائمة فوراً
         setShowProfileMenu(!showProfileMenu);
+        
+        // إذا بتفتح القائمة وكانت البيانات قديمة
+        if (!showProfileMenu) {
+            const now = new Date();
+            if (!lastDataRefresh || (now.getTime() - lastDataRefresh.getTime()) > 60000) { // دقيقة
+                refreshUserData().then(() => {
+                    setLastDataRefresh(now);
+                });
+            }
+        }
     };
 
     // إغلاق القائمة عند النقر خارجها
@@ -240,10 +249,11 @@ const Navbar = () => {
     };
 
     // ⭐⭐ **دالة للحصول على الـ ID للمستخدم الحالي** ⭐⭐
-const getCurrentUserId = () => {
-    const currentUser = userFromDB || user;
-    return currentUser?.id || null;
-};
+    const getCurrentUserId = useCallback(() => {
+        const currentUser = userFromDB || user;
+        return currentUser?.id || null;
+    }, [userFromDB, user]);
+
     const navLinks = [
         { id: 'home', href: '/', label: 'Home', icon: <HiHome size={24} /> },
         { id: 'trending', href: '/trending', label: 'Trending', icon: <FaRocket size={22} /> },
@@ -256,12 +266,9 @@ const getCurrentUserId = () => {
         { id: 'posts', href: '/posts', label: 'Posts', icon: <FaFeatherAlt size={22} /> },
     ];
 
-    const handleTabClick = async (tabId: string, href: string) => {
+    const handleTabClick = useCallback(async (tabId: string, href: string) => {
         setActiveTab(tabId);
-        if (tabId === 'profile') {
-            await refreshUserData();
-        }
-
+        
         // إذا كان الرابط يحتوي على ID ديناميكي، تأكد من وجوده
         if (tabId === 'profile' && href.includes('/profile/')) {
             const userId = getCurrentUserId();
@@ -277,13 +284,13 @@ const getCurrentUserId = () => {
 
         setIsMenuOpen(false);
         setShowProfileMenu(false);
-    };
+    }, [router, getCurrentUserId]);
 
-    const handleCreatePost = () => {
+    const handleCreatePost = useCallback(() => {
         router.push('/create-post');
-    };
+    }, [router]);
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         try {
             await api.post('/logout');
         } catch (error: any) {
@@ -303,12 +310,12 @@ const getCurrentUserId = () => {
 
             router.push('/');
         }
-    };
+    }, [router]);
 
     // ⭐⭐ **دالة للحصول على بيانات المستخدم الحالية** ⭐⭐
-    const getCurrentUser = () => {
+    const getCurrentUser = useCallback(() => {
         return userFromDB || user;
-    };
+    }, [userFromDB, user]);
 
     if (isLoading) {
         return (
