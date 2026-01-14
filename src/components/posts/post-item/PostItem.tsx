@@ -34,7 +34,7 @@ interface PostItemProps {
     };
     onPostDeleted?: (postId: number) => void;
     onImagesUpdated?: () => void;
-    onPostUpdated?: () => void;
+    onPostUpdated?: (updatedPost?: any) => void; // أضفي parameter هنا
 }
 
 const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostItemProps) => {
@@ -298,22 +298,12 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     />
 
                     {/* قسم التعليقات - تم تصحيحه */}
-                    <div 
-                        className={styles.statItem}
-                        onClick={handleCommentsClick}
-                        style={{ cursor: 'pointer' }}
-                    >
+                    <div className={styles.statItem} onClick={handleCommentsClick}>
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
                     </div>
 
-                    {/* قسم المشاركة */}
-                    <div className={styles.statItem}>
-                        <span className={styles.statIcon}>↪️</span>
-                        <span className={styles.statCount}>0</span>
-                        <span className={styles.statLabel}>Share</span>
-                    </div>
                 </div>
 
                 <div className={styles.commentPlaceholder}>
@@ -331,6 +321,15 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     post={currentPost}
                     onClose={() => setShowUpdateModal(false)}
                     onPostUpdated={handlePostUpdateSuccess}
+                />
+            )}
+
+            {showCommentsModal && (
+                <PostCommentsModal
+                    post={currentPost}
+                    isOpen={showCommentsModal}
+                    onClose={() => setShowCommentsModal(false)}
+                    onCommentAdded={handleCommentAdded}
                 />
             )}
 
