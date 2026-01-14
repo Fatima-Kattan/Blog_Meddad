@@ -1,13 +1,16 @@
 // src/components/posts/post-item/PostItem.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PostHeader from '../post-header/PostHeader';
 import PostContent from '../post-content/PostContent';
 import PostImages from '../post-images/PostImages';
 import UpdatePost from '../update-post/UpdatePost';
 import { useUserData } from '@/hooks/useUserData';
 import styles from './PostItem.module.css';
+import LikeButton from '@/components/likes/LikeButton';
+import Link from 'next/link';
+import likesService from '@/services/api/likes/likesService';
 
 interface PostItemProps {
     post: {
@@ -26,7 +29,7 @@ interface PostItemProps {
     };
     onPostDeleted?: (postId: number) => void;
     onImagesUpdated?: () => void;
-    onPostUpdated?: () => void; 
+    onPostUpdated?: () => void;
 }
 
 const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostItemProps) => {
@@ -37,6 +40,43 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
 
     const { userData } = useUserData();
     const isCurrentUser = userData?.id === post.user.id;
+
+    useEffect(() => {
+        const checkLikeStatus = async () => {
+            try {
+                console.log('Checking like status for post:', post.id);
+                
+                // 1. جيب من localStorage أولاً (فوري)
+                const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+                const isLikedLocally = likedPosts.includes(post.id);
+                
+                if (isLikedLocally) {
+                    setIsLiked(true);
+                    console.log('Found in localStorage: liked');
+                    return; // خرجي، ما تحتاجي تكملي للـ API
+                }
+                
+                // 2. إذا مش موجود في localStorage، روح جيب من API
+                const isLikedFromAPI = await likesService.checkUserLike(post.id);
+                console.log('From API:', isLikedFromAPI);
+                setIsLiked(isLikedFromAPI);
+                
+                // 3. خزن في localStorage للمرة الجاية
+                if (isLikedFromAPI) {
+                    const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+                    if (!likedPosts.includes(post.id)) {
+                        likedPosts.push(post.id);
+                        localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error checking like status:', error);
+            }
+        };
+
+        checkLikeStatus();
+    }, [post.id]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -55,15 +95,6 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         });
     };
 
-    const handleLike = () => {
-        if (isLiked) {
-            setLikesCount(prev => prev - 1);
-        } else {
-            setLikesCount(prev => prev + 1);
-        }
-        setIsLiked(!isLiked);
-    };
-
     const handleEditClick = () => {
         setShowUpdateModal(true);
     };
@@ -72,11 +103,39 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         console.log('✅ Post updated, calling parent refresh...');
         setShowUpdateModal(false);
 
-        
         if (onPostUpdated) {
             onPostUpdated();
         } else {
             console.warn('⚠️ onPostUpdated prop is not provided to PostItem');
+        }
+    };
+
+    // دالة تحديث عدد الإعجابات
+    const handleLikeUpdate = (newCount: number, liked: boolean) => {
+        setLikesCount(newCount);
+        setIsLiked(liked);
+        
+        // تحديث localStorage
+        try {
+            const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+            
+            if (liked) {
+                // أضف إذا مش موجود
+                if (!likedPosts.includes(post.id)) {
+                    likedPosts.push(post.id);
+                }
+            } else {
+                // شيل إذا موجود
+                const index = likedPosts.indexOf(post.id);
+                if (index > -1) {
+                    likedPosts.splice(index, 1);
+                }
+            }
+            
+            localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+            console.log('Updated localStorage for post:', post.id, 'liked:', liked);
+        } catch (error) {
+            console.error('Error updating localStorage:', error);
         }
     };
 
@@ -102,23 +161,34 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     <PostImages
                         images={post.images}
                         compact={false}
-                        maxHeight={post.images.length > 2 ? 300 : 400} 
+                        maxHeight={post.images.length > 2 ? 300 : 400}
                     />
                 )}
 
                 <div className={styles.postStats}>
-                    <div className={styles.statItem} onClick={handleLike}>
-                        <span className={styles.statIcon}>
-                            {isLiked ? '❤️' : '🤍'}
-                        </span>
-                        <span className={styles.statCount}>{likesCount}</span>
-                        <span className={styles.statLabel}>Likes</span>
-                    </div>
+                    {/* زر الإعجاب */}
+                    <LikeButton
+                        postId={post.id}
+                        initialLikesCount={likesCount}
+                        isInitiallyLiked={isLiked}
+                        onLikeUpdate={handleLikeUpdate}
+                    />
 
-                    <div className={styles.statItem}>
+                    {/* قسم التعليقات */}
+                    <Link 
+                        href={`/post/${post.id}`} 
+                        className={styles.statItem}
+                    >
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
+                    </Link>
+
+                    {/* قسم المشاركة */}
+                    <div className={styles.statItem}>
+                        <span className={styles.statIcon}>↪️</span>
+                        <span className={styles.statCount}>0</span>
+                        <span className={styles.statLabel}>Share</span>
                     </div>
                 </div>
 
@@ -129,7 +199,6 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 </div>
             </article>
 
-            
             {showUpdateModal && (
                 <UpdatePost
                     post={post}
