@@ -167,7 +167,7 @@ export const useUserData = (options: UserDataOptions = {}): UseUserDataReturn =>
                 /* console.log('API request timed out'); */
             }, 5000);
 
-            const response = await fetch('http://localhost:8000/api/user', {
+            const response = await fetch('http://localhost:8000/api/v1/user', {
                 headers: { 
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'

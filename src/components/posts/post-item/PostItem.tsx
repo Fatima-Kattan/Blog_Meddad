@@ -26,7 +26,7 @@ interface PostItemProps {
     };
     onPostDeleted?: (postId: number) => void;
     onImagesUpdated?: () => void;
-    onPostUpdated?: () => void; // ✅ تأكد من وجود هذا البروب
+    onPostUpdated?: () => void; 
 }
 
 const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostItemProps) => {
@@ -34,7 +34,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     const [likesCount, setLikesCount] = useState(post.likes_count);
     const [commentsCount, setCommentsCount] = useState(post.comments_count);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
-    
+
     const { userData } = useUserData();
     const isCurrentUser = userData?.id === post.user.id;
 
@@ -47,7 +47,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
         if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
         if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-        
+
         return date.toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric',
@@ -71,8 +71,8 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     const handlePostUpdateSuccess = () => {
         console.log('✅ Post updated, calling parent refresh...');
         setShowUpdateModal(false);
+
         
-        // ✅ استدعاء onPostUpdated لإعادة تحميل البيانات في الأب
         if (onPostUpdated) {
             onPostUpdated();
         } else {
@@ -83,7 +83,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     return (
         <>
             <article className={styles.postContainer}>
-                <PostHeader 
+                <PostHeader
                     user={post.user}
                     postDate={formatDate(post.created_at)}
                     postId={post.id}
@@ -92,16 +92,20 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     onImagesUpdated={onImagesUpdated}
                     onEditPost={handleEditClick}
                 />
-                
-                <PostContent 
+
+                <PostContent
                     title={post.title}
                     caption={post.caption}
                 />
-                
+
                 {post.images && post.images.length > 0 && (
-                    <PostImages images={post.images} />
+                    <PostImages
+                        images={post.images}
+                        compact={false}
+                        maxHeight={post.images.length > 2 ? 300 : 400} 
+                    />
                 )}
-                
+
                 <div className={styles.postStats}>
                     <div className={styles.statItem} onClick={handleLike}>
                         <span className={styles.statIcon}>
@@ -110,14 +114,14 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                         <span className={styles.statCount}>{likesCount}</span>
                         <span className={styles.statLabel}>Likes</span>
                     </div>
-                    
+
                     <div className={styles.statItem}>
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
                     </div>
                 </div>
-                
+
                 <div className={styles.commentPlaceholder}>
                     <button className={styles.commentButton}>
                         Write a comment...
@@ -125,12 +129,12 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 </div>
             </article>
 
-            {/* مودال تعديل البوست */}
+            
             {showUpdateModal && (
                 <UpdatePost
                     post={post}
                     onClose={() => setShowUpdateModal(false)}
-                    onPostUpdated={handlePostUpdateSuccess} // ✅ تمرير الدالة
+                    onPostUpdated={handlePostUpdateSuccess}
                 />
             )}
         </>

@@ -356,16 +356,7 @@ const getCurrentUserId = () => {
 
                     {/* الجزء الأيمن: أيقونات */}
                     <div className={styles.rightSection}>
-                        {/* زر إنشاء منشور جديد */}
-                        {isAuthenticated && (
-                            <button
-                                className={styles.createButton}
-                                onClick={handleCreatePost}
-                                aria-label="Create post"
-                            >
-                                <IoMdAddCircleOutline size={25} />
-                            </button>
-                        )}
+                        
 
                         {/* إشعارات */}
                         {isAuthenticated && (

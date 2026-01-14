@@ -13,32 +13,48 @@
 
 .singleImage .imageWrapper {
     width: 100%;
+    height: 400px;
 }
 
 /* Multiple images grid */
 .twoImages {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2px;
+    gap: 3px;
 }
+
+.twoImages .imageWrapper {
+    height: 250px;
+}
+
 
 .threeImages {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 2px;
+    grid-template-rows: auto auto;
+    gap: 3px;
 }
 
 .threeImages .imageWrapper:first-child {
     grid-column: 1 / -1;
     grid-row: 1;
+    height: 220px; 
+}
+
+.threeImages .imageWrapper:nth-child(2),
+.threeImages .imageWrapper:nth-child(3) {
+    height: 160px; 
 }
 
 .fourImages {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: 2px;
+    gap: 3px;
+}
+
+.fourImages .imageWrapper {
+    height: 180px;
 }
 
 .imageWrapper {
@@ -48,7 +64,7 @@
 }
 
 .imageWrapper:hover {
-    transform: scale(1.01);
+    transform: scale(1.02);
 }
 
 .postImage {
@@ -169,6 +185,24 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .twoImages .imageWrapper {
+        height: 200px;
+    }
+    
+    
+    .threeImages .imageWrapper:first-child {
+        height: 180px; 
+    }
+    
+    .threeImages .imageWrapper:nth-child(2),
+    .threeImages .imageWrapper:nth-child(3) {
+        height: 150px; 
+    }
+    
+    .fourImages .imageWrapper {
+        height: 140px;
+    }
+    
     .imageModal {
         padding: 10px;
     }

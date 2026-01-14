@@ -1,15 +1,17 @@
-// components/posts/post-images/PostImages.tsx
+// PostImages.tsx مع unoptimized
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import styles from './PostImages.module.css';
 
 interface PostImagesProps {
     images: string[];
+    compact?: boolean;
+    maxHeight?: number;
 }
 
-const PostImages = ({ images }: PostImagesProps) => {
+const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProps) => {
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
 
     if (!images || images.length === 0) {
@@ -25,6 +27,8 @@ const PostImages = ({ images }: PostImagesProps) => {
     };
 
     const getGridClass = () => {
+        if (compact) return styles.compactGrid;
+        
         switch (images.length) {
             case 1:
                 return styles.singleImage;
@@ -41,8 +45,11 @@ const PostImages = ({ images }: PostImagesProps) => {
 
     return (
         <>
-            <div className={`${styles.imagesContainer} ${getGridClass()}`}>
-                {images.map((imageUrl, index) => (
+            <div 
+                className={`${styles.imagesContainer} ${getGridClass()} ${compact ? styles.compact : ''}`}
+                style={compact ? { maxHeight: `${maxHeight}px` } : {}}
+            >
+                {images.slice(0, compact ? 4 : images.length).map((imageUrl, index) => (
                     <div 
                         key={index} 
                         className={styles.imageWrapper}
@@ -51,18 +58,26 @@ const PostImages = ({ images }: PostImagesProps) => {
                         <Image
                             src={imageUrl}
                             alt={`Post image ${index + 1}`}
-                            width={600}
-                            height={400}
+                            width={compact ? 150 : 600}
+                            height={compact ? 150 : 400}
                             className={styles.postImage}
+                            unoptimized={true} 
+                            loading={index < 2 ? 'eager' : 'lazy'}
                             onError={(e) => {
                                 e.currentTarget.src = '/default-image.png';
                             }}
                         />
                         
                         {/* Show image count for multiple images */}
-                        {images.length > 1 && index === 3 && images.length > 4 && (
+                        {!compact && images.length > 1 && index === 3 && images.length > 4 && (
                             <div className={styles.moreImagesOverlay}>
                                 +{images.length - 4} more
+                            </div>
+                        )}
+                        
+                        {compact && images.length > 4 && index === 3 && (
+                            <div className={styles.compactMoreOverlay}>
+                                +{images.length - 3}
                             </div>
                         )}
                     </div>
@@ -81,13 +96,13 @@ const PostImages = ({ images }: PostImagesProps) => {
                             ×
                         </button>
                         
-                        <Image
-                            src={images[selectedImageIndex]}
-                            alt={`Selected image ${selectedImageIndex + 1}`}
-                            width={800}
-                            height={600}
-                            className={styles.modalImage}
-                        />
+                        <div className={styles.modalImageContainer}>
+                            <img
+                                src={images[selectedImageIndex]}
+                                alt={`Selected image ${selectedImageIndex + 1}`}
+                                className={styles.modalImage}
+                            />
+                        </div>
                         
                         {/* Navigation for multiple images */}
                         {images.length > 1 && (
