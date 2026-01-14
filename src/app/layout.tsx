@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from '@/components/shared/navbar/Navbar';
 import ConditionalNavbar from '@/components/shared/navbar/ConditionalNavbar';
+import { NotificationsProvider } from '@/context/NotificationContext'; // ✅ استدعاء البروفايدر
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,10 +28,12 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <ConditionalNavbar />
-        <main>{children}</main>
+        {/* ✅ غلف كل محتوى الموقع بالبروفايدر */}
+        <NotificationsProvider>
+          <ConditionalNavbar />
+          <main>{children}</main>
+        </NotificationsProvider>
       </body>
-
     </html>
   );
 }

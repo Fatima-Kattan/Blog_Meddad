@@ -28,7 +28,7 @@ import {
 
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { IoLogInOutline } from 'react-icons/io5';
-import NotificationIcon from '@/components/notification_icon/NotificationIcon';
+import NotificationIcon from '@/components/notification/notification_icon/NotificationIcon';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
