@@ -5,16 +5,17 @@ import styles from './CreatePostModal.module.css';
 import {
     HiPhotograph,
     HiX,
+    HiHashtag
 } from 'react-icons/hi';
 import { useUserData } from '@/hooks/useUserData';
 import { createPost } from '@/services/api/posts/createPost';
 import InputField from '@/components/shared/InputField';
 
-// غير interface
+// ⭐ أضف interface للـ tags
 interface CreatePostModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onPostCreated: (newPost: any) => void; // غير هنا
+    onPostCreated: (newPost: any) => void;
 }
 
 interface CreatePostData {
@@ -26,7 +27,7 @@ interface CreatePostData {
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ 
     isOpen, 
     onClose, 
-    onPostCreated // غير هنا
+    onPostCreated
 }) => {
     const [postData, setPostData] = useState<CreatePostData>({
         title: '',
@@ -42,13 +43,27 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     const { userImage, userName, userData, refreshData } = useUserData();
     
     const modalRef = useRef<HTMLDivElement>(null);
-    const urlInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (isOpen) {
             refreshData();
         }
     }, [isOpen, refreshData]);
+
+    // ⭐ دالة لتمييز التاغات في النص
+    const highlightHashtags = (text: string) => {
+        return text.replace(/#(\w+)/g, '<span class="hashtag-highlight">#$1</span>');
+    };
+
+    const [previewHtml, setPreviewHtml] = useState('');
+
+    useEffect(() => {
+        if (postData.caption) {
+            setPreviewHtml(highlightHashtags(postData.caption));
+        } else {
+            setPreviewHtml('');
+        }
+    }, [postData.caption]);
 
     const showNotification = (message: string, type: 'success' | 'error') => {
         setNotification({ message, type });
@@ -138,7 +153,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         }
     };
 
-    
+    // ✅ الحل: دالة handleSubmit المعدلة كاملة
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -159,9 +174,14 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             const response = await createPost(postData, token);
             
             showNotification('Post created successfully!', 'success');
-            console.log('✅ Post created:', response);
+            console.log('✅ Post created response:', response);
 
-            // أنشئ الـ newPost object
+            // ✅ التحقق من وجود البيانات
+            if (!response.success || !response.data) {
+                throw new Error('Invalid response from server');
+            }
+
+            // ✅ الكود المعدل مع optional chaining وتحسين التعامل مع البيانات
             const newPost = {
                 id: response.data.id,
                 user: {
@@ -169,23 +189,20 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     full_name: userName,
                     image: userImage
                 },
-                title: response.data.title,
-                caption: response.data.caption,
-                images: response.data.images || [],
-                likes_count: 0,
-                comments_count: 0,
-                created_at: response.data.created_at,
-                updated_at: response.data.updated_at
+                title: response.data.title || postData.title,
+                caption: response.data.caption || postData.caption,
+                images: response.data.images || postData.images || [],
+                created_at: response.data.created_at || new Date().toISOString(),
+                updated_at: response.data.updated_at || new Date().toISOString(),
+                tags: [] 
             };
             
             console.log('🎉 Formatted new post:', newPost);
             
-            // مرر الـ newPost لـ onPostCreated
             if (onPostCreated) {
                 onPostCreated(newPost);
             }
             
-            // أغلق المودال
             setTimeout(() => {
                 resetForm();
                 onClose();
@@ -208,6 +225,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         setImageUrlInput('');
         setIsUrlValid(true);
         setNotification(null);
+        setPreviewHtml('');
     };
 
     const removeImage = (index: number) => {
@@ -273,7 +291,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                             name="caption"
                             value={postData.caption}
                             onChange={handleInputChange}
-                            placeholder="What's on your mind?"
+                            placeholder="What's on your mind? Use #hashtags"
                             className={styles.postTextarea}
                             rows={4}
                             required

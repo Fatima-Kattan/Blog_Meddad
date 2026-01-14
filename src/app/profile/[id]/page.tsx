@@ -4,7 +4,7 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import ProfileService, { UserProfile } from '@/services/api/auth/profileService';
-import Profile from '@/components/auth/profile/profile'; // تأكد من المسار الصحيح
+import Profile from '@/components/auth/profile/profile';
 
 export default function UserProfilePage() {
     const params = useParams();
@@ -16,6 +16,11 @@ export default function UserProfilePage() {
     const [error, setError] = useState<string | null>(null);
     
     useEffect(() => {
+        // ⭐⭐ تنظيف عند الدخول للصفحة
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('profileOpenedFromTop');
+        }
+        
         const fetchProfile = async () => {
             try {
                 setLoading(true);
@@ -44,6 +49,13 @@ export default function UserProfilePage() {
         };
         
         fetchProfile();
+        
+        // تنظيف إضافي عند مغادرة الصفحة
+        return () => {
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('profileOpenedFromTop');
+            }
+        };
     }, [userId, router]);
     
     if (loading) {
