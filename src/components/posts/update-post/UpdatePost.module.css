@@ -1,4 +1,4 @@
-/* components/posts/update-post/UpdatePost.module.css */
+/* src/components/posts/update-post/UpdatePost.module.css */
 :root {
     --color-primary: #8b5cf6;
     --color-primary-dark: #6d28d9;
@@ -45,6 +45,13 @@
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     border: 1px solid var(--color-border);
+    position: relative; /* ⭐ مهم */
+}
+
+.modalContentWrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 80px; 
 }
 
 @keyframes fadeIn {
@@ -63,16 +70,21 @@
     }
 }
 
+
 .modalHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 20px 24px;
     border-bottom: 1px solid var(--color-border);
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(109, 40, 217, 0.05));
+    background: var(--color-surface);
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 100; 
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
+    margin-bottom: -1px; 
 }
 
 .modalTitle {
@@ -140,7 +152,7 @@
 .editNote {
     margin: 0;
     font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    color: var(--color-text-muted);
 }
 
 .modalForm {
@@ -179,6 +191,7 @@
 .textAreaContainer {
     padding: 20px 24px;
     border-bottom: 1px solid var(--color-border);
+    position: relative;
 }
 
 .postTextarea {
@@ -204,6 +217,39 @@
 
 .postTextarea::placeholder {
     color: var(--color-text-muted);
+}
+
+/* ⭐ معاينة التاغات */
+.previewSection {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(26, 11, 46, 0.3);
+    border-radius: 8px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.previewLabel {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.previewContent {
+    color: var(--color-text);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+
+.hashtag-highlight {
+    color: var(--color-primary);
+    font-weight: 600;
+    background: rgba(139, 92, 246, 0.15);
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin: 0 2px;
 }
 
 /* عرض الصور المضافة */
@@ -333,17 +379,17 @@
 }
 
 .urlSubmitButton {
-    padding: 8px 16px;
+    padding: 0.75rem 1.5rem;
     background: var(--color-primary);
     border: none;
-    border-radius: 6px;
+    border-radius: 0.5rem;
     color: var(--color-text);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
-    min-width: 60px;
+    height: fit-content;
 }
 
 .urlSubmitButton:hover:not(:disabled) {
@@ -380,9 +426,28 @@
     display: flex;
     padding: 20px 24px;
     gap: 12px;
-    background: rgba(10, 4, 24, 0.5);
+    background: var(--color-surface); /* ⭐ غير لثابت */
     position: sticky;
     bottom: 0;
+    z-index: 100;
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+/* أضف بعد actionButtons: */
+.actionButtons::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    /* background: linear-gradient(to top, 
+        var(--color-surface) 0%,
+        rgba(26, 11, 46, 0.8) 50%,
+        transparent 100%
+    ); */
+    pointer-events: none;
+    z-index: -1;
 }
 
 .cancelButton {
@@ -463,9 +528,6 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     min-width: 300px;
     max-width: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 .notificationSuccess {
@@ -478,6 +540,11 @@
     border-left: 4px solid #b91c1c;
 }
 
+.notificationInfo {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border-left: 4px solid #1d4ed8;
+}
+
 @keyframes slideIn {
     from {
         transform: translateX(100%);
@@ -487,42 +554,6 @@
         transform: translateX(0);
         opacity: 1;
     }
-}
-
-/* في UpdatePost.module.css - أضف هذا فقط */
-.inputFieldWrapper {
-    flex: 1;
-}
-
-/* تأكد من أن زر Add يظهر بشكل صحيح */
-.urlInputGroup {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    width: 100%;
-}
-
-.urlSubmitButton {
-    padding: 0.75rem 1.5rem;
-    background: var(--color-primary);
-    border: none;
-    border-radius: 0.5rem;
-    color: var(--color-text);
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-    height: fit-content;
-    margin-top: 1.5rem; 
-}
-
-.inputFieldWrapper :global(.input-group) {
-    margin-bottom: 0; 
-}
-
-.inputFieldWrapper :global(.input-label) {
-    display: none; 
 }
 
 /* تصميم متجاوب */
@@ -565,5 +596,9 @@
     .postTextarea {
         padding: 10px 14px;
         font-size: 0.875rem;
+    }
+    
+    .previewSection {
+        padding: 8px;
     }
 }

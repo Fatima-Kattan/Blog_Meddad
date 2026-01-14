@@ -1,4 +1,3 @@
-// components/create post model/CreatePostModal.tsx
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -6,28 +5,29 @@ import styles from './CreatePostModal.module.css';
 import {
     HiPhotograph,
     HiX,
+    HiHashtag
 } from 'react-icons/hi';
 import { useUserData } from '@/hooks/useUserData';
 import { createPost } from '@/services/api/posts/createPost';
 import InputField from '@/components/shared/InputField';
 
+// ⭐ أضف interface للـ tags
 interface CreatePostModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onPostCreated: () => void;
+    onPostCreated: (newPost: any) => void;
 }
 
-// واجهة مطابقة للحقول في Laravel Controller
 interface CreatePostData {
     title: string;
     caption: string;
-    images: string[]; // مصفوفة من الروابط
+    images: string[];
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ 
     isOpen, 
     onClose, 
-    onPostCreated 
+    onPostCreated
 }) => {
     const [postData, setPostData] = useState<CreatePostData>({
         title: '',
@@ -43,7 +43,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
     const { userImage, userName, userData, refreshData } = useUserData();
     
     const modalRef = useRef<HTMLDivElement>(null);
-    const urlInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -51,7 +50,21 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         }
     }, [isOpen, refreshData]);
 
-    // إظهار الإشعار
+    // ⭐ دالة لتمييز التاغات في النص
+    const highlightHashtags = (text: string) => {
+        return text.replace(/#(\w+)/g, '<span class="hashtag-highlight">#$1</span>');
+    };
+
+    const [previewHtml, setPreviewHtml] = useState('');
+
+    useEffect(() => {
+        if (postData.caption) {
+            setPreviewHtml(highlightHashtags(postData.caption));
+        } else {
+            setPreviewHtml('');
+        }
+    }, [postData.caption]);
+
     const showNotification = (message: string, type: 'success' | 'error') => {
         setNotification({ message, type });
         setTimeout(() => setNotification(null), 3000);
@@ -62,7 +75,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         imgElement.src = 'https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff&size=40';
     };
 
-    // إغلاق المودال عند الضغط على ESC
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
@@ -79,7 +91,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         };
     }, [isOpen, onClose]);
 
-    // إغلاق عند النقر خارج المودال
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (modalRef.current && 
@@ -117,7 +128,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             return;
         }
         
-        // التحقق من عدد الصور (الحد الأقصى 4)
         if (postData.images.length >= 4) {
             showNotification('You can add up to 4 images only', 'error');
             return;
@@ -135,7 +145,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         setPostData(prev => ({ ...prev, [name]: value }));
     };
 
-    // دالة خاصة لـ InputField (لأن onChange في InputField يتوقع React.ChangeEvent<HTMLInputElement>)
     const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setImageUrlInput(value);
@@ -144,10 +153,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         }
     };
 
+    // ✅ الحل: دالة handleSubmit المعدلة كاملة
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        // التحقق من المدخلات الأساسية
         if (!postData.caption.trim() || !postData.title.trim()) {
             showNotification('Please add title and caption to your post', 'error');
             return;
@@ -156,24 +165,48 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         setIsLoading(true);
 
         try {
-            // الحصول على التوكن من localStorage
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('Authentication required. Please login again.');
             }
 
             console.log('📤 Creating post with data:', postData);
-
-            // استدعاء API إنشاء البوست
             const response = await createPost(postData, token);
             
             showNotification('Post created successfully!', 'success');
-            console.log('✅ Post created:', response);
+            console.log('✅ Post created response:', response);
 
-            // نجاح
-            onPostCreated();
-            resetForm();
-            onClose();
+            // ✅ التحقق من وجود البيانات
+            if (!response.success || !response.data) {
+                throw new Error('Invalid response from server');
+            }
+
+            // ✅ الكود المعدل مع optional chaining وتحسين التعامل مع البيانات
+            const newPost = {
+                id: response.data.id,
+                user: {
+                    id: userData?.id || 0,
+                    full_name: userName,
+                    image: userImage
+                },
+                title: response.data.title || postData.title,
+                caption: response.data.caption || postData.caption,
+                images: response.data.images || postData.images || [],
+                created_at: response.data.created_at || new Date().toISOString(),
+                updated_at: response.data.updated_at || new Date().toISOString(),
+                tags: [] 
+            };
+            
+            console.log('🎉 Formatted new post:', newPost);
+            
+            if (onPostCreated) {
+                onPostCreated(newPost);
+            }
+            
+            setTimeout(() => {
+                resetForm();
+                onClose();
+            }, 1000);
             
         } catch (error: any) {
             console.error('❌ Error creating post:', error);
@@ -192,6 +225,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
         setImageUrlInput('');
         setIsUrlValid(true);
         setNotification(null);
+        setPreviewHtml('');
     };
 
     const removeImage = (index: number) => {
@@ -205,7 +239,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
 
     return (
         <div className={styles.modalOverlay}>
-            {/* إشعار مخصص */}
             {notification && (
                 <div className={`${styles.customNotification} ${notification.type === 'success' ? styles.notificationSuccess : styles.notificationError}`}>
                     {notification.message}
@@ -213,7 +246,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
             )}
             
             <div className={styles.modalContainer} ref={modalRef}>
-                {/* هيدر المودال */}
                 <div className={styles.modalHeader}>
                     <h2 className={styles.modalTitle}>Create Post</h2>
                     <button 
@@ -225,7 +257,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     </button>
                 </div>
 
-                {/* صورة المستخدم */}
                 <div className={styles.userSection}>
                     <div className={styles.userInfo}>
                         <div className={styles.userAvatar}>
@@ -242,9 +273,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                     </div>
                 </div>
 
-                {/* الفورم الرئيسي */}
                 <form onSubmit={handleSubmit} className={styles.modalForm}>
-                    {/* حقل العنوان (يبقى input عادي) */}
                     <div className={styles.inputContainer}>
                         <input
                             type="text"
@@ -257,20 +286,18 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                         />
                     </div>
 
-                    {/* حقل الوصف (يبقى textarea عادي) */}
                     <div className={styles.textAreaContainer}>
                         <textarea
                             name="caption"
                             value={postData.caption}
                             onChange={handleInputChange}
-                            placeholder="What's on your mind?"
+                            placeholder="What's on your mind? Use #hashtags"
                             className={styles.postTextarea}
                             rows={4}
                             required
                         />
                     </div>
 
-                    {/* عرض الصور المضافة */}
                     {postData.images.length > 0 && (
                         <div className={styles.imagesPreview}>
                             <h3 className={styles.previewTitle}>Added Images ({postData.images.length}/4)</h3>
@@ -301,7 +328,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                         </div>
                     )}
 
-                    {/* قسم إضافة الصور عبر الرابط */}
                     <div className={styles.imageUploadSection}>
                         <div className={styles.sectionHeader}>
                             <HiPhotograph size={20} />
@@ -318,17 +344,15 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                         
                         <div className={styles.urlForm}>
                             <div className={styles.urlInputGroup}>
-                                {/* ⭐⭐ هنا استخدم InputField كما هو بدون تعديل */}
                                 <div className={styles.inputFieldWrapper}>
                                     <InputField
-                                        label="" // نتركه فارغاً لأننا لا نريد label
+                                        label=""
                                         name="imageUrl"
                                         type="url"
                                         value={imageUrlInput}
-                                        onChange={handleImageUrlChange} // ⬅️ هذه تأخذ React.ChangeEvent<HTMLInputElement>
+                                        onChange={handleImageUrlChange}
                                         placeholder="Enter image URL (jpg, png, gif, etc.)"
                                         disabled={postData.images.length >= 4}
-                                        // ⭐ نمرر error فقط إذا كان موجوداً في InputField
                                         error={!isUrlValid && imageUrlInput ? 'Please enter a valid image URL' : undefined}
                                     />
                                 </div>
@@ -341,7 +365,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                                     Add
                                 </button>
                             </div>
-                            {/* نعرض رسائل الخطأ هنا بدلاً من في InputField إذا كان لا يدعم error */}
                             {!isUrlValid && imageUrlInput && (
                                 <p className={styles.errorText}>
                                     Please enter a valid image URL
@@ -358,7 +381,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                         </div>
                     </div>
 
-                    {/* أزرار الإجراء */}
                     <div className={styles.actionButtons}>
                         <button
                             type="button"

@@ -28,7 +28,7 @@ export const usePosts = (initialPage = 1, limit = 10): UsePostsReturn => {
             const response: PostsResponse = await getPosts(page, limit);
 
             if (response.success) {
-                // الـ Laravel يعيد البيانات في response.data.data
+                
                 const postsData = response.data.data || [];
                 
                 if (isLoadMore) {
@@ -37,13 +37,13 @@ export const usePosts = (initialPage = 1, limit = 10): UsePostsReturn => {
                     setPosts(postsData);
                 }
                 
-                // تحقق إذا في صفحات أكثر
+                
                 setHasMore(response.data.current_page < response.data.last_page);
             } else {
-                setError(response.message || 'فشل في جلب المنشورات');
+                setError(response.message || 'Failed to fetch posts');
             }
         } catch (err: any) {
-            setError(err.message || 'حدث خطأ في الاتصال');
+            setError(err.message || 'A connection error occurred');
         } finally {
             setLoading(false);
         }

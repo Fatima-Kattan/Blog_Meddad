@@ -3,33 +3,55 @@
 
 import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const ConditionalNavbar = () => {
   const pathname = usePathname();
   
   // صفحات لا نريد فيها النافبار
   const hiddenPaths = ['/login', '/register'];
-  const hasNavbar = !hiddenPaths.includes(pathname || '');
   
-  // أضف/شيل كلاس من الـ body حسب وجود النافبار
+  // تحقق إذا كان المسار يحتوي على /profile/
+  const isProfilePage = pathname?.startsWith('/profile/');
+  
+  // حالة تتبع إذا كانت صفحة البروفايل مفتوحة من الأعلى
+  const [hideNavForProfile, setHideNavForProfile] = useState(false);
+  
   useEffect(() => {
-    if (hasNavbar) {
-      document.body.classList.add('with-navbar');
-      document.body.classList.remove('without-navbar');
+    if (isProfilePage && typeof window !== 'undefined') {
+      // تحقق من localStorage
+      const openedFromTop = localStorage.getItem('profileOpenedFromTop') === 'true';
+      setHideNavForProfile(openedFromTop);
+      
+      // نظف localStorage بعد القراءة
+      if (openedFromTop) {
+        localStorage.removeItem('profileOpenedFromTop');
+      }
     } else {
+      setHideNavForProfile(false);
+    }
+  }, [pathname, isProfilePage]);
+  
+  // قرار إخفاء النافبار
+  const shouldHideNavbar = 
+    hiddenPaths.includes(pathname || '') || 
+    (isProfilePage && hideNavForProfile);
+  
+  useEffect(() => {
+    if (shouldHideNavbar) {
       document.body.classList.add('without-navbar');
       document.body.classList.remove('with-navbar');
+    } else {
+      document.body.classList.add('with-navbar');
+      document.body.classList.remove('without-navbar');
     }
     
-    // تنظيف عند unmount
     return () => {
       document.body.classList.remove('with-navbar', 'without-navbar');
     };
-  }, [hasNavbar]);
+  }, [shouldHideNavbar]);
   
-  // إذا كان المسار ضمن hiddenPaths، لا نعرض النافبار
-  if (!hasNavbar) {
+  if (shouldHideNavbar) {
     return null;
   }
   

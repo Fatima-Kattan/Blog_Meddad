@@ -1,0 +1,154 @@
+/* src/components/posts/post-comments/PostCommentsModal.module.css */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    padding: 16px;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal {
+    width: 100%;
+    max-width: 500px;
+    max-height: 80vh;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #666;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.closeButton:hover {
+    background: #f5f5f5;
+}
+
+.title {
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    flex: 1;
+}
+
+.postContent {
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+    background: #f9f9f9;
+}
+
+.postHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.userAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ddd;
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+}
+
+.userName {
+    color: #333;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.postTime {
+    color: #777;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.postCaption {
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 8px 0;
+}
+
+.postImages {
+    margin-top: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+}
+
+.mainImage {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.commentsListWrapper {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 300px;
+    padding: 8px 0;
+}
+
+.commentFormWrapper {
+    padding: 12px 16px;
+    border-top: 1px solid #eee;
+    background: #fff;
+}

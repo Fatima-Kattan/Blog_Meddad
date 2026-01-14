@@ -1,5 +1,6 @@
+// src/components/shared/navbar/Navbar.tsx
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import styles from './Navbar.module.css';
@@ -27,9 +28,6 @@ import {
 
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { IoLogInOutline } from 'react-icons/io5';
-
-// ⭐⭐ استيراد الهوك ⭐⭐
-import { useUserData } from '@/hooks/useUserData';
 import NotificationIcon from '@/components/notification_icon/NotificationIcon';
 
 const Navbar = () => {
@@ -38,6 +36,7 @@ const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [activeTab, setActiveTab] = useState('home');
     const [isLoading, setIsLoading] = useState(true);
+    const [lastDataRefresh, setLastDataRefresh] = useState<Date | null>(null);
 
     const pathname = usePathname();
     const router = useRouter();
@@ -179,10 +178,20 @@ const Navbar = () => {
         }
     };
 
-    // ⭐⭐ **فتح قائمة البروفايل مع تحديث البيانات** ⭐⭐
-    const handleProfileMenuClick = async () => {
-        await refreshUserData();
+    // ⭐⭐ **التعديل هنا: فتح قائمة البروفايل بدون تأخير** ⭐⭐
+    const handleProfileMenuClick = () => {
+        // افتح القائمة فوراً
         setShowProfileMenu(!showProfileMenu);
+        
+        // إذا بتفتح القائمة وكانت البيانات قديمة
+        if (!showProfileMenu) {
+            const now = new Date();
+            if (!lastDataRefresh || (now.getTime() - lastDataRefresh.getTime()) > 60000) { // دقيقة
+                refreshUserData().then(() => {
+                    setLastDataRefresh(now);
+                });
+            }
+        }
     };
 
     // إغلاق القائمة عند النقر خارجها
@@ -240,50 +249,56 @@ const Navbar = () => {
     };
 
     // ⭐⭐ **دالة للحصول على الـ ID للمستخدم الحالي** ⭐⭐
-const getCurrentUserId = () => {
-    const currentUser = userFromDB || user;
-    return currentUser?.id || null;
-};
+    const getCurrentUserId = useCallback(() => {
+        const currentUser = userFromDB || user;
+        return currentUser?.id || null;
+    }, [userFromDB, user]);
+
+    // ⭐⭐ **تعديل navLinks** ⭐⭐
     const navLinks = [
         { id: 'home', href: '/', label: 'Home', icon: <HiHome size={24} /> },
         { id: 'trending', href: '/trending', label: 'Trending', icon: <FaRocket size={22} /> },
         {
             id: 'profile',
-            href: `/profile/${getCurrentUserId()}`,
+            href: '#', // ⭐⭐ غير إلى #
             label: 'Profile',
             icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
         },
         { id: 'posts', href: '/posts', label: 'Posts', icon: <FaFeatherAlt size={22} /> },
     ];
 
-    const handleTabClick = async (tabId: string, href: string) => {
+    // ⭐⭐ **تعديل handleTabClick** ⭐⭐
+    const handleTabClick = useCallback(async (tabId: string, href: string) => {
         setActiveTab(tabId);
+        
+        // ⭐⭐ التعامل الخاص بالبروفايل من القائمة السفلية
         if (tabId === 'profile') {
-            await refreshUserData();
-        }
-
-        // إذا كان الرابط يحتوي على ID ديناميكي، تأكد من وجوده
-        if (tabId === 'profile' && href.includes('/profile/')) {
-            const userId = getCurrentUserId();
-            if (!userId) {
-                // إذا لم يكن هناك userId، اذهب إلى صفحة تسجيل الدخول
-                router.push('/login');
-                return;
+            // ⭐⭐ تأكد من إزالة العلامة إذا فُتح من الأسفل
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('profileOpenedFromTop');
             }
-            router.push(`/profile/${userId}`);
-        } else {
-            router.push(href);
+            
+            const userId = getCurrentUserId();
+            if (userId) {
+                router.push(`/profile/${userId}`);
+            }
+            
+            setIsMenuOpen(false);
+            setShowProfileMenu(false);
+            return;
         }
-
+        
+        // لباقي التبويبات
+        router.push(href);
         setIsMenuOpen(false);
         setShowProfileMenu(false);
-    };
+    }, [router, getCurrentUserId]);
 
-    const handleCreatePost = () => {
+    const handleCreatePost = useCallback(() => {
         router.push('/create-post');
-    };
+    }, [router]);
 
-    const handleLogout = async () => {
+    const handleLogout = useCallback(async () => {
         try {
             await api.post('/logout');
         } catch (error: any) {
@@ -292,6 +307,7 @@ const getCurrentUserId = () => {
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                localStorage.removeItem('profileOpenedFromTop');
             }
 
             setIsAuthenticated(false);
@@ -303,12 +319,12 @@ const getCurrentUserId = () => {
 
             router.push('/');
         }
-    };
+    }, [router]);
 
     // ⭐⭐ **دالة للحصول على بيانات المستخدم الحالية** ⭐⭐
-    const getCurrentUser = () => {
+    const getCurrentUser = useCallback(() => {
         return userFromDB || user;
-    };
+    }, [userFromDB, user]);
 
     if (isLoading) {
         return (
@@ -402,14 +418,28 @@ const getCurrentUserId = () => {
 
                                         <div className={styles.menuDivider} />
 
-                                        <Link
-                                            href={`/profile/${getCurrentUserId()}`}
+                                        {/* ⭐⭐ استخدم button بدل Link للتحكم الكامل ⭐⭐ */}
+                                        <button
                                             className={styles.menuItem}
-                                            onClick={() => setShowProfileMenu(false)}
+                                            onClick={() => {
+                                                // ⭐⭐ ضع علامة أن البروفايل فتح من الأعلى
+                                                if (typeof window !== 'undefined') {
+                                                    localStorage.setItem('profileOpenedFromTop', 'true');
+                                                }
+                                                
+                                                // انتقل إلى صفحة البروفايل
+                                                const userId = getCurrentUserId();
+                                                if (userId) {
+                                                    router.push(`/profile/${userId}`);
+                                                }
+                                                
+                                                // أغلق القائمة المنسدلة
+                                                setShowProfileMenu(false);
+                                            }}
                                         >
                                             <RiUserStarLine size={20} />
                                             <span>My Profile</span>
-                                        </Link>
+                                        </button>
                                         <Link
                                             href="/posts"
                                             className={styles.menuItem}
@@ -509,7 +539,30 @@ const getCurrentUserId = () => {
                     <div className={styles.mobileLinks}>
                         {isAuthenticated ? (
                             <>
-                                {navLinks.map((link) => (
+                                {/* ⭐⭐ تعديل رابط البروفايل للجوال ⭐⭐ */}
+                                <button
+                                    className={`${styles.mobileLink} ${activeTab === 'profile' ? styles.active : ''}`}
+                                    onClick={() => {
+                                        // ⭐⭐ ضع علامة للفتح من الأعلى للجوال أيضًا
+                                        if (typeof window !== 'undefined') {
+                                            localStorage.setItem('profileOpenedFromTop', 'true');
+                                        }
+                                        
+                                        const userId = getCurrentUserId();
+                                        if (userId) {
+                                            router.push(`/profile/${userId}`);
+                                        }
+                                        setIsMenuOpen(false);
+                                    }}
+                                >
+                                    <span className={styles.mobileLinkIcon}>
+                                        <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
+                                    </span>
+                                    Profile
+                                </button>
+
+                                {/* روابط أخرى */}
+                                {navLinks.filter(link => link.id !== 'profile').map((link) => (
                                     <Link
                                         key={link.id}
                                         href={link.href}

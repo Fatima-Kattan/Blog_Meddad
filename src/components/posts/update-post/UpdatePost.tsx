@@ -6,9 +6,10 @@ import styles from './UpdatePost.module.css';
 import {
     HiPhotograph,
     HiX,
+    HiHashtag
 } from 'react-icons/hi';
 import { useUserData } from '@/hooks/useUserData';
-import { updatePost } from '@/services/api/posts/update-post';
+import { updatePost, UpdatePostData } from '@/services/api/posts/update-post';
 import InputField from '@/components/shared/InputField';
 
 interface UpdatePostProps {
@@ -17,9 +18,13 @@ interface UpdatePostProps {
         title: string;
         caption: string;
         images: string[];
+        tags?: Array<{ // ⭐ إضافة tags
+            id: number;
+            tag_name: string;
+        }>;
     };
     onClose: () => void;
-    onPostUpdated: () => void;
+    onPostUpdated: (updatedPost: any) => void; // ⭐ تعديل لاستقبال الـ post المحدث
 }
 
 const UpdatePost: React.FC<UpdatePostProps> = ({ 
@@ -27,7 +32,7 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
     onClose, 
     onPostUpdated 
 }) => {
-    const [postData, setPostData] = useState({
+    const [postData, setPostData] = useState<UpdatePostData>({
         post_id: post.id,
         title: post.title,
         caption: post.caption,
@@ -43,13 +48,28 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
     
     const modalRef = useRef<HTMLDivElement>(null);
 
+    // ⭐ دالة لتمييز التاغات في النص
+    const highlightHashtags = (text: string) => {
+        return text.replace(/#(\w+)/g, '<span class="hashtag-highlight">#$1</span>');
+    };
+
+    const [previewHtml, setPreviewHtml] = useState('');
+
+    useEffect(() => {
+        if (postData.caption) {
+            setPreviewHtml(highlightHashtags(postData.caption));
+        } else {
+            setPreviewHtml('');
+        }
+    }, [postData.caption]);
+
     // إظهار الإشعار
     const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
         setNotification({ message, type });
         setTimeout(() => setNotification(null), 3000);
     };
 
-    // ✅ الحل: استخدام useMemo للمقارنة
+    // ✅ الحل: استخدام useMemo للمقارنة مع التاغات
     const hasChanges = useMemo(() => {
         if (postData.title !== post.title) return true;
         if (postData.caption !== post.caption) return true;
@@ -59,6 +79,11 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
         for (let i = 0; i < postData.images.length; i++) {
             if (postData.images[i] !== post.images[i]) return true;
         }
+        
+        // ⭐ التحقق من تغيير التاغات (مقارنة نصية)
+        const oldHashtags = (post.caption?.match(/#(\w+)/g) || []).sort().join(',');
+        const newHashtags = (postData.caption?.match(/#(\w+)/g) || []).sort().join(',');
+        if (oldHashtags !== newHashtags) return true;
         
         return false;
     }, [postData, post]);
@@ -167,21 +192,41 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
             }
 
             console.log('📤 Updating post with data:', postData);
+            console.log('🏷️ Hashtags in caption:', postData.caption.match(/#(\w+)/g));
+            
             const response = await updatePost(postData, token);
             
             showNotification('Post updated successfully!', 'success');
-            console.log('✅ Post updated:', response);
+            console.log('✅ Post updated with tags:', response.data?.tags);
 
-            // ✅ **مهم: أضف تأخير قبل إغلاق المودال وإعادة التحميل**
-            setTimeout(() => {
-                // ✅ استدعاء callback لإعادة تحميل البيانات
-                if (onPostUpdated) {
-                    onPostUpdated();
-                }
+            // ⭐ إنشاء الـ updatedPost object مع التاغات
+            const updatedPost = {
+                id: response.data.id,
+                user: {
+                    id: userData?.id || 0,
+                    full_name: userName,
+                    image: userImage
+                },
+                title: response.data.title,
+                caption: response.data.caption,
+                images: response.data.images || [],
                 
-                // ✅ إغلاق المودال بعد التأكد من تحديث البيانات
+                created_at: response.data.created_at,
+                updated_at: response.data.updated_at,
+                tags: response.data.tags || [] // ⭐ إضافة التاغات
+            };
+            
+            console.log('🎉 Formatted updated post:', updatedPost);
+            
+            // ✅ استدعاء callback وإرسال الـ post المحدث
+            if (onPostUpdated) {
+                onPostUpdated(updatedPost);
+            }
+            
+            // ✅ إغلاق المودال بعد التأكد من تحديث البيانات
+            setTimeout(() => {
                 onClose();
-            }, 500); // تأخير نصف ثانية للتأكد من تحديث السيرفر
+            }, 500);
             
         } catch (error: any) {
             console.error('❌ Error updating post:', error);
@@ -253,7 +298,7 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
                             name="caption"
                             value={postData.caption}
                             onChange={handleInputChange}
-                            placeholder="What's on your mind?"
+                            placeholder="What's on your mind? Use #hashtags"
                             className={styles.postTextarea}
                             rows={4}
                             required
