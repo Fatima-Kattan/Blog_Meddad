@@ -1,7 +1,6 @@
-// PostImages.tsx مع unoptimized
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import styles from './PostImages.module.css';
 
@@ -26,6 +25,10 @@ const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProp
         setSelectedImageIndex(null);
     };
 
+    const handleViewAllClick = () => {
+        setSelectedImageIndex(0);
+    };
+
     const getGridClass = () => {
         if (compact) return styles.compactGrid;
         
@@ -34,14 +37,29 @@ const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProp
                 return styles.singleImage;
             case 2:
                 return styles.twoImages;
-            case 3:
-                return styles.threeImages;
-            case 4:
-                return styles.fourImages;
             default:
-                return styles.multipleImages;
+                // For 3 or more images
+                return styles.threeOrMoreImages;
         }
     };
+
+    // Determine how many images to show initially
+    const getInitialImagesToShow = () => {
+        if (compact) {
+            return images.slice(0, 4);
+        }
+        
+        if (images.length <= 2) {
+            // If 1 or 2 images, show all of them
+            return images;
+        }
+        
+        // If 3 or more images, show only the first two
+        return images.slice(0, 2);
+    };
+
+    const imagesToShow = getInitialImagesToShow();
+    const showViewAllButton = images.length > 2;
 
     return (
         <>
@@ -49,7 +67,7 @@ const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProp
                 className={`${styles.imagesContainer} ${getGridClass()} ${compact ? styles.compact : ''}`}
                 style={compact ? { maxHeight: `${maxHeight}px` } : {}}
             >
-                {images.slice(0, compact ? 4 : images.length).map((imageUrl, index) => (
+                {imagesToShow.map((imageUrl, index) => (
                     <div 
                         key={index} 
                         className={styles.imageWrapper}
@@ -59,32 +77,41 @@ const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProp
                             src={imageUrl}
                             alt={`Post image ${index + 1}`}
                             width={compact ? 150 : 600}
-                            height={compact ? 150 : 400}
+                            height={compact ? 150 : 250}
                             className={styles.postImage}
-                            unoptimized={true} 
-                            loading={index < 2 ? 'eager' : 'lazy'}
+                            unoptimized={true}
+                            loading="eager"
                             onError={(e) => {
                                 e.currentTarget.src = '/default-image.png';
                             }}
                         />
                         
-                        {/* Show image count for multiple images */}
-                        {!compact && images.length > 1 && index === 3 && images.length > 4 && (
-                            <div className={styles.moreImagesOverlay}>
-                                +{images.length - 4} more
-                            </div>
-                        )}
-                        
-                        {compact && images.length > 4 && index === 3 && (
-                            <div className={styles.compactMoreOverlay}>
-                                +{images.length - 3}
+                        {/* Overlay for second image when there are more than 2 images */}
+                        {index === 1 && images.length > 2 && (
+                            <div className={styles.moreOverlay}>
+                                +{images.length - 2}
                             </div>
                         )}
                     </div>
                 ))}
+                
+                {/* View All button for more than 2 images */}
+                {showViewAllButton && !compact && (
+                    <button 
+                        className={styles.viewAllButton}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleViewAllClick();
+                        }}
+                        aria-label="View all photos"
+                    >
+                        {images.length === 3 ? 'View all 3 photos' : `View all ${images.length} photos`}
+                        <span className={styles.viewAllIcon}>→</span>
+                    </button>
+                )}
             </div>
 
-            {/* Image Modal */}
+            {/* Image Modal - shows all images */}
             {selectedImageIndex !== null && (
                 <div className={styles.imageModal} onClick={handleCloseModal}>
                     <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -99,19 +126,25 @@ const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProp
                         <div className={styles.modalImageContainer}>
                             <img
                                 src={images[selectedImageIndex]}
-                                alt={`Selected image ${selectedImageIndex + 1}`}
+                                alt={`Image ${selectedImageIndex + 1}`}
                                 className={styles.modalImage}
+                                onError={(e) => {
+                                    e.currentTarget.src = '/default-image.png';
+                                }}
                             />
                         </div>
                         
-                        {/* Navigation for multiple images */}
+                        {/* Navigation buttons for all images */}
                         {images.length > 1 && (
                             <div className={styles.navigation}>
                                 <button 
                                     className={styles.navButton}
-                                    onClick={() => setSelectedImageIndex(
-                                        selectedImageIndex > 0 ? selectedImageIndex - 1 : images.length - 1
-                                    )}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedImageIndex(
+                                            selectedImageIndex > 0 ? selectedImageIndex - 1 : images.length - 1
+                                        );
+                                    }}
                                     aria-label="Previous image"
                                 >
                                     ←
@@ -123,9 +156,12 @@ const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProp
                                 
                                 <button 
                                     className={styles.navButton}
-                                    onClick={() => setSelectedImageIndex(
-                                        selectedImageIndex < images.length - 1 ? selectedImageIndex + 1 : 0
-                                    )}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedImageIndex(
+                                            selectedImageIndex < images.length - 1 ? selectedImageIndex + 1 : 0
+                                        );
+                                    }}
                                     aria-label="Next image"
                                 >
                                     →
