@@ -6,6 +6,7 @@ import PostHeader from '../post-header/PostHeader';
 import PostContent from '../post-content/PostContent';
 import PostImages from '../post-images/PostImages';
 import UpdatePost from '../update-post/UpdatePost';
+import PostCommentsModal from '../post-comments/PostCommentsModal';
 import { useUserData } from '@/hooks/useUserData';
 import styles from './PostItem.module.css';
 
@@ -38,6 +39,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     const [likesCount, setLikesCount] = useState(post.likes_count);
     const [commentsCount, setCommentsCount] = useState(post.comments_count);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [showCommentsModal, setShowCommentsModal] = useState(false);
     const [currentPost, setCurrentPost] = useState(post);
 
     const { userData } = useUserData();
@@ -131,8 +133,16 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         setIsLiked(!isLiked);
     };
 
+    const handleCommentsClick = () => {
+        setShowCommentsModal(true);
+    };
+
     const handleEditClick = () => {
         setShowUpdateModal(true);
+    };
+
+    const handleCommentAdded = () => {
+        setCommentsCount(prev => prev + 1);
     };
 
     const handlePostUpdateSuccess = (updatedPost?: any) => {
@@ -227,7 +237,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                         <span className={styles.statLabel}>Likes</span>
                     </div>
 
-                    <div className={styles.statItem}>
+                    <div className={styles.statItem} onClick={handleCommentsClick}>
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
@@ -235,7 +245,10 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 </div>
 
                 <div className={styles.commentPlaceholder}>
-                    <button className={styles.commentButton}>
+                    <button 
+                        className={styles.commentButton}
+                        onClick={handleCommentsClick}
+                    >
                         Write a comment...
                     </button>
                 </div>
@@ -246,6 +259,15 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     post={currentPost}
                     onClose={() => setShowUpdateModal(false)}
                     onPostUpdated={handlePostUpdateSuccess}
+                />
+            )}
+
+            {showCommentsModal && (
+                <PostCommentsModal
+                    post={currentPost}
+                    isOpen={showCommentsModal}
+                    onClose={() => setShowCommentsModal(false)}
+                    onCommentAdded={handleCommentAdded}
                 />
             )}
         </>
