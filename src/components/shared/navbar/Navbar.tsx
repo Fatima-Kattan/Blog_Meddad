@@ -405,9 +405,7 @@ const getCurrentUserId = () => {
                                             <div className={styles.profileInfo}>
                                                 <h4>{currentUser?.full_name || 'User'}</h4>
                                                 <p>{currentUser?.email || 'No email'}</p>
-                                                {currentUser?.bio && (
-                                                    <p className={styles.userBio}>{currentUser.bio}</p>
-                                                )}
+                                                
                                             </div>
                                         </div>
 

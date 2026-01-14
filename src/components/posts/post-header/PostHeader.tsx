@@ -9,6 +9,7 @@ import { removeImageFromPost } from '@/services/api/posts/remove-image';
 import { useUserData } from '@/hooks/useUserData';
 import styles from './PostHeader.module.css';
 import Link from 'next/link';
+import { HiPencil, HiPhotograph, HiTrash } from 'react-icons/hi';
 
 interface PostHeaderProps {
     user: {
@@ -174,7 +175,7 @@ const PostHeader = ({
                                     onClick={handleEdit}
                                     disabled={isLoading}
                                 >
-                                    <span className={styles.editIcon}>✏️</span>
+                                    <HiPencil className={styles.editIcon} />
                                     Edit Post
                                 </button>
 
@@ -185,7 +186,7 @@ const PostHeader = ({
                                         onClick={handleAddImages}
                                         disabled={isLoading}
                                     >
-                                        <span className={styles.addImageIcon}>🖼️</span>
+                                        <HiPhotograph className={styles.imageIcon} />
                                         Add Image ({imagesCount}/4)
                                     </button>
                                 )}
@@ -196,7 +197,7 @@ const PostHeader = ({
                                     onClick={handleDelete}
                                     disabled={isLoading}
                                 >
-                                    <span className={styles.deleteIcon}>🗑️</span>
+                                    <HiTrash className={styles.deleteIcon} />
                                     Delete Post
                                 </button>
                             </div>
