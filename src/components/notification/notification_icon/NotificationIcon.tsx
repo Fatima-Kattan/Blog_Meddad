@@ -7,51 +7,51 @@ import NotificationMenu from '../notificationMenu/NotificationMenu';
 import { useNotifications } from '@/context/NotificationContext';
 
 function NotificationIcon() {
-  const { unreadCount } = useNotifications();
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+    const { unreadCount } = useNotifications();
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const toggleMenu = () => {
-    setIsOpen(prev => !prev);
-  };
-
-  // ✅ إغلاق القائمة عند النقر خارجها
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
+    const toggleMenu = () => {
+        setIsOpen(prev => !prev);
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
+    // ✅ إغلاق القائمة عند النقر خارجها
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                wrapperRef.current &&
+                !wrapperRef.current.contains(event.target as Node)
+            ) {
+                setIsOpen(false);
+            }
+        };
 
-  return (
-    <div className={styles.notificationWrapper} ref={wrapperRef}>
-      <button
-        className={styles.iconButton}
-        aria-label="Notifications"
-        onClick={toggleMenu}
-      >
-        <HiBell size={22} />
-        {unreadCount > 0 && (
-          <span className={styles.notificationBadge}>{unreadCount}</span>
-        )}
-      </button>
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
-      {isOpen && (
-        <div className={styles.menuWrapper}>
-          <NotificationMenu />
+    return (
+        <div className={styles.notificationWrapper} ref={wrapperRef}>
+            <button
+                className={styles.iconButton}
+                aria-label="Notifications"
+                onClick={toggleMenu}
+            >
+                <HiBell size={22} />
+                {unreadCount > 0 && (
+                    <span className={styles.notificationBadge}>{unreadCount}</span>
+                )}
+            </button>
+
+            {isOpen && (
+                <div className={styles.menuWrapper}>
+                    <NotificationMenu />
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 }
 
 export default NotificationIcon;

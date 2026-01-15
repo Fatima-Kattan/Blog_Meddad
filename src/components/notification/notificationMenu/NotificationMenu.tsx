@@ -10,7 +10,7 @@ function NotificationMenu() {
   const router = useRouter();
 
   if (notifications.length === 0) {
-    return <div className={styles.empty}>لا يوجد إشعارات</div>;
+    return <div className={styles.empty}>You have no new notifications</div>;
   }
 
   const limitedNotifications = notifications.slice(0, 3);

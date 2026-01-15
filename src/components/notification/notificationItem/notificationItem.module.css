@@ -13,7 +13,6 @@
 }
 
 .unread {
-    /* background:linear-gradient(135deg, #8b5cf61a, #6d28d90d)#34225c67 ; */
     background:linear-gradient(135deg, #8b5cf61a, #6d28d90d)#34225c43 ;
 }
 
@@ -22,7 +21,7 @@
     opacity: 0.85;
 }
 
-.unread:hover {
+.unread:hover,.read:hover  {
     background: linear-gradient(135deg, #8a5cf66a, #6c28d95c);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
@@ -68,7 +67,7 @@
     min-width: 0;
     padding-right: 8px;
 }
-
+/* 
 .notificationTitle {
     font-weight: 600;
     color: #4c1d95;
@@ -79,10 +78,24 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+} */
+
+.notificationTitle {
+    
+    font-weight: 200;
+    color: #ffffff; /* تغيير إلى الأبيض */
+    margin-bottom: 4px;
+    font-size: 75%;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .notificationType {
-    color: #7c3aed;
+    /* color: #7c3aed; */
+    color: rgb(240, 233, 248);
     font-size: 13px;
     margin-bottom: 6px;
     padding: 4px 10px;
@@ -92,15 +105,18 @@
     font-weight: 500;
     border: 1px solid rgba(139, 92, 246, 0.1);
     backdrop-filter: blur(4px);
+    white-space: nowrap;
 }
 
 .notificationTime {
-    font-size: 12px;
+    font-size: 11px;
     color: #a78bfa;
     font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
+    white-space: nowrap;
+
 }
 
 .notificationTime::before {
@@ -117,7 +133,7 @@
     border: none;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 500;
     transition: all 0.3s ease;
     min-width: 110px;
@@ -196,12 +212,11 @@
 
 /* تحسينات للعناصر المقروءة */
 .read .notificationTitle {
-    color: #6d28d9;
-    font-weight: 500;
+    color: #ffffff56;
 }
 
 .read .notificationType {
-    color: #a78bfa;
+    color: #cfadf4;
     background-color: rgba(167, 139, 250, 0.1);
     border-color: rgba(167, 139, 250, 0.15);
 }
@@ -306,3 +321,70 @@
         font-size: 12px;
     }
 }
+
+.actorImage {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(139, 92, 246, 0.2);
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    /* أزلت background من هنا */
+  }
+  
+  /* تنسيق الصورة داخل العنصر */
+  .actorImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* هذي أهم سطر لتكبير/تصغير الصورة */
+  }
+  
+  /* تنسيق الأحرف الأولية */
+  .actorInitials {
+    font-size: 18px; /* أكبر قليلاً */
+    color: #fff;
+    font-weight: 600;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  }
+  
+  /* التأثير اللامع */
+  .actorImage::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      transparent 30%,
+      rgba(255, 255, 255, 0.2) 50%,
+      transparent 70%
+    );
+    transform: rotate(45deg);
+    pointer-events: none; /* مهم حتى لا يمنع الضغط على الصورة */
+  }
+  
+  /* حالة القراءة */
+  .read .actorImage .actorImg {
+    opacity: 0.7;
+    filter: grayscale(30%);
+  }
+  
+  .read .actorImage .actorInitials {
+    background: linear-gradient(135deg, #351e90 0%, #ddd6fe 100%);
+    box-shadow: 0 3px 8px rgba(196, 181, 253, 0.2);
+  }
+
+
+  

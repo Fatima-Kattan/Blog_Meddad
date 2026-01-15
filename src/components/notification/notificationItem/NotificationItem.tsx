@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import styles from './notificationItem.module.css';
-import { useNotifications } from '@/context/NotificationContext'; // ✅ استدعاء الـ context
+import { useNotifications } from '@/context/NotificationContext';
 import { FiCheckCircle } from 'react-icons/fi';
 
 interface Actor {
@@ -12,7 +12,6 @@ interface Actor {
 interface Notification {
     id: number;
     type: string;
-    title: string;
     body: string;
     post_id?: number | null;
     comment_id?: number | null;
@@ -46,12 +45,31 @@ function NotificationItem({ notification }: NotificationItemProps) {
     return (
         <div className={`${styles.notificationItem} ${isRead ? styles.read : styles.unread}`}>
             <div className={styles.actorImage}>
-                <img src={notification.actor.image} alt={notification.actor.full_name} />
+                {notification.actor?.image ? (
+                    <img
+                        src={notification.actor.image}
+                        alt={notification.actor.full_name || 'User'}
+                        className={styles.actorImg}
+                    />
+                ) : (
+                    <span className={styles.actorInitials}>
+                        {notification.actor?.full_name?.charAt(0) || 'U'}
+                    </span>
+                )}
             </div>
-
             <div className={styles.notificationContent}>
-                <div className={styles.notificationTitle}>{notification.title}</div>
-                <div className={styles.notificationType}>{notification.type}</div>
+                <div className={styles.notificationType}>
+                    {notification.type === 'mention' ? '📝 New Post' :
+                        notification.type === 'follow' ? '👤 Follow' :
+                            notification.type === 'like' ? '❤️ Like' : '💬 Comment'}
+                </div>
+                <div className={styles.notificationTitle}>
+                    {notification.type === 'mention' && `${notification.actor.full_name} has just published a new post`}
+                    {notification.type === 'follow' && `${notification.actor.full_name} started following you`}
+                    {notification.type === 'like' && `${notification.actor.full_name} liked your post`}
+                    {notification.type === 'comment' && `${notification.actor.full_name} commented on your post`}
+
+                </div>
                 <div className={styles.notificationTime}>
                     {new Date(notification.created_at).toLocaleString()}
                 </div>
@@ -64,7 +82,7 @@ function NotificationItem({ notification }: NotificationItemProps) {
                     disabled={loading}
                 >
                     <FiCheckCircle />
-                    {loading ? '...جارٍ التحديث' : 'تمّت القراءة'}
+                    {loading ? 'Updating...' : 'Marke as read'}
                 </button>
             )}
         </div>
