@@ -254,34 +254,42 @@ const Navbar = () => {
         return currentUser?.id || null;
     }, [userFromDB, user]);
 
+    // ⭐⭐ **تعديل navLinks** ⭐⭐
     const navLinks = [
         { id: 'home', href: '/', label: 'Home', icon: <HiHome size={24} /> },
         { id: 'trending', href: '/trending', label: 'Trending', icon: <FaRocket size={22} /> },
         {
             id: 'profile',
-            href: `/profile/${getCurrentUserId()}`,
+            href: '#', // ⭐⭐ غير إلى #
             label: 'Profile',
             icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
         },
         { id: 'posts', href: '/posts', label: 'Posts', icon: <FaFeatherAlt size={22} /> },
     ];
 
+    // ⭐⭐ **تعديل handleTabClick** ⭐⭐
     const handleTabClick = useCallback(async (tabId: string, href: string) => {
         setActiveTab(tabId);
         
-        // إذا كان الرابط يحتوي على ID ديناميكي، تأكد من وجوده
-        if (tabId === 'profile' && href.includes('/profile/')) {
-            const userId = getCurrentUserId();
-            if (!userId) {
-                // إذا لم يكن هناك userId، اذهب إلى صفحة تسجيل الدخول
-                router.push('/login');
-                return;
+        // ⭐⭐ التعامل الخاص بالبروفايل من القائمة السفلية
+        if (tabId === 'profile') {
+            // ⭐⭐ تأكد من إزالة العلامة إذا فُتح من الأسفل
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('profileOpenedFromTop');
             }
-            router.push(`/profile/${userId}`);
-        } else {
-            router.push(href);
+            
+            const userId = getCurrentUserId();
+            if (userId) {
+                router.push(`/profile/${userId}`);
+            }
+            
+            setIsMenuOpen(false);
+            setShowProfileMenu(false);
+            return;
         }
-
+        
+        // لباقي التبويبات
+        router.push(href);
         setIsMenuOpen(false);
         setShowProfileMenu(false);
     }, [router, getCurrentUserId]);
@@ -299,6 +307,7 @@ const Navbar = () => {
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
+                localStorage.removeItem('profileOpenedFromTop');
             }
 
             setIsAuthenticated(false);
@@ -409,14 +418,28 @@ const Navbar = () => {
 
                                         <div className={styles.menuDivider} />
 
-                                        <Link
-                                            href={`/profile/${getCurrentUserId()}`}
+                                        {/* ⭐⭐ استخدم button بدل Link للتحكم الكامل ⭐⭐ */}
+                                        <button
                                             className={styles.menuItem}
-                                            onClick={() => setShowProfileMenu(false)}
+                                            onClick={() => {
+                                                // ⭐⭐ ضع علامة أن البروفايل فتح من الأعلى
+                                                if (typeof window !== 'undefined') {
+                                                    localStorage.setItem('profileOpenedFromTop', 'true');
+                                                }
+                                                
+                                                // انتقل إلى صفحة البروفايل
+                                                const userId = getCurrentUserId();
+                                                if (userId) {
+                                                    router.push(`/profile/${userId}`);
+                                                }
+                                                
+                                                // أغلق القائمة المنسدلة
+                                                setShowProfileMenu(false);
+                                            }}
                                         >
                                             <RiUserStarLine size={20} />
                                             <span>My Profile</span>
-                                        </Link>
+                                        </button>
                                         <Link
                                             href="/posts"
                                             className={styles.menuItem}
@@ -516,7 +539,30 @@ const Navbar = () => {
                     <div className={styles.mobileLinks}>
                         {isAuthenticated ? (
                             <>
-                                {navLinks.map((link) => (
+                                {/* ⭐⭐ تعديل رابط البروفايل للجوال ⭐⭐ */}
+                                <button
+                                    className={`${styles.mobileLink} ${activeTab === 'profile' ? styles.active : ''}`}
+                                    onClick={() => {
+                                        // ⭐⭐ ضع علامة للفتح من الأعلى للجوال أيضًا
+                                        if (typeof window !== 'undefined') {
+                                            localStorage.setItem('profileOpenedFromTop', 'true');
+                                        }
+                                        
+                                        const userId = getCurrentUserId();
+                                        if (userId) {
+                                            router.push(`/profile/${userId}`);
+                                        }
+                                        setIsMenuOpen(false);
+                                    }}
+                                >
+                                    <span className={styles.mobileLinkIcon}>
+                                        <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
+                                    </span>
+                                    Profile
+                                </button>
+
+                                {/* روابط أخرى */}
+                                {navLinks.filter(link => link.id !== 'profile').map((link) => (
                                     <Link
                                         key={link.id}
                                         href={link.href}

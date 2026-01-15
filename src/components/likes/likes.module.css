@@ -1,0 +1,591 @@
+/* styles/modules/likes.module.css */
+
+.likeContainer {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 100px;
+}
+
+/* زر القلب */
+.heartButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    transition: all 0.2s ease;
+}
+
+.heartButton:hover:not(:disabled) {
+    background-color: rgba(128, 90, 213, 0.3);
+    transform: scale(1.1);
+    border-color: #805ad5;
+}
+
+.heartButton.liked {
+    /* background-color: rgba(239, 68, 68, 0.2); */
+    border-color: #ef4444;
+}
+
+.heartButton.liked:hover:not(:disabled) {
+    background-color: rgba(188, 56, 56, 0.3);
+}
+
+.heartButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* رابط العرض */
+.likesLink {
+    color: inherit;
+    border-radius: 8px;
+    flex-direction: row;
+    flex: 1;
+    align-items: flex-start;
+    min-width: 60px;
+    padding: 4px 8px;
+    text-decoration: none;
+    transition: all .2s;
+    display: flex;
+    gap: 8px;
+}
+
+.likesLink:hover {
+    background-color: rgba(128, 90, 213, 0.1);
+}
+
+.likesCount {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    /* أبيض */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+}
+
+.likesLabel {
+    font-size: 12px;
+    font-weight: 600;
+    color: #805ad5;
+    /* بنفسجي */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+    line-height: 1;
+}
+
+/* تحميل */
+.loadingSpinner {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinnerIcon {
+    width: 100%;
+    height: 100%;
+    animation: spin 1s linear infinite;
+    stroke: #805ad5;
+}
+
+.spinnerIcon circle {
+    stroke-dasharray: 80;
+    stroke-dashoffset: 60;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* تكييف للهواتف */
+@media (max-width: 768px) {
+    .likeContainer {
+        padding: 3px 10px;
+        min-width: 90px;
+    }
+
+    .heartButton {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+        padding: 6px;
+    }
+
+    .likesCount {
+        font-size: 16px;
+    }
+
+    .likesLabel {
+        font-size: 11px;
+    }
+}
+
+
+/* styles/modules/postLikes.module.css */
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #000000;
+    /* خلفية سوداء */
+    min-height: 100vh;
+    color: #ffffff;
+}
+
+/* الهيدر */
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #805ad5;
+    /* خط بنفسجي */
+}
+
+.backButton {
+    background: none;
+    border: none;
+    color: #805ad5;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    margin-right: 20px;
+}
+
+.backButton:hover {
+    background-color: rgba(128, 90, 213, 0.1);
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    flex: 1;
+}
+
+/* معلومات المنشور */
+.postInfo {
+    background: linear-gradient(135deg, rgba(128, 90, 213, 0.1), rgba(128, 90, 213, 0.05));
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(128, 90, 213, 0.3);
+}
+
+.postTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 20px;
+    background-color: rgba(128, 90, 213, 0.15);
+    border-radius: 12px;
+    border: 1px solid rgba(128, 90, 213, 0.3);
+}
+
+.statCount {
+    font-size: 24px;
+    font-weight: 700;
+    color: #805ad5;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: #a0aec0;
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* قائمة الإعجابات */
+.likesList {
+    background: linear-gradient(135deg, rgba(128, 90, 213, 0.05), rgba(128, 90, 213, 0.02));
+    border-radius: 16px;
+    border: 1px solid rgba(128, 90, 213, 0.2);
+    overflow: hidden;
+}
+
+.listHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background-color: rgba(128, 90, 213, 0.1);
+    border-bottom: 1px solid rgba(128, 90, 213, 0.3);
+}
+
+.listTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.listCount {
+    font-size: 18px;
+    font-weight: 700;
+    color: #805ad5;
+    background-color: rgba(128, 90, 213, 0.2);
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* عنصر الإعجاب */
+.likeItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.likeItem:hover {
+    background-color: rgba(128, 90, 213, 0.05);
+}
+
+.likeItem:last-child {
+    border-bottom: none;
+}
+
+.userInfo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.userAvatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #805ad5;
+}
+
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatarFallback {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #805ad5, #6b46c1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.userDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.userName {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.likeTime {
+    font-size: 14px;
+    color: #a0aec0;
+}
+
+.likeBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: rgba(239, 68, 68, 0.1);
+    border-radius: 20px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.heartIcon {
+    font-size: 18px;
+}
+
+.likedText {
+    font-size: 14px;
+    color: #f56565;
+    font-weight: 600;
+}
+
+/* حالة فارغة */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.emptyIcon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.emptyState h3 {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 8px;
+}
+
+.emptyState p {
+    color: #a0aec0;
+    font-size: 16px;
+}
+
+/* الترقيم */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 30px;
+    padding: 20px;
+}
+
+.pageButton {
+    padding: 12px 24px;
+    background-color: rgba(128, 90, 213, 0.1);
+    color: #805ad5;
+    border: 1px solid rgba(128, 90, 213, 0.3);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pageButton:hover:not(:disabled) {
+    background-color: rgba(128, 90, 213, 0.2);
+    border-color: #805ad5;
+}
+
+.pageButton:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.pageNumbers {
+    display: flex;
+    gap: 8px;
+}
+
+.pageNumber {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(128, 90, 213, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(128, 90, 213, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.pageNumber:hover {
+    background-color: rgba(128, 90, 213, 0.2);
+}
+
+.pageNumber.active {
+    background-color: #805ad5;
+    border-color: #805ad5;
+    color: white;
+}
+
+/* التحميل */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    color: #ffffff;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(128, 90, 213, 0.3);
+    border-top-color: #805ad5;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* خطأ */
+.errorContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    text-align: center;
+    padding: 40px;
+}
+
+.errorIcon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 3px solid rgba(239, 68, 68, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: #f56565;
+    margin-bottom: 20px;
+}
+
+.errorContainer h3 {
+    font-size: 24px;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.errorContainer p {
+    color: #a0aec0;
+    margin-bottom: 24px;
+    max-width: 400px;
+}
+
+.retryButton {
+    padding: 12px 32px;
+    background-color: #805ad5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+}
+
+.retryButton:hover {
+    background-color: #6b46c1;
+}
+
+.backLink {
+    color: #805ad5;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.backLink:hover {
+    text-decoration: underline;
+}
+
+/* تكييف للهواتف */
+@media (max-width: 768px) {
+    .container {
+        padding: 16px;
+    }
+
+    .title {
+        font-size: 24px;
+    }
+
+    .postInfo {
+        padding: 20px;
+    }
+
+    .postTitle {
+        font-size: 18px;
+    }
+
+    .stats {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .statItem {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 16px;
+    }
+
+    .statCount {
+        font-size: 20px;
+    }
+
+    .userAvatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .userName {
+        font-size: 16px;
+    }
+
+    .likeItem {
+        padding: 16px;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+    }
+
+    .pageNumbers {
+        order: 3;
+        flex-basis: 100%;
+        justify-content: center;
+        margin-top: 16px;
+    }
+}
+
+

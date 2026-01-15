@@ -1,0 +1,496 @@
+/* src/components/posts/post-comments/comments-list/CommentsList.module.css */
+
+:root {
+    --color-primary: #8b5cf6;
+    --color-primary-dark: #6d28d9;
+    --color-secondary: #a78bfa;
+    --color-background: #0a0418;
+    --color-surface: #1a0b2e;
+    --color-surface-light: #2a1b42;
+    --color-border: rgba(139, 92, 246, 0.3);
+    --color-border-light: rgba(139, 92, 246, 0.2);
+    --color-text: #ffffff;
+    --color-text-secondary: #c4b5fd;
+    --color-text-muted: #a78bfa;
+    --color-danger: #ef4444;
+    --color-success: #10b981;
+}
+
+.commentsList {
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.commentsHeader {
+    padding: 20px 16px 10px;
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0;
+}
+
+.commentsTitle {
+    color: var(--color-text);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* الحاوية الرئيسية للتعليقات مع scroll */
+.commentsContainer {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 10px 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* تحسين scrollbar */
+.commentsContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+.commentsContainer::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 3px;
+}
+
+.commentsContainer::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 3px;
+}
+
+.commentsContainer::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+}
+
+/* تعليق واحد */
+.commentItem {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--color-border-light);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.commentItem:hover {
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: 12px;
+}
+
+.commentItem.hasOpenMenu {
+    z-index: 10000;
+    position: relative;
+}
+
+.commentItem:last-child {
+    border-bottom: none;
+}
+
+/* محتوى التعليق */
+.commentContent {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.3);
+    flex-shrink: 0;
+}
+
+.commentBody {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* هيدر التعليق */
+.commentHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.commentInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.userName {
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timestamp {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* الأزرار والإجراءات */
+.actionsContainer {
+    display: flex;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.moreActionsContainer {
+    position: relative;
+}
+
+.moreActionsButton {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.moreActionsButton:hover {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+    transform: rotate(90deg);
+}
+
+/* القائمة المنبثقة - الحل الجديد */
+.actionsMenu {
+    position: fixed; /* نبقى على fixed للخروج من التدفق */
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    min-width: 140px;
+    z-index: 99999; /* زيادة z-index */
+    overflow: hidden;
+    animation: fadeInUp 0.2s ease;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.actionMenuItem {
+    width: 100%;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.actionMenuItem:last-child {
+    border-bottom: none;
+}
+
+.actionMenuItem:hover {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+/* زر الحذف */
+.actionMenuItemDelete {
+    color: var(--color-danger);
+    background: rgba(239, 68, 68, 0.05);
+    font-weight: 600;
+    width: 100%;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    align-items: center;
+    padding: 10px 14px;
+    display: flex;
+    gap: 8px;
+    transition: all 0.2s ease;
+    font-size: .85rem;
+}
+
+.actionMenuItemDelete:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ff3838;
+}
+
+.editIcon, .deleteIcon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+.deleteIcon {
+    color: #ff6b6b;
+}
+
+/* نص التعليق */
+.commentTextContainer {
+    margin-top: 8px;
+}
+
+.commentText {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+    word-break: break-word;
+    white-space: pre-line;
+}
+
+/* حالة التعديل */
+.editContainer {
+    background: rgba(10, 4, 24, 0.5);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.editTextarea {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    resize: vertical;
+    min-height: 80px;
+    max-height: 150px;
+    font-family: inherit;
+    padding: 12px;
+    border-radius: 8px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.editTextarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.editTextarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+.editButtons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    justify-content: flex-end;
+}
+
+.cancelEdit, .saveEdit {
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    font-weight: 500;
+}
+
+.cancelEdit {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+}
+
+.cancelEdit:hover {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--color-text);
+}
+
+.saveEdit {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-text);
+    border: none;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.saveEdit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+/* حالات التحميل والخطأ والفارغ */
+.loadingContainer, .errorContainer, .emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    flex: 1;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(139, 92, 246, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loadingText, .errorText, .emptyText {
+    color: var(--color-text);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.emptySubtext {
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+}
+
+.errorText {
+    color: var(--color-danger);
+    margin-bottom: 16px;
+}
+
+.retryButton {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--color-primary);
+    border: 1px solid var(--color-border);
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.retryButton:hover {
+    background: rgba(139, 92, 246, 0.3);
+    transform: translateY(-2px);
+}
+
+.emptyIcon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    color: var(--color-primary);
+    opacity: 0.5;
+}
+
+/* زر Load More */
+.loadMoreContainer {
+    padding: 16px;
+    text-align: center;
+    border-top: 1px solid var(--color-border-light);
+    flex-shrink: 0;
+}
+
+.loadMoreButton {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    padding: 8px 24px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.loadMoreButton:hover:not(:disabled) {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--color-text);
+    transform: translateY(-2px);
+    border-color: var(--color-primary);
+}
+
+.loadMoreButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* إصلاح للعرض على الأجهزة المحمولة */
+@media (max-width: 768px) {
+    .commentsList {
+        padding: 0 12px;
+    }
+    
+    .commentsHeader {
+        padding: 16px 12px 8px;
+    }
+    
+    .commentItem {
+        padding: 12px 0;
+    }
+    
+    .commentItem:hover {
+        padding: 12px 8px;
+        margin: 0 -8px;
+    }
+    
+    .avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .userName {
+        font-size: 0.85rem;
+    }
+    
+    .timestamp {
+        font-size: 0.7rem;
+    }
+    
+    .commentText {
+        font-size: 0.85rem;
+    }
+    
+    .actionMenuItem {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .moreActionsButton {
+        width: 26px;
+        height: 26px;
+    }
+}
