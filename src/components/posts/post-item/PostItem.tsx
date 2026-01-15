@@ -34,7 +34,7 @@ interface PostItemProps {
     };
     onPostDeleted?: (postId: number) => void;
     onImagesUpdated?: () => void;
-    onPostUpdated?: (updatedPost?: any) => void; // أضفي parameter هنا
+    onPostUpdated?: (updatedPost?: any) => void;
 }
 
 const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostItemProps) => {
@@ -60,7 +60,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 if (isLikedLocally) {
                     setIsLiked(true);
                     console.log('Found in localStorage: liked');
-                    return; // خرجي، ما تحتاجي تكملي للـ API
+                    return;
                 }
 
                 // 2. إذا مش موجود في localStorage، روح جيب من API
@@ -100,15 +100,6 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
             day: 'numeric',
             year: 'numeric'
         });
-    };
-
-    // ⭐ دالة لتمييز التاغات داخل النص
-    const highlightHashtagsInText = (text: string) => {
-        if (!text) return '';
-        return text.replace(
-            /#(\w+)/g,
-            '<span class="hashtag-inline">#$1</span>'
-        );
     };
 
     // ⭐ دالة لاستخراج التاغات من النص
@@ -161,7 +152,6 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         return uniqueTags;
     };
 
-    const highlightedCaption = highlightHashtagsInText(currentPost.caption);
     const uniqueTags = getUniqueTags();
 
     const handleCommentsClick = () => {
@@ -239,6 +229,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     return (
         <>
             <article className={styles.postContainer}>
+                
                 <PostHeader
                     user={currentPost.user}
                     postDate={formatDate(currentPost.created_at)}
@@ -249,36 +240,29 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     onEditPost={handleEditClick}
                 />
 
-                <div className={styles.postContent}>
-                    <h2 className={styles.postTitle}>{currentPost.title}</h2>
+                
+                <PostContent 
+                    title={currentPost.title} 
+                    caption={currentPost.caption} 
+                />
+                
 
-                    {/* ⭐ عرض النص مع التاغات ملوّنة */}
-                    {currentPost.caption && (
-                        <div className={styles.captionContainer}>
-                            <p
-                                className={styles.postCaption}
-                                dangerouslySetInnerHTML={{ __html: highlightedCaption }}
-                            />
+                
+                {uniqueTags.length > 0 && (
+                    <div className={styles.tagsContainer}>
+                        <div className={styles.tagsLabel}></div>
+                        <div className={styles.tagsList}>
+                            {uniqueTags.map(tag => (
+                                <span
+                                    key={`${tag.source}-${tag.id}`}
+                                    className={`${styles.tag} ${tag.source === 'api' ? styles.tagApi : styles.tagText}`}
+                                >
+                                    #{tag.name}
+                                </span>
+                            ))}
                         </div>
-                    )}
-
-                    {/* ⭐ قسم التاغات تحت النص */}
-                    {uniqueTags.length > 0 && (
-                        <div className={styles.tagsContainer}>
-                            <div className={styles.tagsLabel}></div>
-                            <div className={styles.tagsList}>
-                                {uniqueTags.map(tag => (
-                                    <span
-                                        key={`${tag.source}-${tag.id}`}
-                                        className={`${styles.tag} ${tag.source === 'api' ? styles.tagApi : styles.tagText}`}
-                                    >
-                                        #{tag.name}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 {currentPost.images && currentPost.images.length > 0 && (
                     <PostImages
@@ -297,13 +281,18 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                         onLikeUpdate={handleLikeUpdate}
                     />
 
-                    {/* قسم التعليقات - تم تصحيحه */}
-                    <div className={styles.statItem} onClick={handleCommentsClick}>
+                    
+                    <div 
+                        className={styles.statItem}
+                        onClick={handleCommentsClick}
+                        
+                    >
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
                     </div>
 
+                
                 </div>
 
                 <div className={styles.commentPlaceholder}>
@@ -321,15 +310,6 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     post={currentPost}
                     onClose={() => setShowUpdateModal(false)}
                     onPostUpdated={handlePostUpdateSuccess}
-                />
-            )}
-
-            {showCommentsModal && (
-                <PostCommentsModal
-                    post={currentPost}
-                    isOpen={showCommentsModal}
-                    onClose={() => setShowCommentsModal(false)}
-                    onCommentAdded={handleCommentAdded}
                 />
             )}
 
