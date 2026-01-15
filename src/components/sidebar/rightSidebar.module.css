@@ -1,12 +1,16 @@
 .sidebarSection {
-  width: 320px;
-  height: 486px;
+  width: 320px; /* 320 .. 305 */
+  height: 441px;/* 486 ..441 */
   background: #1a0b2e;
   border: 1px solid #8b5cf64d;
   border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 20px #8b5cf61a;
   padding: 20px 8px;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .suggestedFriends {
   padding: 5px;
@@ -18,8 +22,41 @@
   font-weight: 600;
   margin-bottom: 24px;
   filter: drop-shadow(0px 4px 8px rgba(240, 240, 240, 0.275));
+  flex-shrink: 0;
 }
 /* أضف هذه الأنماط إلى ملف CSS الخاص بك */
+
+/* إضافة div داخلي للسكرول */
+.sidebarSection > div:last-child {
+  flex: 1;
+  overflow-y: auto; /* تفعيل السكرول العمودي */
+  padding-right: 4px; /* مسافة للسكرول */
+}
+
+/* تخصيص شكل السكرول */
+.sidebarSection > div:last-child::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebarSection > div:last-child::-webkit-scrollbar-track {
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 10px;
+}
+
+.sidebarSection > div:last-child::-webkit-scrollbar-thumb {
+  background: rgba(139, 92, 246, 0.5);
+  border-radius: 10px;
+}
+
+.sidebarSection > div:last-child::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 92, 246, 0.7);
+}
+
+/* التأكد من أن كروت المستخدمين لا تتأثر بالسكرول */
+.sidebarSection > div:last-child > div {
+  display: flex;
+  flex-direction: column;
+}
 
 .statement {
   display: flex;

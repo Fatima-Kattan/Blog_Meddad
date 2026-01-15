@@ -18,20 +18,22 @@ function NotificationMenu() {
   return (
     <div className={styles.menu}>
       <h1 className={styles.title}>Notifications</h1>
-      {limitedNotifications.map(n => (
-        <NotificationItem
-          key={n.id}
-          notification={n}
-          onUpdate={() => markAsRead(n.id)}
-        />
-      ))}
 
+      {limitedNotifications.map(n => (
+        n ? (
+          <NotificationItem
+            key={n.id}
+            notification={n}
+            onUpdate={() => markAsRead(n.id)}
+          />
+        ) : null
+      ))}
       {notifications.length > 3 && (
         <button
           onClick={() => router.push('/notifications')}
           className={styles.moreBtn} // ✅ زر منسق من الملف الخارجي
         >
-          Show All Notifications 
+          Show All Notifications
         </button>
       )}
     </div>

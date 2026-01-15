@@ -82,7 +82,7 @@ function NotificationItem({ notification }: NotificationItemProps) {
                     disabled={loading}
                 >
                     <FiCheckCircle />
-                    {loading ? 'Updating...' : 'Marke as read'}
+                    {loading ? 'Updating' : 'Marke as read'}
                 </button>
             )}
         </div>

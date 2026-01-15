@@ -47,9 +47,10 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     try {
       const res = await readService.markAsRead(id, token);
       // ✅ تحديث الإشعارات
-      setNotifications(prev =>
-        prev.map(n => n.id === id ? res.data.notification : n)
-      );
+      await fetchNotifications();
+      // setNotifications(prev =>
+      //   prev.map(n => n.id === id ? res.data.notification : n)
+      // );
       // ✅ العدد الجديد من السيرفر
       setUnreadCount(res.data.count); 
     } catch (err) {
