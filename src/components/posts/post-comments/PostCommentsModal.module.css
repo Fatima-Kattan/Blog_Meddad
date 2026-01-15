@@ -1,16 +1,33 @@
 /* src/components/posts/post-comments/PostCommentsModal.module.css */
+
+:root {
+    --color-primary: #8b5cf6;
+    --color-primary-dark: #6d28d9;
+    --color-secondary: #a78bfa;
+    --color-background: #0a0418;
+    --color-surface: #1a0b2e;
+    --color-surface-light: #2a1b42;
+    --color-border: rgba(139, 92, 246, 0.3);
+    --color-border-light: rgba(139, 92, 246, 0.2);
+    --color-text: #ffffff;
+    --color-text-secondary: #c4b5fd;
+    --color-text-muted: #a78bfa;
+    --color-danger: #ef4444;
+}
+
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(10, 4, 24, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 10000;
     padding: 16px;
+    backdrop-filter: blur(10px);
     animation: fadeIn 0.2s ease;
 }
 
@@ -22,20 +39,21 @@
 .modal {
     width: 100%;
     max-width: 500px;
-    max-height: 80vh;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-height: 85vh;
+    background: var(--color-surface);
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    animation: slideUp 0.3s ease;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes slideUp {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(40px);
     }
     to {
         opacity: 1;
@@ -44,47 +62,73 @@
 }
 
 .header {
-    padding: 12px 16px;
-    border-bottom: 1px solid #ddd;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
-    gap: 12px;
-    background: #fff;
+    gap: 15px;
+    background: var(--color-surface);
+    backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 10;
+    flex-shrink: 0;
 }
 
 .closeButton {
-    background: none;
-    border: none;
-    width: 36px;
-    height: 36px;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #666;
-    border-radius: 50%;
-    transition: background 0.2s;
+    color: var(--color-text-secondary);
+    transition: all 0.2s ease;
 }
 
 .closeButton:hover {
-    background: #f5f5f5;
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+    transform: rotate(90deg);
 }
 
 .title {
-    color: #333;
-    font-size: 16px;
-    font-weight: bold;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 700;
     margin: 0;
     flex: 1;
+    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .postContent {
-    padding: 16px;
-    border-bottom: 1px solid #eee;
-    background: #f9f9f9;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+    background: rgba(10, 4, 24, 0.3);
+    flex-shrink: 0;
+    max-height: 40vh;
+    overflow-y: auto;
+}
+
+.postContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+.postContent::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 3px;
+}
+
+.postContent::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 3px;
 }
 
 .postHeader {
@@ -99,7 +143,8 @@
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1px solid #ddd;
+    border: 2px solid var(--color-primary);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
 }
 
 .userDetails {
@@ -108,47 +153,464 @@
 }
 
 .userName {
-    color: #333;
+    color: var(--color-text);
     font-weight: 600;
-    font-size: 14px;
+    font-size: 0.95rem;
 }
 
 .postTime {
-    color: #777;
-    font-size: 12px;
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
     margin-top: 2px;
 }
 
 .postCaption {
-    color: #333;
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 8px 0;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 12px 0;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 8px;
 }
 
+.postCaption::-webkit-scrollbar {
+    width: 6px;
+}
+
+.postCaption::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 3px;
+}
+
+.postCaption::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 3px;
+}
+
+/* منطقة الصور */
 .postImages {
-    margin-top: 12px;
-    border-radius: 6px;
+    margin-top: 15px;
+    border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #ddd;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    max-height: 300px;
+    position: relative;
+}
+
+.mainImageContainer {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    height: 200px;
 }
 
 .mainImage {
     width: 100%;
-    max-height: 200px;
+    height: 200px;
     object-fit: cover;
     display: block;
+    transition: transform 0.3s ease;
 }
 
+.mainImageContainer:hover .mainImage {
+    transform: scale(1.05);
+}
+
+.moreImagesIndicator {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+}
+
+.viewMoreButton {
+    background: rgba(10, 4, 24, 0.8);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(5px);
+}
+
+.viewMoreButton:hover {
+    background: rgba(139, 92, 246, 0.3);
+    border-color: var(--color-primary);
+}
+
+/* الصور المصغرة */
+.imageThumbnails {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 8px;
+    background: rgba(10, 4, 24, 0.5);
+}
+
+.thumbnailContainer {
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 6px;
+    height: 70px;
+    transition: all 0.2s ease;
+}
+
+.thumbnailContainer:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.thumbnailImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.moreOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 4, 24, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* منطقة الكومنتات - ارتفاع ديناميكي */
 .commentsListWrapper {
     flex: 1;
-    overflow-y: auto;
-    max-height: 300px;
-    padding: 8px 0;
+    min-height: 200px;
+    max-height: 40vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-surface);
+}
+
+/* إصلاح للسكرول - تطبيق على العناصر الفرعية */
+.commentsListWrapper > div {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* تحسين تقسيم المساحة */
+.modal.hasLongPost .postContent {
+    max-height: 30vh;
+}
+
+.modal.hasLongPost .commentsListWrapper {
+    max-height: 45vh;
 }
 
 .commentFormWrapper {
-    padding: 12px 16px;
-    border-top: 1px solid #eee;
-    background: #fff;
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-surface);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+}
+
+/* Modal لعرض الصور بالحجم الكامل */
+.imageModalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10001;
+    backdrop-filter: blur(20px);
+    animation: fadeIn 0.3s ease;
+}
+
+.imageModal {
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    background: var(--color-surface);
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.imageModalHeader {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-surface);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.imageModalCloseButton {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: all 0.2s ease;
+}
+
+.imageModalCloseButton:hover {
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--color-text);
+    border-color: var(--color-primary);
+    transform: rotate(90deg);
+}
+
+.imageCounter {
+    color: var(--color-text);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.imageModalContent {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    min-height: 300px;
+    max-height: 500px;
+}
+
+.fullSizeImage {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* أزرار التنقل */
+.navButton {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(139, 92, 246, 0.3);
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.navButton:hover {
+    background: rgba(139, 92, 246, 0.5);
+    border-color: var(--color-primary);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.prevButton {
+    left: 20px;
+}
+
+.nextButton {
+    right: 20px;
+}
+
+/* الصور المصغرة في الأسفل */
+.imageThumbnailsModal {
+    display: flex;
+    gap: 8px;
+    padding: 15px;
+    border-top: 1px solid var(--color-border);
+    background: rgba(10, 4, 24, 0.5);
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+.imageThumbnailsModal::-webkit-scrollbar {
+    height: 6px;
+}
+
+.imageThumbnailsModal::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 3px;
+}
+
+.imageThumbnailsModal::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 3px;
+}
+
+.thumbnailModal {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.thumbnailModal:hover {
+    transform: scale(1.05);
+    border-color: var(--color-primary);
+}
+
+.thumbnailModal.activeThumbnail {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.thumbnailImageModal {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal {
+        max-height: 90vh;
+        max-width: 95%;
+        border-radius: 16px;
+    }
+    
+    .header {
+        padding: 16px 20px;
+    }
+    
+    .postContent {
+        padding: 16px 20px;
+        max-height: 35vh;
+    }
+    
+    .commentFormWrapper {
+        padding: 14px 20px;
+    }
+    
+    .commentsListWrapper {
+        max-height: 35vh;
+    }
+    
+    .imageModal {
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .imageModalContent {
+        padding: 10px;
+        max-height: 400px;
+    }
+    
+    .fullSizeImage {
+        max-height: 350px;
+    }
+    
+    .navButton {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .prevButton {
+        left: 10px;
+    }
+    
+    .nextButton {
+        right: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modal {
+        max-height: 95vh;
+        max-width: 100%;
+        border-radius: 12px;
+    }
+    
+    .header {
+        padding: 12px 16px;
+    }
+    
+    .postContent {
+        padding: 12px 16px;
+        max-height: 30vh;
+    }
+    
+    .commentFormWrapper {
+        padding: 12px 16px;
+    }
+    
+    .commentsListWrapper {
+        max-height: 40vh;
+    }
+    
+    .title {
+        font-size: 1.1rem;
+    }
+    
+    .postCaption {
+        max-height: 150px;
+    }
+    
+    .postImages {
+        max-height: 250px;
+    }
+    
+    .mainImageContainer {
+        height: 150px;
+    }
+    
+    .mainImage {
+        height: 150px;
+    }
+    
+    .thumbnailContainer {
+        height: 60px;
+    }
+    
+    .imageModal {
+        max-height: 90vh;
+    }
+    
+    .imageModalContent {
+        max-height: 300px;
+    }
+    
+    .fullSizeImage {
+        max-height: 250px;
+    }
+    
+    .thumbnailModal {
+        width: 50px;
+        height: 50px;
+    }
 }
