@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import styles from './CommentsList.module.css';
 import { HiTrash, HiPencil, HiDotsVertical } from 'react-icons/hi';
 import { useComments } from '@/hooks/useComments';
+import { useRouter } from 'next/navigation'; // ⭐ إضافة useRouter
 
 interface CommentsListProps {
     postId: number | string;
@@ -35,6 +36,9 @@ const CommentsList: React.FC<CommentsListProps> = ({
         refreshComments
     } = useComments(postId);
 
+    // ⭐ إضافة useRouter للتنقل
+    const router = useRouter();
+
     // 🔍 أضف useEffect لمراقبة البيانات
     useEffect(() => {
         console.log('📊 CommentsList data:', {
@@ -45,6 +49,12 @@ const CommentsList: React.FC<CommentsListProps> = ({
             totalComments
         });
     }, [comments, loading, error, totalComments]);
+
+    // ⭐ دالة الذهاب إلى البروفايل
+    const navigateToProfile = (userId: number, e: React.MouseEvent) => {
+        e.stopPropagation(); // منع انتشار الحدث
+        router.push(`/profile/${userId}`);
+    };
 
     const handleEdit = (comment: any) => {
         setEditingCommentId(comment.id);
@@ -151,19 +161,31 @@ const CommentsList: React.FC<CommentsListProps> = ({
                     return (
                         <div key={comment.id} className={styles.commentItem}>
                             <div className={styles.commentContent}>
-                                <img
-                                    src={comment.user?.image || 'https://ui-avatars.com/api/?name=' + (comment.user?.full_name || 'User')}
-                                    alt={comment.user?.full_name || 'User'}
-                                    className={styles.avatar}
-                                    onError={(e) => {
-                                        e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (comment.user?.full_name || 'User');
-                                    }}
-                                />
+                                {/* ⭐ تعديل صورة المستخدم - جعلها قابلة للنقر */}
+                                <div 
+                                    className={styles.avatarContainer}
+                                    onClick={(e) => navigateToProfile(comment.user_id, e)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <img
+                                        src={comment.user?.image || 'https://ui-avatars.com/api/?name=' + (comment.user?.full_name || 'User')}
+                                        alt={comment.user?.full_name || 'User'}
+                                        className={styles.avatar}
+                                        onError={(e) => {
+                                            e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + (comment.user?.full_name || 'User');
+                                        }}
+                                    />
+                                </div>
 
                                 <div className={styles.commentBody}>
                                     <div className={styles.commentHeader}>
                                         <div className={styles.commentInfo}>
-                                            <span className={styles.userName}>
+                                            {/* ⭐ تعديل اسم المستخدم - جعله قابلاً للنقر */}
+                                            <span 
+                                                className={styles.userName}
+                                                onClick={(e) => navigateToProfile(comment.user_id, e)}
+                                                style={{ cursor: 'pointer' }}
+                                            >
                                                 {comment.user?.full_name || 'User'}
                                             </span>
                                             <span className={styles.timestamp}>
