@@ -17,7 +17,6 @@ import {
 } from 'react-icons/hi';
 
 import {
-    FaRocket,
     FaFeatherAlt,
     FaMagic
 } from 'react-icons/fa';
@@ -26,9 +25,10 @@ import {
     RiUserStarLine
 } from 'react-icons/ri';
 
-import { IoMdAddCircleOutline } from "react-icons/io";
+import { IoMdAddCircleOutline, IoMdNotifications } from "react-icons/io";
 import { IoLogInOutline } from 'react-icons/io5';
-import NotificationIcon from '@/components/notification_icon/NotificationIcon';
+import { IoNotificationsOutline } from 'react-icons/io5'; // ⭐ إضافة أيقونة الإشعارات
+import NotificationIcon from '@/components/notification/notification_icon/NotificationIcon';
 
 const Navbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -254,10 +254,10 @@ const Navbar = () => {
         return currentUser?.id || null;
     }, [userFromDB, user]);
 
-    // ⭐⭐ **تعديل navLinks** ⭐⭐
+    // ⭐⭐ **تعديل navLinks - إزالة التريندينج وإضافة الإشعارات** ⭐⭐
     const navLinks = [
         { id: 'home', href: '/', label: 'Home', icon: <HiHome size={24} /> },
-        { id: 'trending', href: '/trending', label: 'Trending', icon: <FaRocket size={22} /> },
+        { id: 'notifications', href: '/notifications', label: 'Notifications', icon: <IoMdNotifications size={22} /> }, // ⭐ استبدال التريندينج بالإشعارات
         {
             id: 'profile',
             href: '#', // ⭐⭐ غير إلى #
@@ -374,9 +374,11 @@ const Navbar = () => {
                     <div className={styles.rightSection}>
                         
 
-                        {/* إشعارات */}
+                        {/* إشعارات (في الجزء العلوي للأجهزة الكبيرة فقط) */}
                         {isAuthenticated && (
-                            <NotificationIcon/>
+                            <div className={styles.notificationContainer}>
+                                <NotificationIcon/>
+                            </div>
                         )}
 
                         {/* عرض البروفايل أو أزرار الدخول */}

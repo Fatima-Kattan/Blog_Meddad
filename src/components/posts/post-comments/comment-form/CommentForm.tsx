@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import styles from './CommentForm.module.css';
 import { HiPaperAirplane } from 'react-icons/hi';
 import { useComments } from '@/hooks/useComments';
+import InputField from '@/components/shared/InputField';
 
 interface CommentFormProps {
     postId: number | string;
@@ -16,8 +17,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // استخدام الهوك للتعامل مع التعليقات
-    const { createNewComment, commentsCount } = useComments(postId);
+    const { createNewComment, commentsCount, refreshComments } = useComments(postId);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,20 +28,25 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
         setError(null);
 
         try {
-            // استخدام API حقيقي لإضافة التعليق
             const newComment = await createNewComment({
                 post_id: postId,
                 comment_text: commentText
             });
 
             if (newComment) {
-                // تمرير التعليق للـ parent
+                console.log('✅ Comment added successfully:', newComment);
+                
                 onCommentAdded(newComment);
                 setCommentText('');
+                
+                // Refresh comments list
+                setTimeout(() => {
+                    refreshComments();
+                }, 100);
             }
 
         } catch (err: any) {
-            console.error('Error adding comment:', err);
+            console.error('❌ Error adding comment:', err);
             setError(err.message || 'Failed to add comment');
         } finally {
             setIsSubmitting(false);
@@ -58,22 +63,18 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
     return (
         <form onSubmit={handleSubmit} className={styles.commentForm}>
             <div className={styles.inputContainer}>
-                <input
+                <InputField
+                    label=""
+                    name="comment"
                     type="text"
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Write a comment..."
-                    className={styles.input}
                     disabled={isSubmitting}
+                    error={error || undefined}
                 />
-
-                {error && (
-                    <div className={styles.errorMessage}>
-                        {error}
-                    </div>
-                )}
-
+                
                 <button
                     type="submit"
                     className={styles.submitButton}
