@@ -26,12 +26,14 @@ interface PostItemProps {
         images: string[];
         likes_count: number;
         comments_count: number;
+        showUserInfo?: boolean;
         created_at: string;
         tags?: Array<{
             id: number;
             tag_name: string;
         }>;
     };
+
     onPostDeleted?: (postId: number) => void;
     onImagesUpdated?: () => void;
     onPostUpdated?: (updatedPost?: any) => void;
@@ -49,50 +51,50 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     const isCurrentUser = userData?.id === post.user.id;
 
     useEffect(() => {
-    const checkLikeStatus = async () => {
-        try {
-            console.log('Checking like status for post:', post.id);
-            console.log('Current user ID:', userData?.id); // 🔍 تأكد من user ID
+        const checkLikeStatus = async () => {
+            try {
+                console.log('Checking like status for post:', post.id);
+                console.log('Current user ID:', userData?.id); // 🔍 تأكد من user ID
 
-            // 1. تأكد إنه في user مسجل دخول
-            if (!userData?.id) {
-                setIsLiked(false);
-                return;
-            }
+                // 1. تأكد إنه في user مسجل دخول
+                if (!userData?.id) {
+                    setIsLiked(false);
+                    return;
+                }
 
-            // 2. جيب من localStorage بحسب user ID
-            const likedKey = `liked_posts_user_${userData.id}`;
-            const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
-            const isLikedLocally = likedPosts.includes(post.id);
-
-            if (isLikedLocally) {
-                setIsLiked(true);
-                console.log(`Found in localStorage for user ${userData.id}: liked`);
-                return;
-            }
-
-            // 3. إذا مش موجود في localStorage، روح جيب من API
-            const isLikedFromAPI = await likesService.checkUserLike(post.id);
-            console.log('From API:', isLikedFromAPI);
-            setIsLiked(isLikedFromAPI);
-
-            // 4. خزن في localStorage بحسب user ID
-            if (isLikedFromAPI) {
+                // 2. جيب من localStorage بحسب user ID
                 const likedKey = `liked_posts_user_${userData.id}`;
                 const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
-                if (!likedPosts.includes(post.id)) {
-                    likedPosts.push(post.id);
-                    localStorage.setItem(likedKey, JSON.stringify(likedPosts));
+                const isLikedLocally = likedPosts.includes(post.id);
+
+                if (isLikedLocally) {
+                    setIsLiked(true);
+                    console.log(`Found in localStorage for user ${userData.id}: liked`);
+                    return;
                 }
+
+                // 3. إذا مش موجود في localStorage، روح جيب من API
+                const isLikedFromAPI = await likesService.checkUserLike(post.id);
+                console.log('From API:', isLikedFromAPI);
+                setIsLiked(isLikedFromAPI);
+
+                // 4. خزن في localStorage بحسب user ID
+                if (isLikedFromAPI) {
+                    const likedKey = `liked_posts_user_${userData.id}`;
+                    const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
+                    if (!likedPosts.includes(post.id)) {
+                        likedPosts.push(post.id);
+                        localStorage.setItem(likedKey, JSON.stringify(likedPosts));
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error checking like status:', error);
             }
+        };
 
-        } catch (error) {
-            console.error('Error checking like status:', error);
-        }
-    };
-
-    checkLikeStatus();
-}, [post.id, userData?.id]); // ⭐ اضف userData?.id للـ dependencies
+        checkLikeStatus();
+    }, [post.id, userData?.id]); // ⭐ اضف userData?.id للـ dependencies
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -207,43 +209,43 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     };
 
     // دالة تحديث عدد الإعجابات
-   const handleLikeUpdate = (newCount: number, liked: boolean) => {
-    setLikesCount(newCount);
-    setIsLiked(liked);
+    const handleLikeUpdate = (newCount: number, liked: boolean) => {
+        setLikesCount(newCount);
+        setIsLiked(liked);
 
-    // تحديث localStorage بحسب user ID
-    if (userData?.id) {
-        try {
-            const likedKey = `liked_posts_user_${userData.id}`;
-            const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
+        // تحديث localStorage بحسب user ID
+        if (userData?.id) {
+            try {
+                const likedKey = `liked_posts_user_${userData.id}`;
+                const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
 
-            if (liked) {
-                // أضف إذا مش موجود
-                if (!likedPosts.includes(post.id)) {
-                    likedPosts.push(post.id);
+                if (liked) {
+                    // أضف إذا مش موجود
+                    if (!likedPosts.includes(post.id)) {
+                        likedPosts.push(post.id);
+                    }
+                } else {
+                    // شيل إذا موجود
+                    const index = likedPosts.indexOf(post.id);
+                    if (index > -1) {
+                        likedPosts.splice(index, 1);
+                    }
                 }
-            } else {
-                // شيل إذا موجود
-                const index = likedPosts.indexOf(post.id);
-                if (index > -1) {
-                    likedPosts.splice(index, 1);
-                }
+
+                localStorage.setItem(likedKey, JSON.stringify(likedPosts));
+                console.log(`Updated localStorage for user ${userData.id}, post: ${post.id}, liked: ${liked}`);
+            } catch (error) {
+                console.error('Error updating localStorage:', error);
             }
-
-            localStorage.setItem(likedKey, JSON.stringify(likedPosts));
-            console.log(`Updated localStorage for user ${userData.id}, post: ${post.id}, liked: ${liked}`);
-        } catch (error) {
-            console.error('Error updating localStorage:', error);
+        } else {
+            console.warn('No user ID available for localStorage update');
         }
-    } else {
-        console.warn('No user ID available for localStorage update');
-    }
-};
+    };
 
     return (
         <>
             <article className={styles.postContainer}>
-                
+
                 <PostHeader
                     user={currentPost.user}
                     postDate={formatDate(currentPost.created_at)}
@@ -254,14 +256,14 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     onEditPost={handleEditClick}
                 />
 
-                
-                <PostContent 
-                    title={currentPost.title} 
-                    caption={currentPost.caption} 
-                />
-                
 
-                
+                <PostContent
+                    title={currentPost.title}
+                    caption={currentPost.caption}
+                />
+
+
+
                 {uniqueTags.length > 0 && (
                     <div className={styles.tagsContainer}>
                         <div className={styles.tagsLabel}></div>
@@ -295,18 +297,18 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                         onLikeUpdate={handleLikeUpdate}
                     />
 
-                    
-                    <div 
+
+                    <div
                         className={styles.statItem}
                         onClick={handleCommentsClick}
-                        
+
                     >
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
                     </div>
 
-                
+
                 </div>
 
                 <div className={styles.commentPlaceholder}>

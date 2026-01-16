@@ -1,11 +1,11 @@
 'use client'
 // components/Profile.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './profile.css';
 import ProfileService, {
     UserProfile,
     ProfileStats,
-    Post,
+    Post as ProfilePost,
     UpdateProfileData,
     ProfileResponse,
     UserProfileResponse
@@ -18,10 +18,11 @@ import InputField from '@/components/shared/InputField';
 import SelectField from '@/components/shared/SelectField';
 import DatePickerField from '@/components/shared/DatePickerField';
 import { MdEdit, MdOutlineEmail } from 'react-icons/md';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PostFeed from '@/components/posts/post-feed/PostFeed';
+import PostItem from '@/components/posts/post-item/PostItem';
+import axios from 'axios';
 
 type TabType = 'overview' | 'posts' | 'followers' | 'following';
 
@@ -30,14 +31,55 @@ interface ProfileProps {
     isOwnProfile?: boolean;
 }
 
-// ⬇️ أزل هذا التعريف المكرر:
-// export default function ProfileComponent({ profile, isCurrentUser = false }: ProfileComponentProps) {
+interface ApiPost {
+    id: number;
+    user_id: number;
+    title: string;
+    caption: string;
+    images: string[];
+    created_at: string;
+    likes_count: number;
+    comments_count: number;
+    user: {
+        id: number;
+        full_name: string;
+        image: string;
+    };
+    likes: any[];
+    comments: any[];
+    tags: any[];
+}
 
-// ⬇️ احتفظ بهذا التعريف فقط:
+interface UserPostsResponse {
+    success: boolean;
+    data: {
+        user: {
+            id: number;
+            full_name: string;
+            image: string;
+            bio: string;
+            created_at: string;
+        };
+        posts: {
+            current_page: number;
+            data: ApiPost[];
+            total: number;
+            last_page: number;
+        };
+        stats: {
+            total_posts: number;
+            total_likes: number;
+            total_comments: number;
+        };
+    };
+    message: string;
+}
+
 const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: propIsOwnProfile }) => {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     const urlUserId = params?.id as string;
     const queryUserId = searchParams?.get('id');
@@ -46,7 +88,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [isOwnProfile, setIsOwnProfile] = useState(propIsOwnProfile || false);
     const [user, setUser] = useState<UserProfile | null>(null);
     const [stats, setStats] = useState<ProfileStats | null>(null);
-    const [posts, setPosts] = useState<Post[]>([]);
+    const [profilePosts, setProfilePosts] = useState<ProfilePost[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('posts');
@@ -57,36 +99,157 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [today, setToday] = useState('');
 
+    // States for UserPostsFeed
+    const [userPosts, setUserPosts] = useState<ApiPost[]>([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [postsError, setPostsError] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const observerRef = useRef<HTMLDivElement>(null);
+
+    // إعادة تعيين الحالة عند تغيير المستخدم
     useEffect(() => {
+        const resetState = () => {
+            setUser(null);
+            setStats(null);
+            setProfilePosts([]);
+            setUserPosts([]);
+            setLoading(true);
+            setError(null);
+            setPostsLoading(true);
+            setPostsError(null);
+            setPage(1);
+            setHasMore(true);
+            setIsOwnProfile(propIsOwnProfile || false);
+            setActiveTab('posts');
+        };
+
+        resetState();
+        
         const todayDate = new Date().toISOString().split('T')[0];
         setToday(todayDate);
 
-        fetchProfileData();
+        if (targetUserId) {
+            fetchProfileData();
+        }
     }, [targetUserId]);
+
+    // التعامل مع تغيير المسار
+    useEffect(() => {
+        if (pathname && pathname.includes('/profile/')) {
+            const urlUserId = params?.id as string;
+            const currentUserId = localStorage.getItem('user_id');
+            
+            if (urlUserId && currentUserId) {
+                const isOwn = urlUserId === currentUserId.toString();
+                console.log(`🔄 تحديث isOwnProfile: ${isOwn} (المستخدم الحالي: ${currentUserId}, المستخدم المستهدف: ${urlUserId})`);
+                setIsOwnProfile(isOwn);
+            }
+        }
+    }, [pathname, params?.id]);
+
+    useEffect(() => {
+        if (targetUserId && activeTab === 'posts') {
+            fetchUserPosts(1, true);
+        }
+    }, [targetUserId, activeTab]);
+
+    // Auto infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !postsLoading) {
+                    loadMore();
+                }
+            },
+            { threshold: 0.5 }
+        );
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [hasMore, postsLoading]);
+
+    const fetchUserPosts = useCallback(async (pageNum: number = 1, isRefresh: boolean = false) => {
+        if (!targetUserId) {
+            setPostsError('No user ID provided');
+            setPostsLoading(false);
+            return;
+        }
+
+        try {
+            setPostsLoading(true);
+            const response = await axios.get<UserPostsResponse>(
+                `http://localhost:8000/api/v1/user/${targetUserId}/posts`,
+                {
+                    params: { page: pageNum },
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+
+            if (response.data.success) {
+                const newPosts = response.data.data.posts.data;
+                
+                if (isRefresh) {
+                    setUserPosts(newPosts);
+                } else {
+                    setUserPosts(prev => [...prev, ...newPosts]);
+                }
+                
+                setHasMore(pageNum < response.data.data.posts.last_page);
+                setPage(pageNum + 1);
+                setPostsError(null);
+            } else {
+                setPostsError(response.data.message || 'Failed to fetch user posts');
+            }
+        } catch (err: any) {
+            setPostsError(err.response?.data?.message || 'Error fetching user posts');
+            console.error('Error fetching user posts:', err);
+        } finally {
+            setPostsLoading(false);
+        }
+    }, [targetUserId]);
+
+    const loadMore = () => {
+        if (!postsLoading && hasMore) {
+            fetchUserPosts(page, false);
+        }
+    };
+
+    const refreshUserPosts = () => {
+        setPage(1);
+        setHasMore(true);
+        fetchUserPosts(1, true);
+    };
 
     const fetchProfileData = async () => {
         try {
             setLoading(true);
             setError(null);
-            /*             console.log('🔄 جلب بيانات البروفايل لـ ID:', targetUserId);
-             */
+            
             let profileResponse: ProfileResponse | UserProfileResponse;
 
+            console.log(`🔍 جلب بيانات للمستخدم: ${targetUserId}`);
+
             if (targetUserId) {
-/*                 console.log(`📋 جلب بروفايل للمستخدم: ${targetUserId}`);
- */                try {
+                try {
                     profileResponse = await ProfileService.getUserProfileById(targetUserId);
 
                     const currentUserId = localStorage.getItem('user_id');
-                    /*   console.log('🔍 ID الحالي من localStorage:', currentUserId);
-                      console.log('🔍 الـ ID المستهدف:', targetUserId); */
-
-                    if (currentUserId && currentUserId === targetUserId.toString()) {
+                    console.log(`👤 المقارنة: المستخدم الحالي=${currentUserId}, المستخدم المستهدف=${targetUserId}`);
+                    
+                    if (currentUserId && currentUserId.toString() === targetUserId.toString()) {
+                        console.log('✅ هذا هو الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(true);
-/*                         console.log('✅ هذا البروفايل الخاص بالمستخدم الحالي');
- */                    } else {
+                    } else {
+                        console.log('❌ هذا ليس الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(false);
-                        /*   console.log('👀 هذا بروفايل مستخدم آخر'); */
                     }
 
                 } catch (fetchError) {
@@ -94,20 +257,14 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     throw new Error('فشل في جلب بروفايل المستخدم');
                 }
             } else {
-                // ⬇️ جلب البروفايل الشخصي بدون ID
-/*                 console.log('🔄 جلب البروفايل الشخصي...');
- */                profileResponse = await ProfileService.getUserProfile();
+                profileResponse = await ProfileService.getUserProfile();
                 setIsOwnProfile(true);
 
-                // ⬇️ احفظ الـ ID في localStorage
                 if (profileResponse.data.user.id) {
                     localStorage.setItem('user_id', profileResponse.data.user.id.toString());
-/*                     console.log('💾 تم حفظ الـ ID:', profileResponse.data.user.id);
- */                }
+                }
             }
 
-            /*             console.log('📦 بيانات البروفايل الكاملة:', profileResponse);
-             */
             if (!profileResponse.success) {
                 throw new Error(profileResponse.message || 'فشل في تحميل البروفايل');
             }
@@ -115,11 +272,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             // تحويل البيانات إلى الشكل الصحيح
             const userData = profileResponse.data.user;
             const statsData = profileResponse.data.stats;
-            /* 
-                        console.log('👤 بيانات المستخدم:', userData);
-                        console.log('📊 الإحصائيات:', statsData);
-             */
-            // تحويل UserProfileResponse إلى UserProfile
+
+            console.log(`📊 بيانات المستخدم المستلمة:`, {
+                id: userData.id,
+                name: userData.full_name,
+                isOwnProfile: isOwnProfile
+            });
+
             const formattedUser: UserProfile = {
                 id: userData.id,
                 full_name: userData.full_name,
@@ -147,12 +306,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setStats(formattedStats);
 
             // جلب المنشورات مع تفاصيل اللايكات
-            const userPosts = userData.posts || [];
-            /*             console.log('📝 المنشورات من API:', userPosts.length);
-             */
-            if (userPosts.length > 0) {
+            const userOldPosts = userData.posts || [];
+            if (userOldPosts.length > 0) {
                 const postsWithLikes = await Promise.all(
-                    userPosts.map(async (post) => {
+                    userOldPosts.map(async (post) => {
                         try {
                             const likes = await ProfileService.getPostLikes(post.id);
                             return {
@@ -171,13 +328,14 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                         }
                     })
                 );
-                setPosts(postsWithLikes);
+                setProfilePosts(postsWithLikes);
             } else {
-                setPosts([]);
+                setProfilePosts([]);
             }
 
-            /*             console.log('✅ تم تحميل بيانات البروفايل بنجاح');
-             */
+            console.log(`✅ تم تحميل بيانات الملف الشخصي بنجاح للمستخدم: ${formattedUser.full_name}`);
+            console.log(`👁️ isOwnProfile الحالي: ${isOwnProfile}`);
+
         } catch (err) {
             console.error('🔥 خطأ في جلب البيانات:', err);
             const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في جلب البيانات';
@@ -267,27 +425,39 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }));
     };
 
-    const handleGoToMyProfile = () => {
-        // ⬇️ استخدم دالة لتحميل البروفايل الشخصي
-        loadOwnProfile();
-    };
-
-    // ⬇️ دالة لتحميل البروفايل الشخصي
     const loadOwnProfile = async () => {
         try {
-            // جلب الـ ID أولاً
             const currentId = await ProfileService.getCurrentUserId();
             if (currentId) {
-                // التوجه إلى صفحة البروفايل الشخصي
                 router.push(`/profile/${currentId}`);
             } else {
-                // إذا لم يكن هناك ID، اذهب إلى الصفحة الرئيسية
                 router.push('/');
             }
         } catch (error) {
             console.error('❌ فشل في تحميل البروفايل الشخصي:', error);
             router.push('/login');
         }
+    };
+
+    const handlePostDeleted = (deletedPostId: number) => {
+        // تحديث القائمتين
+        refreshUserPosts();
+        setProfilePosts(prev => prev.filter(post => post.id !== deletedPostId));
+    };
+
+    const handleImagesUpdated = () => {
+        refreshUserPosts();
+    };
+
+    const handlePostUpdated = () => {
+        refreshUserPosts();
+    };
+
+      const checkIfOwnProfile = () => {
+        const currentUserId = localStorage.getItem('user_id');
+        const isOwn = currentUserId && targetUserId && currentUserId.toString() === targetUserId.toString();
+        console.log(`🔍 فحص isOwnProfile: ${isOwn} (current: ${currentUserId}, target: ${targetUserId})`);
+        return isOwn;
     };
 
     if (loading) {
@@ -377,6 +547,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         );
     }
 
+    const finalIsOwnProfile = checkIfOwnProfile();
+
     return (
         <div className="profile-container">
             <div className="profile-content">
@@ -384,20 +556,18 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     {isOwnProfile && (
                         <div className='display'>
                             <button className="edit-avatar-btn" onClick={handleEditClick}>
-                                <MdEdit style={{ width: 20, height: 20, }} />
-
+                                <MdEdit style={{ width: 20, height: 20 }} />
                             </button>
                         </div>
                     )}
 
                     {!isOwnProfile && (
                         <div className="display-not-owner">
-                            {/*  <span>👤 Viewing Profile</span> */}
                             <button
                                 onClick={loadOwnProfile}
                                 className="edit-avatar-btn-not-owner"
                             >
-                                <HiArrowNarrowRight style={{ width: 20, height: 20, }} />
+                                <HiArrowNarrowRight style={{ width: 20, height: 20 }} />
                                 back to my profile
                             </button>
                         </div>
@@ -431,7 +601,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             <div className="stat-number">{stats.following_count}</div>
                             <div className="stat-label">FOLLOWING</div>
                         </div>
-
                     </div>
 
                     <div className="profile-info-section">
@@ -510,12 +679,117 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 <span className="tab-count">{stats.posts_count}</span>
                             </button>
                         )}
-
                     </div>
 
                     {activeTab === 'posts' && (
                         <div className="recent-activity">
-                            <PostFeed />
+                            {postsError ? (
+                                <div style={{
+                                    textAlign: 'center',
+                                    padding: '2rem',
+                                    background: '#fff5f5',
+                                    border: '1px solid #fed7d7',
+                                    borderRadius: '8px',
+                                    marginBottom: '1rem'
+                                }}>
+                                    <p style={{ color: '#e53e3e', marginBottom: '1rem' }}>{postsError}</p>
+                                    <button
+                                        onClick={refreshUserPosts}
+                                        style={{
+                                            background: '#3182ce',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '0.75rem 1.5rem',
+                                            borderRadius: '6px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Try Again
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    {userPosts.length === 0 && !postsLoading ? (
+                                        <div style={{
+                                            textAlign: 'center',
+                                            padding: '3rem 1rem',
+                                            background: '#341c53',
+                                            borderRadius: '12px',
+                                            border: '1px solid #7c3aed'
+                                        }}>
+                                            <p style={{
+                                                fontSize: '1.25rem',
+                                                fontWeight: '600',
+                                                color: '#ffffffff',
+                                                marginBottom: '0.5rem'
+                                            }}>
+                                                There are no posts yet.
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {userPosts.map((post) => (
+                                                <PostItem 
+                                                    key={post.id} 
+                                                    post={post}
+                                                    onPostDeleted={handlePostDeleted}
+                                                    onImagesUpdated={handleImagesUpdated}
+                                                    onPostUpdated={handlePostUpdated}
+                                                />
+                                            ))}
+
+                                            {postsLoading && (
+                                                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                                    <div style={{
+                                                        width: '40px',
+                                                        height: '40px',
+                                                        border: '3px solid #e2e8f0',
+                                                        borderTop: '3px solid #3182ce',
+                                                        borderRadius: '50%',
+                                                        animation: 'spin 1s linear infinite',
+                                                        margin: '0 auto 1rem'
+                                                    }}></div>
+                                                    <p>Loading user's posts...</p>
+                                                </div>
+                                            )}
+
+                                            {hasMore && !postsLoading && (
+                                                <div ref={observerRef} style={{ textAlign: 'center', padding: '1rem' }}>
+                                                    <button
+                                                        onClick={loadMore}
+                                                        style={{
+                                                            background: '#edf2f7',
+                                                            color: '#2d3748',
+                                                            border: '1px solid #cbd5e0',
+                                                            padding: '0.75rem 1.5rem',
+                                                            borderRadius: '6px',
+                                                            cursor: 'pointer',
+                                                            fontWeight: '200',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.background = '#e2e8f0';
+                                                            e.currentTarget.style.borderColor = '#a0aec0';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.background = '#edf2f7';
+                                                            e.currentTarget.style.borderColor = '#cbd5e0';
+                                                        }}
+                                                    >
+                                                        Load More
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {!hasMore && userPosts.length > 0 && (
+                                                <div style={{ textAlign: 'center', padding: '2rem', color: '#718096', fontStyle: 'italic' }}>
+                                                    <p>You've seen all of this user's posts</p>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -715,6 +989,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     </div>
                 </div>
             )}
+
+            <style jsx>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 };

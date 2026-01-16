@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getPosts, Post, PostsResponse } from '@/services/api/posts/get-posts';
+import { getUserPosts, UserPostsResponse } from '@/services/api/posts/get-user-posts';
 
 interface UsePostsReturn {
     posts: Post[];
@@ -13,7 +14,7 @@ interface UsePostsReturn {
     refreshPosts: () => void;
 }
 
-export const usePosts = (initialPage = 1, limit = 10): UsePostsReturn => {
+export const usePosts = (initialPage = 1, limit = 10, userId?: number): UsePostsReturn => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -25,11 +26,21 @@ export const usePosts = (initialPage = 1, limit = 10): UsePostsReturn => {
             setLoading(true);
             setError(null);
 
-            const response: PostsResponse = await getPosts(page, limit);
+            console.log('🎯 usePosts - userId:', userId);
+            
+            let response: PostsResponse | UserPostsResponse;
+            
+            if (userId) {
+                console.log(`📡 جلب بوستات المستخدم ${userId}`);
+                response = await getUserPosts(userId, page, limit);
+            } else {
+                console.log(`📡 جلب كل البوستات`);
+                response = await getPosts(page, limit);
+            }
 
             if (response.success) {
-                
                 const postsData = response.data.data || [];
+                console.log(`✅ تم جلب ${postsData.length} بوست`);
                 
                 if (isLoadMore) {
                     setPosts(prev => [...prev, ...postsData]);
@@ -37,21 +48,21 @@ export const usePosts = (initialPage = 1, limit = 10): UsePostsReturn => {
                     setPosts(postsData);
                 }
                 
-                
                 setHasMore(response.data.current_page < response.data.last_page);
             } else {
                 setError(response.message || 'Failed to fetch posts');
             }
         } catch (err: any) {
+            console.error('❌ خطأ في جلب البوستات:', err);
             setError(err.message || 'A connection error occurred');
         } finally {
             setLoading(false);
         }
-    }, [limit]);
+    }, [limit, userId]);
 
     useEffect(() => {
         fetchPosts(currentPage, false);
-    }, [fetchPosts]);
+    }, [fetchPosts, currentPage]);
 
     const loadMore = () => {
         if (hasMore && !loading) {

@@ -311,9 +311,8 @@
 }
 
 .info-value {
-    font-size: 1.1rem;
     color: white;
-    font-weight: 600;
+    font-weight: 400;
 }
 
 .account-created {
