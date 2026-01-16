@@ -35,79 +35,98 @@ export interface RegisterResponse {
 
 
 class AuthService {
-    private baseURL = '/api/v1';
-    
+    private baseURL = 'http://localhost:8000/api/v1';
+
     async register(data: RegisterData): Promise<RegisterResponse> {
         const url = `${this.baseURL}/register`;
-        console.log('🌐 Sending JSON to:', url);
-        
-        // ⬇️ أعد تحضير البيانات للـ JSON
-        const jsonData: any = {
-            full_name: data.full_name,
-            email: data.email,
-            password: data.password,
-            password_confirmation: data.password_confirmation,
-            phone_number: data.phone_number,
-            birth_date: data.birth_date,
-            gender: data.gender,
-        };
-        
-        // ⬇️ أضف الحقول الاختيارية إذا موجودة
+        console.log('🌐 Sending FormData to:', url);
+
+        const formData = new FormData();
+
+        // أضف جميع الحقول كـ FormData
+        formData.append('full_name', data.full_name);
+        formData.append('email', data.email);
+        formData.append('password', data.password);
+        formData.append('password_confirmation', data.password_confirmation);
+        formData.append('phone_number', data.phone_number);
+        formData.append('birth_date', data.birth_date);
+        formData.append('gender', data.gender);
+
         if (data.bio && data.bio.trim() !== '') {
-            jsonData.bio = data.bio;
+            formData.append('bio', data.bio);
         }
         if (data.image && data.image.trim() !== '') {
-        jsonData.image = data.image;
-        console.log('🖼️ Image URL included:', data.image);
-    } else {
-        console.log('⚠️ No image URL provided');
-    }
-        // ⚠️ مشكلة: الصورة ما بتقدر ترسلها في JSON
-        // إذا كان API يطلب JSON فقط، ما راح تقدر ترسل ملفات
-        // الحل: إما ترفع الصورة بشكل منفصل أو تستخدم base64
-        
-        /* console.log('📦 JSON Data to send:', jsonData); */
-        
+            formData.append('image', data.image);
+        }
+
+        // 🔍 تحقق من محتويات FormData (للتشفيت فقط)
+        for (let [key, value] of formData.entries()) {
+            console.log(`📝 ${key}:`, value);
+        }
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    // ⚠️ لا تضف 'Content-Type' هنا - سيقوم fetch بإضافته تلقائياً مع boundary لـ FormData
                     'Accept': 'application/json',
+                    // إذا كنت بحاجة إلى token:
+                    // 'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(jsonData),//بتحول لجيسون
+                body: formData, // ⭐ أرسل FormData بدلاً من JSON
             });
-            
+
             const responseText = await response.text();
             console.log('📨 Response status:', response.status);
             console.log('📄 Response (first 500 chars):', responseText.substring(0, 500));
-            
+
             // تحقق إذا كان HTML
             if (responseText.trim().startsWith('<!DOCTYPE')) {
                 console.error('❌ Server returned HTML!');
+
+                // 🔍 سجل الـ HTML الكامل للمساعدة في التشخيص
+                console.error('📄 Full HTML response (first 1000 chars):', responseText.substring(0, 1000));
+
                 throw new Error(`Server error ${response.status}: Received HTML page`);
             }
-            
+
             // حاول تحليل الـ JSON
             try {
                 const result = JSON.parse(responseText);
-                
+
                 if (!response.ok) {
+                    console.error('❌ API Error:', result);
                     throw new Error(result.message || `HTTP ${response.status}: ${JSON.stringify(result)}`);
                 }
-                
+
                 console.log('✅ Registration successful!');
                 return result;
-                
+
             } catch (jsonError) {
                 console.error('❌ JSON parse error:', jsonError);
+                console.error('📄 Raw response:', responseText);
                 throw new Error(`Invalid JSON from server: ${responseText.substring(0, 200)}`);
             }
-            
+
         } catch (error: any) {
             console.error('🔥 Request failed:', error);
             throw error;
         }
+    }
+
+    // دالة مساعدة لتحويل base64 إلى Blob
+    private dataURLtoBlob(dataURL: string): Blob {
+        const arr = dataURL.split(',');
+        const mime = arr[0].match(/:(.*?);/)![1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new Blob([u8arr], { type: mime });
     }
 }
 export const authService = new AuthService();
