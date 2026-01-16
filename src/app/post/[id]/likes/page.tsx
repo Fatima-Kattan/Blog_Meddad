@@ -23,7 +23,7 @@ interface Like {
 export default function PostLikesPage() {
     const params = useParams();
     const id = params.id as string;
-    
+
     const [likes, setLikes] = useState<Like[]>([]);
     const [postTitle, setPostTitle] = useState('');
     const [loading, setLoading] = useState(true);
@@ -38,7 +38,7 @@ export default function PostLikesPage() {
         try {
             setLoading(true);
             setError('');
-            
+
             const token = localStorage.getItem('token');
             const response = await fetch(
                 `${API_URL}/posts/${id}/likes?page=${page}`,
@@ -176,7 +176,11 @@ export default function PostLikesPage() {
                         {likes.map((like) => (
                             <div key={like.id} className={styles.likeItem}>
                                 <div className={styles.userInfo}>
-                                    <div className={styles.userAvatar}>
+                                    <a
+                                        href={`/profile/${like.user?.id || ''}`}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className={styles.userAvatar}
+                                    >
                                         {like.user?.image ? (
                                             <img
                                                 src={like.user.image}
@@ -199,7 +203,7 @@ export default function PostLikesPage() {
                                                 {getInitials(like.user?.full_name || '??')}
                                             </div>
                                         )}
-                                    </div>
+                                    </a>
                                     <div className={styles.userDetails}>
                                         <h4 className={styles.userName}>{like.user?.full_name || 'User'}</h4>
                                         <span className={styles.likeTime}>{formatDate(like.created_at)}</span>
@@ -244,9 +248,8 @@ export default function PostLikesPage() {
                                 <button
                                     key={pageNum}
                                     onClick={() => fetchLikes(pageNum)}
-                                    className={`${styles.pageNumber} ${
-                                        currentPage === pageNum ? styles.active : ''
-                                    }`}
+                                    className={`${styles.pageNumber} ${currentPage === pageNum ? styles.active : ''
+                                        }`}
                                 >
                                     {pageNum}
                                 </button>

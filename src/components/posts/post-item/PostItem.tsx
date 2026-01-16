@@ -49,41 +49,50 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     const isCurrentUser = userData?.id === post.user.id;
 
     useEffect(() => {
-        const checkLikeStatus = async () => {
-            try {
-                console.log('Checking like status for post:', post.id);
+    const checkLikeStatus = async () => {
+        try {
+            console.log('Checking like status for post:', post.id);
+            console.log('Current user ID:', userData?.id); // 🔍 تأكد من user ID
 
-                // 1. جيب من localStorage أولاً (فوري)
-                const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
-                const isLikedLocally = likedPosts.includes(post.id);
-
-                if (isLikedLocally) {
-                    setIsLiked(true);
-                    console.log('Found in localStorage: liked');
-                    return;
-                }
-
-                // 2. إذا مش موجود في localStorage، روح جيب من API
-                const isLikedFromAPI = await likesService.checkUserLike(post.id);
-                console.log('From API:', isLikedFromAPI);
-                setIsLiked(isLikedFromAPI);
-
-                // 3. خزن في localStorage للمرة الجاية
-                if (isLikedFromAPI) {
-                    const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
-                    if (!likedPosts.includes(post.id)) {
-                        likedPosts.push(post.id);
-                        localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
-                    }
-                }
-
-            } catch (error) {
-                console.error('Error checking like status:', error);
+            // 1. تأكد إنه في user مسجل دخول
+            if (!userData?.id) {
+                setIsLiked(false);
+                return;
             }
-        };
 
-        checkLikeStatus();
-    }, [post.id]);
+            // 2. جيب من localStorage بحسب user ID
+            const likedKey = `liked_posts_user_${userData.id}`;
+            const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
+            const isLikedLocally = likedPosts.includes(post.id);
+
+            if (isLikedLocally) {
+                setIsLiked(true);
+                console.log(`Found in localStorage for user ${userData.id}: liked`);
+                return;
+            }
+
+            // 3. إذا مش موجود في localStorage، روح جيب من API
+            const isLikedFromAPI = await likesService.checkUserLike(post.id);
+            console.log('From API:', isLikedFromAPI);
+            setIsLiked(isLikedFromAPI);
+
+            // 4. خزن في localStorage بحسب user ID
+            if (isLikedFromAPI) {
+                const likedKey = `liked_posts_user_${userData.id}`;
+                const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
+                if (!likedPosts.includes(post.id)) {
+                    likedPosts.push(post.id);
+                    localStorage.setItem(likedKey, JSON.stringify(likedPosts));
+                }
+            }
+
+        } catch (error) {
+            console.error('Error checking like status:', error);
+        }
+    };
+
+    checkLikeStatus();
+}, [post.id, userData?.id]); // ⭐ اضف userData?.id للـ dependencies
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -198,13 +207,15 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     };
 
     // دالة تحديث عدد الإعجابات
-    const handleLikeUpdate = (newCount: number, liked: boolean) => {
-        setLikesCount(newCount);
-        setIsLiked(liked);
+   const handleLikeUpdate = (newCount: number, liked: boolean) => {
+    setLikesCount(newCount);
+    setIsLiked(liked);
 
-        // تحديث localStorage
+    // تحديث localStorage بحسب user ID
+    if (userData?.id) {
         try {
-            const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+            const likedKey = `liked_posts_user_${userData.id}`;
+            const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
 
             if (liked) {
                 // أضف إذا مش موجود
@@ -219,12 +230,15 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 }
             }
 
-            localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
-            console.log('Updated localStorage for post:', post.id, 'liked:', liked);
+            localStorage.setItem(likedKey, JSON.stringify(likedPosts));
+            console.log(`Updated localStorage for user ${userData.id}, post: ${post.id}, liked: ${liked}`);
         } catch (error) {
             console.error('Error updating localStorage:', error);
         }
-    };
+    } else {
+        console.warn('No user ID available for localStorage update');
+    }
+};
 
     return (
         <>

@@ -24,6 +24,7 @@
     height: 30px;
     font-size: 20px;
     transition: all 0.2s ease;
+    margin-bottom: 3px
 }
 
 .heartButton:hover:not(:disabled) {
