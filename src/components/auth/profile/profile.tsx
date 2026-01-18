@@ -553,6 +553,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         <div className="profile-container">
             <div className="profile-content">
                 <div className="profile-sidebar">
+                    <div>
                     {isOwnProfile && (
                         <div className='display'>
                             <button className="edit-avatar-btn" onClick={handleEditClick}>
@@ -591,7 +592,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             Member since {formatDate(user.created_at)}
                         </div>
                     </div>
-
+                    
                     <div className="profile-stats">
                         <div className="stat-card">
                             <div className="stat-number">{stats.followers_count}</div>
@@ -635,11 +636,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             </div>
                         </div>
                     </div>
-
-                    <div className="account-created">
-                        <div className="created-label">ACCOUNT CREATED</div>
-                        <div className="created-date">{formatDate(user.created_at)}</div>
                     </div>
+
+                   
                 </div>
 
                 <div className="profile-main">

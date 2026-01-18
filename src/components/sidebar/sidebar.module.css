@@ -228,46 +228,564 @@
   .createPost {
     padding: 16px;
   }
-  
+
   .createHeader {
     gap: 12px;
   }
-  
+
   .userAvatar {
     width: 40px;
     height: 40px;
   }
-  
+
   .createButton span {
     display: none;
   }
-  
+
   .mediaOptions {
     gap: 12px;
     justify-content: space-between;
   }
-  
+
   .mediaOption span {
     display: none;
   }
-  
+
   .mediaOption {
     padding: 8px;
   }
-  
+
   .actionButtons {
     flex-direction: column;
     gap: 12px;
   }
-  
+
   .privacyOptions,
   .submitButtons {
     width: 100%;
   }
-  
+
   .privacySelect,
   .cancelBtn,
   .postBtn {
     width: 100%;
   }
+}
+
+
+/* LeftSidebar.module.css */
+
+/* الأساسيات */
+.sidebar {
+  width: 280px;
+  min-height: 100vh;
+  background: #1a0b2e;
+  color: white;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid #334155;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 24px 16px;
+  gap: 20px;
+  overflow-x: hidden;
+
+}
+
+.sidebar.compact {
+  width: 80px;
+  padding: 20px 12px;
+}
+
+/* التحميل */
+.loadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.loadingSpinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-top-color: #4e10a0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* قسم البروفايل */
+.profileSection {
+  background: #1a0b2e;
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #8b5cf64d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.profileSection:hover {
+  transform: translateY(-2px);
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.2);
+}
+
+.profileImageContainer {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #804bfcc3;
+}
+
+.profileInfo {
+  text-align: center;
+  margin-bottom: 20px;
+  padding-top: 10px;
+}
+
+.profileName {
+  font-size: 15px;
+  font-weight: 700;
+  background: linear-gradient(90deg, #d2c4e8, #a892da);
+  color: #0000;
+  -webkit-background-clip: text;
+  background-clip: text;
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.profileUsername {
+  font-size: 14px;
+  color: #bfc4ca;
+  margin: 0;
+  /* font-weight: 500; */
+}
+
+/* إحصائيات البروفايل */
+.profileStats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin-top: 5px;
+  padding: 20px;
+  background: #1a0b2e;
+  border-radius: 12px;
+  border: 1px solid #8a5cf6b9;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.statNumber {
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 11px;
+  background: linear-gradient(90deg, #d2c4e8, #a892da);
+  color: #0000;
+  -webkit-background-clip: text;
+  background-clip: text;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+/* تفاصيل المستخدم */
+.userDetails {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.detailItem:last-child {
+  border-bottom: none;
+}
+
+.detailIcon {
+  width: 16px;
+  height: 16px;
+  color: #8a5cf6e4;
+  flex-shrink: 0;
+}
+
+.detailText {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* التنقل */
+.navigation {
+  background: #1a0b2e;
+  border-radius: 16px;
+  padding: 16px;
+  padding-left: 44px;
+  padding-right: 44px;
+  border: 1px solid #8b5cf64d;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #cbd5e1;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.navLink:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: white;
+  transform: translateX(4px);
+}
+
+.navLink.active {
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.1));
+  color: #8a5cf6e1;
+  font-weight: 600;
+}
+
+.navIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.navLabel {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.navCount {
+  background: #9763f1;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* قسم إنشاء المنشور */
+.createPostSection {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #334155;
+}
+
+.createPostHeader {
+  margin-bottom: 16px;
+}
+
+.createPostTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+}
+
+.createPostBox {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #475569;
+}
+
+.postInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.postAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #6366f1;
+}
+
+.postInput {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #475569;
+  border-radius: 20px;
+  padding: 10px 16px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.postInput::placeholder {
+  color: #94a3b8;
+}
+
+.postInput:hover {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.postActions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.postActionButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid #475569;
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.postActionButton:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: white;
+  border-color: #6366f1;
+  transform: translateY(-2px);
+}
+
+.actionIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.actionLabel {
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* المنشورات الأخيرة */
+.recentPosts {
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid #334155;
+}
+
+.recentPostsTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 16px 0;
+}
+
+.recentPostItem {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.recentPostItem:hover {
+  border-color: #6366f1;
+  transform: translateY(-2px);
+}
+
+.postMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.postAuthor {
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+
+.postDate {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.postPreview {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #6366f1;
+  border-radius: 2px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+    padding: 20px 12px;
+  }
+
+  .profileStats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .postActions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+    padding: 16px 10px;
+  }
+
+  .profileImageContainer {
+    width: 60px;
+    height: 60px;
+  }
+
+  .profileName {
+    font-size: 18px;
+  }
+
+  .statNumber {
+    font-size: 10px;
+  }
+
+  .navLabel {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar {
+    display: none;
+  }
+
+  .sidebar.compact {
+    display: flex;
+    width: 60px;
+  }
+
+  .profileInfo,
+  .userDetails,
+  .navLabel,
+  .actionLabel,
+  .statLabel,
+  .createPostTitle,
+  .recentPostsTitle,
+  .recentPosts {
+    display: none;
+  }
+
+  .profileSection,
+  .navigation,
+  .createPostSection {
+    padding: 12px;
+  }
+
+  .profileStats {
+    padding: 8px;
+    gap: 4px;
+  }
+
+  .postActions {
+    display: none;
+  }
+}
+
+
+.display {
+  display: flex;
+  gap: 15px;
+  padding-top: 5px;
+}
+
+.navigation_h3 {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 90%;
+}
+
+.color_icon{
+  color: #9763f1;
 }

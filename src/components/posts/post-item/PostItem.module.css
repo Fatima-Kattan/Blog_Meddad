@@ -3,11 +3,11 @@
     background: #1a1a1a;
     border-radius: 12px;
     padding: 16px;
-    margin-bottom: 20px;
     border: 1px solid #333;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
     padding: 40px;
+    overflow: hidden;
 }
 
 .postContainer:hover {
@@ -131,7 +131,7 @@
     background: #1a0b2e;
     border-radius: 16px;
     border: 1px solid rgba(139, 92, 246, 0.2);
-    margin-bottom: 20px;
+    margin-bottom: 10px;
    /*  overflow: hidden; */
     transition: all 0.3s ease;
 }
