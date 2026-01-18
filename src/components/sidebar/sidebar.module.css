@@ -278,21 +278,22 @@
 /* الأساسيات */
 .sidebar {
   width: 280px;
-  min-height: 100vh;
+  min-height: 75vh;
   background: #1a0b2e;
   color: white;
   position: sticky;
-  top: 0;
+  top: 22%;
+  border-radius: 15px;
   overflow-y: auto;
   overflow-x: hidden;
-  border-right: 1px solid #334155;
+  border: 1px solid #8b5cf64d;
   display: flex;
   align-items: center;
   flex-direction: column;
   padding: 24px 16px;
   gap: 20px;
   overflow-x: hidden;
-
+  position: fixed;
 }
 
 .sidebar.compact {
@@ -695,8 +696,10 @@
 /* Responsive */
 @media (max-width: 1024px) {
   .sidebar {
-    width: 240px;
+    width: 258px;
     padding: 20px 12px;
+    gap: 5px;
+    top: 25%;
   }
 
   .profileStats {
