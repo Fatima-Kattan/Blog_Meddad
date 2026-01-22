@@ -260,7 +260,7 @@
 .listCount {
     font-size: 18px;
     font-weight: 700;
-    color: #805ad5;
+    color: rgb(233, 221, 221);
     background-color: rgba(128, 90, 213, 0.2);
     padding: 6px 12px;
     border-radius: 20px;
@@ -589,4 +589,144 @@
     }
 }
 
+
+/* //////////////// */
+/* ... إبقى على كل الأنماط اللي عندك */
+
+/* أضف أو عدل هدول الأنماط */
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+    backdrop-filter: blur(3px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modalContainer {
+    background-color: #1a0b2e;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* تأكد من هادا الستايل */
+.modalContainer.closing {
+    animation: slideDown 0.3s ease forwards;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(50px) scale(0.95);
+    }
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid #1a0b2e;
+    position: sticky;
+    top: 0;
+    background: #1a0b2e;
+    color: white;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    font-size: 32px;
+    color: #d8cdcd;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+    margin-right: 12px;
+    line-height: 1;
+}
+
+.closeButton:hover {
+    background-color: #c650502f;
+    color: #da1d1d;
+    border: 1px solid #6c1212;
+    transform: rotate(90deg);
+}
+
+.modalTitle {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+    padding-right: 48px;
+    color: rgb(235, 223, 223);
+}
+
+.modalContent {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 200px;
+}
+
+/* تأكد من هادا */
+.likesList {
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.likeItem:hover {
+    background-color: #240b4670;
+}
+
+/* إصلاح مشكلة ظهور المودال تحت المحتوى */
+:global(body.modal-open) {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+}
 

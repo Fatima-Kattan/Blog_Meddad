@@ -1,25 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import useSWR from 'swr';
 import ProfileService from '@/services/api/auth/profileService';
-import {
-  HiHome,
-  HiUsers,
-  HiCalendar,
-  HiVideoCamera,
-  HiPhotograph,
-  HiShoppingBag,
-  HiCamera,
-  HiPaperClip,
-  HiHashtag,
-  HiOutlineMail,
-  HiOutlinePhone,
-  HiOutlineCake,
-  HiOutlineUser,
-  HiOutlineLocationMarker
-} from 'react-icons/hi';
+import { HiHome, HiUsers, HiCalendar } from 'react-icons/hi';
 import styles from './sidebar.module.css';
 import { MdAssistantNavigation } from 'react-icons/md';
 
@@ -41,103 +27,57 @@ interface UserData {
   created_at?: string;
 }
 
+// fetcher بسيط
+const fetcher = async () => {
+  const response = await ProfileService.getUserProfile();
+  if (response.success && response.data.user) {
+    const { user: userData, stats } = response.data;
+    return {
+      id: userData.id,
+      full_name: userData.full_name,
+      image: userData.image || '/default-avatar.png',
+      email: userData.email,
+      bio: userData.bio,
+      phone_number: userData.phone_number,
+      followers_count: stats.followers_count,
+      following_count: stats.following_count,
+      posts_count: stats.posts_count,
+      created_at: userData.created_at
+    };
+  }
+  throw new Error('Failed to fetch user');
+};
+
 const LeftSidebar: React.FC<LeftSidebarProps> = ({ compact = false }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<UserData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [showAllStats, setShowAllStats] = useState(false);
 
-  // جلب بيانات المستخدم الحالي
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        setLoading(true);
-        const response = await ProfileService.getUserProfile();
+  // SWR بيخزن ويعمل revalidate تلقائي
+  const { data: user, error, isLoading } = useSWR('currentUser', fetcher, {
+    revalidateOnFocus: false,   // ما يعيد التحميل كل ما رجعت للصفحة
+    refreshInterval: 5 * 60 * 1000 // تحديث كل 5 دقائق
+  });
 
-        if (response.success && response.data.user) {
-          const userData = response.data.user;
-          const stats = response.data.stats;
-
-          setUser({
-            id: userData.id,
-            full_name: userData.full_name,
-            image: userData.image || '/default-avatar.png',
-            email: userData.email,
-            bio: userData.bio,
-            phone_number: userData.phone_number,
-            followers_count: stats.followers_count,
-            following_count: stats.following_count,
-            posts_count: stats.posts_count,
-            created_at: userData.created_at
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCurrentUser();
-  }, []);
-
-  // تنسيق التاريخ
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
-  // تنسيق الأرقام (2.3k)
-  const formatNumber = (num: number) => {
-    if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'k';
-    }
-    return num.toString();
-  };
+  const formatNumber = (num: number) =>
+    num >= 1000 ? (num / 1000).toFixed(1) + 'k' : num.toString();
 
   const navItems = [
-    { icon: <HiHome className={styles.navIcon} />, label: 'Feed', href: '/', count: null },
-    { icon: <HiUsers className={styles.navIcon} />, label: 'Friends', href: '/following', count: null },
-    { icon: <HiCalendar className={styles.navIcon} />, label: 'notification', href: '/notifications', count: null },
+    { icon: <HiHome className={styles.navIcon} />, label: 'Feed', href: '/' },
+    { icon: <HiUsers className={styles.navIcon} />, label: 'Friends', href: '/following' },
+    { icon: <HiCalendar className={styles.navIcon} />, label: 'Notifications', href: '/notifications' }
   ];
 
-
-  const handleProfileClick = () => {
-    router.push(`/profile/${user?.id}`);
+  const handleNavClick = (href: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    router.push(href);
   };
 
-  const handleFriendsClick = (e: React.MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  router.push('/following');
-};
+  const handleProfileClick = () => {
+    if (user?.id) router.push(`/profile/${user.id}`);
+  };
 
-const handleNotificationsClick = (e: React.MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  router.push('/notifications');
-};
-
-const handleNavClick = (item: any, e: React.MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-  
-  if (item.label === 'Friends') {
-    handleFriendsClick(e);
-  } else if (item.label === 'Notifications') {
-    handleNotificationsClick(e);
-  } else {
-    router.push(item.href);
-  }
-};
-
-  if (loading) {
+  if (isLoading) {
     return (
       <aside className={`${styles.sidebar} ${compact ? styles.compact : ''}`}>
         <div className={styles.loadingContainer}>
@@ -147,9 +87,12 @@ const handleNavClick = (item: any, e: React.MouseEvent) => {
     );
   }
 
+  if (error) {
+    return <div>خطأ بتحميل البيانات</div>;
+  }
+
   return (
     <aside className={`${styles.sidebar} ${compact ? styles.compact : ''}`}>
-      {/* قسم البروفايل */}
       <div className={styles.profileSection} onClick={handleProfileClick}>
         <div className={styles.display}>
           <div className={styles.profileImageContainer}>
@@ -159,18 +102,12 @@ const handleNavClick = (item: any, e: React.MouseEvent) => {
               className={styles.profileImage}
             />
           </div>
-
           <div className={styles.profileInfo}>
-            <h3 className={styles.profileName}>
-              {user?.full_name || 'User'}
-            </h3>
-            <p className={styles.profileUsername}>
-              {user?.email ? user.email : 'username'}
-            </p>
+            <h3 className={styles.profileName}>{user?.full_name || 'User'}</h3>
+            <p className={styles.profileUsername}>{user?.email || 'username'}</p>
           </div>
         </div>
 
-        {/* إحصائيات البروفايل */}
         <div className={styles.profileStats}>
           <div className={styles.statItem}>
             <span className={styles.statNumber}>
@@ -178,50 +115,36 @@ const handleNavClick = (item: any, e: React.MouseEvent) => {
             </span>
             <span className={styles.statLabel}>follower</span>
           </div>
-
           <div className={styles.statItem}>
-            <span className={styles.statNumber}>
-              {user?.following_count || '0'}
-            </span>
+            <span className={styles.statNumber}>{user?.following_count || '0'}</span>
             <span className={styles.statLabel}>following</span>
           </div>
-
           <div className={styles.statItem}>
-            <span className={styles.statNumber}>
-              {user?.posts_count || '0'}
-            </span>
+            <span className={styles.statNumber}>{user?.posts_count || '0'}</span>
             <span className={styles.statLabel}>post</span>
           </div>
         </div>
-
-
       </div>
 
-
-      {/* قسم التنقل */}
-      <h3 className={styles.navigation_h3}> <MdAssistantNavigation className={styles.color_icon} />navigation :</h3>
+      <h3 className={styles.navigation_h3}>
+        <MdAssistantNavigation className={styles.color_icon} /> navigation :
+      </h3>
       <nav className={styles.navigation}>
-
         <ul className={styles.navList}>
-
           {navItems.map((item) => (
             <li key={item.label}>
               <Link
                 href={item.href}
                 className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}
-                onClick={(e) => handleNavClick(item, e)}
+                onClick={(e) => handleNavClick(item.href, e)}
               >
                 {item.icon}
                 <span className={styles.navLabel}>{item.label}</span>
-                {item.count !== null && (
-                  <span className={styles.navCount}>{item.count}</span>
-                )}
               </Link>
             </li>
           ))}
         </ul>
       </nav>
-
     </aside>
   );
 };

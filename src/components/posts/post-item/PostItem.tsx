@@ -12,6 +12,7 @@ import styles from './PostItem.module.css';
 import LikeButton from '@/components/likes/LikeButton';
 import Link from 'next/link';
 import likesService from '@/services/api/likes/likesService';
+import LikesModal from '@/components/likes/LikesModal';
 
 interface PostItemProps {
     post: {
@@ -177,6 +178,17 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         setCommentsCount(prev => prev + 1);
     };
 
+    
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
     const handlePostUpdateSuccess = (updatedPost?: any) => {
         console.log('✅ Post updated successfully:', updatedPost);
         setShowUpdateModal(false);
@@ -308,7 +320,12 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                         <span className={styles.statLabel}>Comments</span>
                     </div>
 
-
+<LikesModal
+                postId={post.id.toString()}
+                postTitle={post.title}
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+            />
                 </div>
 
                 <div className={styles.commentPlaceholder}>
@@ -320,6 +337,8 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     </button>
                 </div>
             </article>
+
+                
 
             {showUpdateModal && (
                 <UpdatePost
