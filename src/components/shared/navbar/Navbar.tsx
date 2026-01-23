@@ -264,7 +264,7 @@ const Navbar = () => {
             label: 'Profile',
             icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
         },
-        { id: 'posts', href: '/posts', label: 'Posts', icon: <FaFeatherAlt size={22} /> },
+        { id: 'posts', href: '#', label: 'MyPosts', icon: <FaFeatherAlt size={22} /> }, // ⭐⭐ غير هنا!
     ];
 
     // ⭐⭐ **تعديل handleTabClick** ⭐⭐
@@ -281,6 +281,20 @@ const Navbar = () => {
             const userId = getCurrentUserId();
             if (userId) {
                 router.push(`/profile/${userId}`);
+            }
+            
+            setIsMenuOpen(false);
+            setShowProfileMenu(false);
+            return;
+        }
+
+        if (tabId === 'posts') {
+            const userId = getCurrentUserId();
+            if (userId) {
+                router.push(`/myPost/${userId}`);
+            } else {
+                // إذا لم يكن مسجل دخول، أرسله لصفحة تسجيل الدخول
+                router.push('/login');
             }
             
             setIsMenuOpen(false);
@@ -442,14 +456,20 @@ const Navbar = () => {
                                             <RiUserStarLine size={20} />
                                             <span>My Profile</span>
                                         </button>
-                                        <Link
-                                            href="/posts"
+                                        {/* ⭐⭐ تعديل هنا! ⭐⭐ */}
+                                        <button
                                             className={styles.menuItem}
-                                            onClick={() => setShowProfileMenu(false)}
+                                            onClick={() => {
+                                                const userId = getCurrentUserId();
+                                                if (userId) {
+                                                    router.push(`/myPost/${userId}`);
+                                                }
+                                                setShowProfileMenu(false);
+                                            }}
                                         >
                                             <FaFeatherAlt size={20} />
                                             <span>My Posts</span>
-                                        </Link>
+                                        </button>
 
                                         <div className={styles.menuDivider} />
 
@@ -563,8 +583,8 @@ const Navbar = () => {
                                     Profile
                                 </button>
 
-                                {/* روابط أخرى */}
-                                {navLinks.filter(link => link.id !== 'profile').map((link) => (
+                                {/* ⭐⭐ تعديل هنا! ⭐⭐ */}
+                                {navLinks.filter(link => link.id !== 'profile' && link.id !== 'posts').map((link) => (
                                     <Link
                                         key={link.id}
                                         href={link.href}
@@ -579,6 +599,25 @@ const Navbar = () => {
                                         {link.label}
                                     </Link>
                                 ))}
+
+                                {/* ⭐⭐ رابط Posts خاص في قائمة الجوال ⭐⭐ */}
+                                <button
+                                    className={`${styles.mobileLink} ${activeTab === 'posts' ? styles.active : ''}`}
+                                    onClick={() => {
+                                        const userId = getCurrentUserId();
+                                        if (userId) {
+                                            router.push(`/myPost/${userId}`);
+                                            setActiveTab('posts');
+                                            setIsMenuOpen(false);
+                                            setShowProfileMenu(false);
+                                        }
+                                    }}
+                                >
+                                    <span className={styles.mobileLinkIcon}>
+                                        <FaFeatherAlt size={24} />
+                                    </span>
+                                    Posts
+                                </button>
 
                                 <div className={styles.mobileDivider} />
 
