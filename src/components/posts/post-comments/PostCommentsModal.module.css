@@ -158,6 +158,18 @@
     font-size: 0.95rem;
 }
 
+/* في ملف PostCommentsModal.module.css */
+.userAvatarContainer:hover .userAvatar {
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+}
+
+.userName:hover {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    color: var(--color-primary); 
+}
+
 .postTime {
     color: var(--color-text-muted);
     font-size: 0.8rem;

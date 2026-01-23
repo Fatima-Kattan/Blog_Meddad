@@ -109,6 +109,19 @@
     flex-shrink: 0;
 }
 
+/* في ملف CommentsList.module.css */
+.avatarContainer:hover,
+.userName:hover {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    color: var(--color-primary); 
+}
+
+.userName {
+    font-weight: 600;
+}
+
+
 .commentBody {
     flex: 1;
     min-width: 0;

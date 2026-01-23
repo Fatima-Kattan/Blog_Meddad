@@ -7,6 +7,7 @@ import { HiX, HiChevronLeft, HiChevronRight } from 'react-icons/hi';
 import CommentsList from './comments-list/CommentsList';
 import CommentForm from './comment-form/CommentForm';
 import { useUserData } from '@/hooks/useUserData';
+import { useRouter } from 'next/navigation'; // ⭐ إضافة useRouter
 
 interface PostCommentsModalProps {
     post: {
@@ -39,6 +40,7 @@ const PostCommentsModal: React.FC<PostCommentsModalProps> = ({
     const [showImageModal, setShowImageModal] = useState(false);
     const postContentRef = useRef<HTMLDivElement>(null);
     const commentsListRef = useRef<HTMLDivElement>(null);
+    const router = useRouter(); // ⭐ إضافة useRouter
 
     useEffect(() => {
         if (isOpen) {
@@ -68,6 +70,12 @@ const PostCommentsModal: React.FC<PostCommentsModalProps> = ({
             document.body.style.overflow = 'unset';
         };
     }, [isOpen]);
+
+    // ⭐ دالة الذهاب إلى البروفايل
+    const navigateToProfile = (userId: number) => {
+        onClose(); // إغلاق المودال أولاً
+        router.push(`/profile/${userId}`);
+    };
 
     const handleOverlayClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) {
@@ -137,16 +145,28 @@ const PostCommentsModal: React.FC<PostCommentsModalProps> = ({
                         ref={postContentRef}
                     >
                         <div className={styles.postHeader}>
-                            <img
-                                src={post.user.image}
-                                alt={post.user.full_name}
-                                className={styles.userAvatar}
-                                onError={(e) => {
-                                    e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.user.full_name);
-                                }}
-                            />
+                            {/* ⭐ تعديل صورة المستخدم - جعلها قابلة للنقر */}
+                            <div 
+                                className={styles.userAvatarContainer}
+                                onClick={() => navigateToProfile(post.user.id)}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <img
+                                    src={post.user.image}
+                                    alt={post.user.full_name}
+                                    className={styles.userAvatar}
+                                    onError={(e) => {
+                                        e.currentTarget.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(post.user.full_name);
+                                    }}
+                                />
+                            </div>
                             <div className={styles.userDetails}>
-                                <span className={styles.userName}>
+                                {/* ⭐ تعديل اسم المستخدم - جعله قابلاً للنقر */}
+                                <span 
+                                    className={styles.userName}
+                                    onClick={() => navigateToProfile(post.user.id)}
+                                    style={{ cursor: 'pointer' }}
+                                >
                                     {post.user.full_name}
                                 </span>
                                 <span className={styles.postTime}>

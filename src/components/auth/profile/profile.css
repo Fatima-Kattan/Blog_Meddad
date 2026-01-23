@@ -311,9 +311,8 @@
 }
 
 .info-value {
-    font-size: 1.1rem;
     color: white;
-    font-weight: 600;
+    font-weight: 400;
 }
 
 .account-created {
@@ -1104,7 +1103,7 @@
     padding: 32px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    height: 1137px;
+    height: 1029px;
     display: flex;
     flex-direction: column;
 }

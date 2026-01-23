@@ -1,11 +1,11 @@
 'use client'
 // components/Profile.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import './profile.css';
 import ProfileService, {
     UserProfile,
     ProfileStats,
-    Post,
+    Post as ProfilePost,
     UpdateProfileData,
     ProfileResponse,
     UserProfileResponse
@@ -18,9 +18,11 @@ import InputField from '@/components/shared/InputField';
 import SelectField from '@/components/shared/SelectField';
 import DatePickerField from '@/components/shared/DatePickerField';
 import { MdEdit, MdOutlineEmail } from 'react-icons/md';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import PostItem from '@/components/posts/post-item/PostItem';
+import axios from 'axios';
 
 type TabType = 'overview' | 'posts' | 'followers' | 'following';
 
@@ -29,14 +31,55 @@ interface ProfileProps {
     isOwnProfile?: boolean;
 }
 
-// ⬇️ أزل هذا التعريف المكرر:
-// export default function ProfileComponent({ profile, isCurrentUser = false }: ProfileComponentProps) {
+interface ApiPost {
+    id: number;
+    user_id: number;
+    title: string;
+    caption: string;
+    images: string[];
+    created_at: string;
+    likes_count: number;
+    comments_count: number;
+    user: {
+        id: number;
+        full_name: string;
+        image: string;
+    };
+    likes: any[];
+    comments: any[];
+    tags: any[];
+}
 
-// ⬇️ احتفظ بهذا التعريف فقط:
+interface UserPostsResponse {
+    success: boolean;
+    data: {
+        user: {
+            id: number;
+            full_name: string;
+            image: string;
+            bio: string;
+            created_at: string;
+        };
+        posts: {
+            current_page: number;
+            data: ApiPost[];
+            total: number;
+            last_page: number;
+        };
+        stats: {
+            total_posts: number;
+            total_likes: number;
+            total_comments: number;
+        };
+    };
+    message: string;
+}
+
 const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: propIsOwnProfile }) => {
     const router = useRouter();
     const params = useParams();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     const urlUserId = params?.id as string;
     const queryUserId = searchParams?.get('id');
@@ -45,7 +88,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [isOwnProfile, setIsOwnProfile] = useState(propIsOwnProfile || false);
     const [user, setUser] = useState<UserProfile | null>(null);
     const [stats, setStats] = useState<ProfileStats | null>(null);
-    const [posts, setPosts] = useState<Post[]>([]);
+    const [profilePosts, setProfilePosts] = useState<ProfilePost[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('posts');
@@ -56,36 +99,157 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [today, setToday] = useState('');
 
+    // States for UserPostsFeed
+    const [userPosts, setUserPosts] = useState<ApiPost[]>([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [postsError, setPostsError] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const observerRef = useRef<HTMLDivElement>(null);
+
+    // إعادة تعيين الحالة عند تغيير المستخدم
     useEffect(() => {
+        const resetState = () => {
+            setUser(null);
+            setStats(null);
+            setProfilePosts([]);
+            setUserPosts([]);
+            setLoading(true);
+            setError(null);
+            setPostsLoading(true);
+            setPostsError(null);
+            setPage(1);
+            setHasMore(true);
+            setIsOwnProfile(propIsOwnProfile || false);
+            setActiveTab('posts');
+        };
+
+        resetState();
+        
         const todayDate = new Date().toISOString().split('T')[0];
         setToday(todayDate);
 
-        fetchProfileData();
+        if (targetUserId) {
+            fetchProfileData();
+        }
     }, [targetUserId]);
+
+    // التعامل مع تغيير المسار
+    useEffect(() => {
+        if (pathname && pathname.includes('/profile/')) {
+            const urlUserId = params?.id as string;
+            const currentUserId = localStorage.getItem('user_id');
+            
+            if (urlUserId && currentUserId) {
+                const isOwn = urlUserId === currentUserId.toString();
+                console.log(`🔄 تحديث isOwnProfile: ${isOwn} (المستخدم الحالي: ${currentUserId}, المستخدم المستهدف: ${urlUserId})`);
+                setIsOwnProfile(isOwn);
+            }
+        }
+    }, [pathname, params?.id]);
+
+    useEffect(() => {
+        if (targetUserId && activeTab === 'posts') {
+            fetchUserPosts(1, true);
+        }
+    }, [targetUserId, activeTab]);
+
+    // Auto infinite scroll
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !postsLoading) {
+                    loadMore();
+                }
+            },
+            { threshold: 0.5 }
+        );
+
+        if (observerRef.current) {
+            observer.observe(observerRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [hasMore, postsLoading]);
+
+    const fetchUserPosts = useCallback(async (pageNum: number = 1, isRefresh: boolean = false) => {
+        if (!targetUserId) {
+            setPostsError('No user ID provided');
+            setPostsLoading(false);
+            return;
+        }
+
+        try {
+            setPostsLoading(true);
+            const response = await axios.get<UserPostsResponse>(
+                `http://localhost:8000/api/v1/user/${targetUserId}/posts`,
+                {
+                    params: { page: pageNum },
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+
+            if (response.data.success) {
+                const newPosts = response.data.data.posts.data;
+                
+                if (isRefresh) {
+                    setUserPosts(newPosts);
+                } else {
+                    setUserPosts(prev => [...prev, ...newPosts]);
+                }
+                
+                setHasMore(pageNum < response.data.data.posts.last_page);
+                setPage(pageNum + 1);
+                setPostsError(null);
+            } else {
+                setPostsError(response.data.message || 'Failed to fetch user posts');
+            }
+        } catch (err: any) {
+            setPostsError(err.response?.data?.message || 'Error fetching user posts');
+            console.error('Error fetching user posts:', err);
+        } finally {
+            setPostsLoading(false);
+        }
+    }, [targetUserId]);
+
+    const loadMore = () => {
+        if (!postsLoading && hasMore) {
+            fetchUserPosts(page, false);
+        }
+    };
+
+    const refreshUserPosts = () => {
+        setPage(1);
+        setHasMore(true);
+        fetchUserPosts(1, true);
+    };
 
     const fetchProfileData = async () => {
         try {
             setLoading(true);
             setError(null);
-            /*             console.log('🔄 جلب بيانات البروفايل لـ ID:', targetUserId);
-             */
+            
             let profileResponse: ProfileResponse | UserProfileResponse;
 
+            console.log(`🔍 جلب بيانات للمستخدم: ${targetUserId}`);
+
             if (targetUserId) {
-/*                 console.log(`📋 جلب بروفايل للمستخدم: ${targetUserId}`);
- */                try {
+                try {
                     profileResponse = await ProfileService.getUserProfileById(targetUserId);
 
                     const currentUserId = localStorage.getItem('user_id');
-                    /*   console.log('🔍 ID الحالي من localStorage:', currentUserId);
-                      console.log('🔍 الـ ID المستهدف:', targetUserId); */
-
-                    if (currentUserId && currentUserId === targetUserId.toString()) {
+                    console.log(`👤 المقارنة: المستخدم الحالي=${currentUserId}, المستخدم المستهدف=${targetUserId}`);
+                    
+                    if (currentUserId && currentUserId.toString() === targetUserId.toString()) {
+                        console.log('✅ هذا هو الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(true);
-/*                         console.log('✅ هذا البروفايل الخاص بالمستخدم الحالي');
- */                    } else {
+                    } else {
+                        console.log('❌ هذا ليس الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(false);
-                      /*   console.log('👀 هذا بروفايل مستخدم آخر'); */
                     }
 
                 } catch (fetchError) {
@@ -93,20 +257,14 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     throw new Error('فشل في جلب بروفايل المستخدم');
                 }
             } else {
-                // ⬇️ جلب البروفايل الشخصي بدون ID
-/*                 console.log('🔄 جلب البروفايل الشخصي...');
- */                profileResponse = await ProfileService.getUserProfile();
+                profileResponse = await ProfileService.getUserProfile();
                 setIsOwnProfile(true);
 
-                // ⬇️ احفظ الـ ID في localStorage
                 if (profileResponse.data.user.id) {
                     localStorage.setItem('user_id', profileResponse.data.user.id.toString());
-/*                     console.log('💾 تم حفظ الـ ID:', profileResponse.data.user.id);
- */                }
+                }
             }
 
-/*             console.log('📦 بيانات البروفايل الكاملة:', profileResponse);
- */
             if (!profileResponse.success) {
                 throw new Error(profileResponse.message || 'فشل في تحميل البروفايل');
             }
@@ -114,11 +272,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             // تحويل البيانات إلى الشكل الصحيح
             const userData = profileResponse.data.user;
             const statsData = profileResponse.data.stats;
-/* 
-            console.log('👤 بيانات المستخدم:', userData);
-            console.log('📊 الإحصائيات:', statsData);
- */
-            // تحويل UserProfileResponse إلى UserProfile
+
+            console.log(`📊 بيانات المستخدم المستلمة:`, {
+                id: userData.id,
+                name: userData.full_name,
+                isOwnProfile: isOwnProfile
+            });
+
             const formattedUser: UserProfile = {
                 id: userData.id,
                 full_name: userData.full_name,
@@ -146,12 +306,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setStats(formattedStats);
 
             // جلب المنشورات مع تفاصيل اللايكات
-            const userPosts = userData.posts || [];
-/*             console.log('📝 المنشورات من API:', userPosts.length);
- */
-            if (userPosts.length > 0) {
+            const userOldPosts = userData.posts || [];
+            if (userOldPosts.length > 0) {
                 const postsWithLikes = await Promise.all(
-                    userPosts.map(async (post) => {
+                    userOldPosts.map(async (post) => {
                         try {
                             const likes = await ProfileService.getPostLikes(post.id);
                             return {
@@ -170,13 +328,14 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                         }
                     })
                 );
-                setPosts(postsWithLikes);
+                setProfilePosts(postsWithLikes);
             } else {
-                setPosts([]);
+                setProfilePosts([]);
             }
 
-/*             console.log('✅ تم تحميل بيانات البروفايل بنجاح');
- */
+            console.log(`✅ تم تحميل بيانات الملف الشخصي بنجاح للمستخدم: ${formattedUser.full_name}`);
+            console.log(`👁️ isOwnProfile الحالي: ${isOwnProfile}`);
+
         } catch (err) {
             console.error('🔥 خطأ في جلب البيانات:', err);
             const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في جلب البيانات';
@@ -266,27 +425,39 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }));
     };
 
-    const handleGoToMyProfile = () => {
-        // ⬇️ استخدم دالة لتحميل البروفايل الشخصي
-        loadOwnProfile();
-    };
-
-    // ⬇️ دالة لتحميل البروفايل الشخصي
     const loadOwnProfile = async () => {
         try {
-            // جلب الـ ID أولاً
             const currentId = await ProfileService.getCurrentUserId();
             if (currentId) {
-                // التوجه إلى صفحة البروفايل الشخصي
                 router.push(`/profile/${currentId}`);
             } else {
-                // إذا لم يكن هناك ID، اذهب إلى الصفحة الرئيسية
                 router.push('/');
             }
         } catch (error) {
             console.error('❌ فشل في تحميل البروفايل الشخصي:', error);
             router.push('/login');
         }
+    };
+
+    const handlePostDeleted = (deletedPostId: number) => {
+        // تحديث القائمتين
+        refreshUserPosts();
+        setProfilePosts(prev => prev.filter(post => post.id !== deletedPostId));
+    };
+
+    const handleImagesUpdated = () => {
+        refreshUserPosts();
+    };
+
+    const handlePostUpdated = () => {
+        refreshUserPosts();
+    };
+
+      const checkIfOwnProfile = () => {
+        const currentUserId = localStorage.getItem('user_id');
+        const isOwn = currentUserId && targetUserId && currentUserId.toString() === targetUserId.toString();
+        console.log(`🔍 فحص isOwnProfile: ${isOwn} (current: ${currentUserId}, target: ${targetUserId})`);
+        return isOwn;
     };
 
     if (loading) {
@@ -376,27 +547,28 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         );
     }
 
+    const finalIsOwnProfile = checkIfOwnProfile();
+
     return (
         <div className="profile-container">
             <div className="profile-content">
                 <div className="profile-sidebar">
+                    <div>
                     {isOwnProfile && (
                         <div className='display'>
                             <button className="edit-avatar-btn" onClick={handleEditClick}>
-                                <MdEdit style={{ width: 20, height: 20, }} />
-
+                                <MdEdit style={{ width: 20, height: 20 }} />
                             </button>
                         </div>
                     )}
 
                     {!isOwnProfile && (
                         <div className="display-not-owner">
-                            {/*  <span>👤 Viewing Profile</span> */}
                             <button
                                 onClick={loadOwnProfile}
                                 className="edit-avatar-btn-not-owner"
                             >
-                                <HiArrowNarrowRight style={{ width: 20, height: 20, }} />
+                                <HiArrowNarrowRight style={{ width: 20, height: 20 }} />
                                 back to my profile
                             </button>
                         </div>
@@ -420,7 +592,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             Member since {formatDate(user.created_at)}
                         </div>
                     </div>
-
+                    
                     <div className="profile-stats">
                         <div className="stat-card">
                             <div className="stat-number">{stats.followers_count}</div>
@@ -430,7 +602,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             <div className="stat-number">{stats.following_count}</div>
                             <div className="stat-label">FOLLOWING</div>
                         </div>
-
                     </div>
 
                     <div className="profile-info-section">
@@ -465,11 +636,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             </div>
                         </div>
                     </div>
-
-                    <div className="account-created">
-                        <div className="created-label">ACCOUNT CREATED</div>
-                        <div className="created-date">{formatDate(user.created_at)}</div>
                     </div>
+
+                   
                 </div>
 
                 <div className="profile-main">
@@ -509,128 +678,117 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 <span className="tab-count">{stats.posts_count}</span>
                             </button>
                         )}
-
                     </div>
 
                     {activeTab === 'posts' && (
                         <div className="recent-activity">
-                            <h3 className="activity-title">Posts ({posts.length})</h3>
-                            <div className="posts-list">
-                                {posts.length > 0 ? (
-                                    posts.map((post) => (
-                                        <div key={post.id} className="post-item">
-                                            {post.images && post.images.length > 0 && (
-                                                <div className={`post-images-grid ${post.images.length === 1 ? 'single-image' :
-                                                    post.images.length === 2 ? 'two-images' :
-                                                        post.images.length === 3 ? 'three-images' :
-                                                            'four-or-more'
-                                                    }`}>
-                                                    {post.images.map((image, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="post-image-item"
-                                                            style={{
-                                                                gridColumn: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1',
-                                                                gridRow: post.images.length === 3 && index === 0 ? 'span 2' : 'span 1'
-                                                            }}
-                                                        >
-                                                            <img
-                                                                src={image}
-                                                                alt={`${post.title} - Image ${index + 1}`}
-                                                                className="post-grid-image"
-                                                            />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            <div className="post-header">
-                                                <h4 className="post-title">{post.title}</h4>
-                                                <span className="post-date">{formatDate(post.created_at)}</span>
-                                            </div>
-
-                                            <p className="post-content">
-                                                {post.caption || 'No content provided...'}
+                            {postsError ? (
+                                <div style={{
+                                    textAlign: 'center',
+                                    padding: '2rem',
+                                    background: '#fff5f5',
+                                    border: '1px solid #fed7d7',
+                                    borderRadius: '8px',
+                                    marginBottom: '1rem'
+                                }}>
+                                    <p style={{ color: '#e53e3e', marginBottom: '1rem' }}>{postsError}</p>
+                                    <button
+                                        onClick={refreshUserPosts}
+                                        style={{
+                                            background: '#3182ce',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '0.75rem 1.5rem',
+                                            borderRadius: '6px',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Try Again
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    {userPosts.length === 0 && !postsLoading ? (
+                                        <div style={{
+                                            textAlign: 'center',
+                                            padding: '3rem 1rem',
+                                            background: '#341c53',
+                                            borderRadius: '12px',
+                                            border: '1px solid #7c3aed'
+                                        }}>
+                                            <p style={{
+                                                fontSize: '1.25rem',
+                                                fontWeight: '600',
+                                                color: '#ffffffff',
+                                                marginBottom: '0.5rem'
+                                            }}>
+                                                There are no posts yet.
                                             </p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {userPosts.map((post) => (
+                                                <PostItem 
+                                                    key={post.id} 
+                                                    post={post}
+                                                    onPostDeleted={handlePostDeleted}
+                                                    onImagesUpdated={handleImagesUpdated}
+                                                    onPostUpdated={handlePostUpdated}
+                                                />
+                                            ))}
 
-                                            {/* إحصائيات المنشور */}
-                                            <div className="post-stats">
-                                                <div className="post-stat likes-stat">
-                                                    <div className="post-stat-icon">
-                                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                                                            <path d="M14 20.408c-.492.308-.903.546-1.192.709-.153.086-.308.17-.463.252h-.002a.75.75 0 01-.686 0 16.709 16.709 0 01-.465-.252 31.147 31.147 0 01-4.803-3.34C3.8 15.572 1 12.331 1 8.513 1 5.052 3.829 2.5 6.736 2.5 9.03 2.5 10.881 3.726 12 5.605 13.12 3.726 14.97 2.5 17.264 2.5 20.17 2.5 23 5.052 23 8.514c0 3.818-2.801 7.06-5.389 9.262A31.146 31.146 0 0114 20.408z" />
-                                                        </svg>
-                                                    </div>
-                                                    <div className="post-stat-info">
-                                                        <div className="post-stat-number">{post.likes_count}</div>
-                                                        <div className="post-stat-label">Likes</div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="post-stat comments-stat">
-                                                    <div className="post-stat-icon">
-                                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                                                            <path d="M12 2.25c-2.429 0-4.817.178-7.152.521C2.87 3.061 1.5 4.795 1.5 6.741v6.018c0 1.946 1.37 3.68 3.348 3.97.877.129 1.761.234 2.652.316V21a.75.75 0 001.28.53l4.184-4.183a.39.39 0 01.266-.112c2.006-.05 3.982-.22 5.922-.506 1.978-.29 3.348-2.023 3.348-3.97V6.741c0-1.947-1.37-3.68-3.348-3.97A49.145 49.145 0 0012 2.25zM8.25 8.625a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25zm2.625 1.125a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875-1.125a1.125 1.125 0 100 2.25 1.125 1.125 0 000-2.25z" />
-                                                        </svg>
-                                                    </div>
-                                                    <div className="post-stat-info">
-                                                        <div className="post-stat-number">{post.comments_count}</div>
-                                                        <div className="post-stat-label">Comments</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* المعجبين */}
-                                            {post.likes && post.likes.length > 0 && (
-                                                <div className="post-likers">
-                                                    <div className="likers-title">
-                                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-                                                            <path d="M9.653 16.915l-.005-.003-.019-.01a20.759 20.759 0 01-1.162-.682 22.045 22.045 0 01-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 018-2.828A4.5 4.5 0 0118 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 01-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 01-.69.001l-.002-.001z" />
-                                                        </svg>
-                                                        Liked by
-                                                    </div>
-                                                    <div className="likers-list">
-                                                        {post.likes.slice(0, 5).map((like) => (
-                                                            <Link
-                                                                href={`/profile/${like.user.id}`}
-                                                                key={like.id}
-                                                                className="liker-item-link"
-                                                                onClick={(e) => e.stopPropagation()}
-                                                            >
-                                                                <div className="liker-item">
-                                                                    <img
-                                                                        src={like.user.image}
-                                                                        alt={like.user.full_name}
-                                                                        className="liker-avatar"
-                                                                    />
-                                                                    <span className="liker-name">{like.user.full_name}</span>
-                                                                </div>
-                                                            </Link>
-                                                        ))}
-                                                        {post.likes.length > 5 && (
-                                                            <div className="liker-item">
-                                                                <span className="liker-name" style={{ color: '#7c3aed' }}>
-                                                                    +{post.likes.length - 5} more
-                                                                </span>
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                            {postsLoading && (
+                                                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                                    <div style={{
+                                                        width: '40px',
+                                                        height: '40px',
+                                                        border: '3px solid #e2e8f0',
+                                                        borderTop: '3px solid #3182ce',
+                                                        borderRadius: '50%',
+                                                        animation: 'spin 1s linear infinite',
+                                                        margin: '0 auto 1rem'
+                                                    }}></div>
+                                                    <p>Loading user's posts...</p>
                                                 </div>
                                             )}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="no-posts">
-                                        <div className="no-posts-icon">📝</div>
-                                        <h3 style={{ color: 'white', marginBottom: '12px' }}>
-                                            No Recent Activity
-                                        </h3>
-                                        <p style={{ color: '#94a3b8' }}>
-                                            Start creating posts to see them here!
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
+
+                                            {hasMore && !postsLoading && (
+                                                <div ref={observerRef} style={{ textAlign: 'center', padding: '1rem' }}>
+                                                    <button
+                                                        onClick={loadMore}
+                                                        style={{
+                                                            background: '#edf2f7',
+                                                            color: '#2d3748',
+                                                            border: '1px solid #cbd5e0',
+                                                            padding: '0.75rem 1.5rem',
+                                                            borderRadius: '6px',
+                                                            cursor: 'pointer',
+                                                            fontWeight: '200',
+                                                            transition: 'all 0.2s'
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.background = '#e2e8f0';
+                                                            e.currentTarget.style.borderColor = '#a0aec0';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.background = '#edf2f7';
+                                                            e.currentTarget.style.borderColor = '#cbd5e0';
+                                                        }}
+                                                    >
+                                                        Load More
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {!hasMore && userPosts.length > 0 && (
+                                                <div style={{ textAlign: 'center', padding: '2rem', color: '#718096', fontStyle: 'italic' }}>
+                                                    <p>You've seen all of this user's posts</p>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -830,6 +988,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     </div>
                 </div>
             )}
+
+            <style jsx>{`
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 };

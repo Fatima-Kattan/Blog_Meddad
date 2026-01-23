@@ -2,10 +2,10 @@
 .feedContainer {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    max-width: 845px;
-    /* margin: 0 auto;
-    padding: 20px 0; */
+    /* gap: 20px; */
+    max-width: 100%;
+    overflow: hidden;
+
 }
 
 .errorContainer {
