@@ -1,9 +1,10 @@
+import MyNotifications from '@/components/notification/myNotification/MyNotifications'
 import React from 'react'
 
 function page() {
     return (
         <div>
-            <h1>welcome</h1>
+            <MyNotifications/>
         </div>
     )
 }
