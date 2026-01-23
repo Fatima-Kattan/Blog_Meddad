@@ -877,14 +877,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Profile Image URL</label>
-                                <input
-                                    type="url"
+                                <InputField
+                                    label="Profile Image URL"
                                     name="image"
                                     value={editForm.image || ''}
                                     onChange={handleInputChange}
-                                    className="form-input"
-                                    placeholder="https://example.com/your-image.jpg"
+                                    placeholder="Enter your image"
                                 />
                             </div>
 
