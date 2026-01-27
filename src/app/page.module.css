@@ -92,6 +92,7 @@ a.primary {
 a.secondary {
   border-color: var(--button-secondary-border);
 }
+
 /* page.module.css */
 .mainContent {
   display: flex;
@@ -103,9 +104,15 @@ a.secondary {
 .leftSidebar {
   flex: 0 0 280px;
   position: sticky;
-  top: 160px; /* النافبار + الهيدر */
+  top: 160px;
+  /* النافبار + الهيدر */
   height: calc(100vh - 180px);
   overflow-y: auto;
+  border-radius: 12px;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #6d47c1;
+  overflow-y: hidden;
 }
 
 /* المحتوى الرئيسي */
@@ -121,28 +128,34 @@ a.secondary {
 .rightSidebar {
   flex: 0 0 320px;
   position: sticky;
-  top: 160px; /* النافبار + الهيدر */
+  top: 160px;
+  /* النافبار + الهيدر */
   height: calc(100vh - 180px);
   overflow-y: auto;
 }
+
 .mainContent {
-    display: flex;
-    padding: 20px 10px;
-    gap: 15px;
-    min-height: calc(100vh - 140px); /* ارتفاع مناسب */
-    align-items: flex-start; /* ✅ هذا مهم */
+  display: flex;
+  padding: 20px 10px;
+  gap: 15px;
+  min-height: calc(100vh - 140px);
+  /* ارتفاع مناسب */
+  align-items: flex-start;
+  /* ✅ هذا مهم */
 }
 
 /* تأكد أن الـ Header ليس position: fixed أو absolute */
 .header {
-    position: static !important; /* أو relative */
+  position: static !important;
+  /* أو relative */
 }
+
 /* تصميم متجاوب */
 @media (max-width: 1200px) {
   .rightSidebar {
     display: none;
   }
-  
+
   .leftSidebar {
     flex: 0 0 250px;
   }
@@ -153,11 +166,11 @@ a.secondary {
     flex-direction: column;
     padding: 15px;
   }
-  
+
   .leftSidebar {
     display: none;
   }
-  
+
   .contentSection {
     width: 100%;
   }

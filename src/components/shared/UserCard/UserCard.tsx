@@ -56,7 +56,6 @@ export default function UserCard({
   return (
     <div className={styles.card} onClick={handleCardClick}>
       <Link
-        /* className={styles.UserCard} */
         className={styles.cardSecond}
         href={`/profile/${user?.id || ''}`}
         onClick={(e) => e.stopPropagation()}

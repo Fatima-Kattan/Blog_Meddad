@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { getPosts, getUserPosts, searchPosts, getPost, getPostsByTagId, getTagInfo, Post, PostsResponse } from '@/services/api/posts/getPost';
+import { getPosts, getUserPosts, searchPosts, getPost, getPostsByTagId, Post } from '@/services/api/posts/getPost';
 
 interface UsePostsOptions {
     initialPage?: number;
@@ -75,7 +75,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                 return;
             }
 
-            // ✅ **الحالة المهمة: جلب البوستات حسب tagId**
+            
             if (tagId) {
                 console.log(`🏷️ [usePosts] Fetching posts by tag ID: ${tagId}, page: ${page}`);
                 
@@ -117,8 +117,8 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                 
                 const response = await getUserPosts(userId, page, limit);
                 
-                if (response.success) {
-                    const postsData = response.data?.data || [];
+                if (response.success && response.data) {
+                    const postsData = response.data.data || [];
                     
                     if (isLoadMore) {
                         setPosts(prev => [...prev, ...postsData]);
@@ -126,7 +126,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                         setPosts(postsData);
                     }
                     
-                    setHasMore(response.data?.current_page < response.data?.last_page);
+                    setHasMore(response.data.current_page < response.data.last_page);
                 } else {
                     setError(response.message || 'Failed to fetch user posts');
                 }
@@ -138,8 +138,8 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                 
                 const response = await searchPosts(searchKeyword, page, limit);
                 
-                if (response.success) {
-                    const postsData = response.data?.data || [];
+                if (response.success && response.data) {
+                    const postsData = response.data.data || [];
                     
                     if (isLoadMore) {
                         setPosts(prev => [...prev, ...postsData]);
@@ -147,7 +147,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                         setPosts(postsData);
                     }
                     
-                    setHasMore(response.data?.current_page < response.data?.last_page);
+                    setHasMore(response.data.current_page < response.data.last_page);
                 } else {
                     setError(response.message || 'Search failed');
                 }
@@ -159,8 +159,8 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                 
                 const response = await searchPosts(`#${tagName}`, page, limit);
                 
-                if (response.success) {
-                    const postsData = response.data?.data || [];
+                if (response.success && response.data) {
+                    const postsData = response.data.data || [];
                     
                     if (isLoadMore) {
                         setPosts(prev => [...prev, ...postsData]);
@@ -168,7 +168,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                         setPosts(postsData);
                     }
                     
-                    setHasMore(response.data?.current_page < response.data?.last_page);
+                    setHasMore(response.data.current_page < response.data.last_page);
                 } else {
                     setError(response.message || 'Failed to fetch tag posts');
                 }
@@ -179,8 +179,8 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
             
             const response = await getPosts(page, limit);
             
-            if (response.success) {
-                const postsData = response.data?.data || [];
+            if (response.success && response.data) {
+                const postsData = response.data.data || [];
                 
                 if (isLoadMore) {
                     setPosts(prev => [...prev, ...postsData]);
@@ -188,7 +188,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                     setPosts(postsData);
                 }
                 
-                setHasMore(response.data?.current_page < response.data?.last_page);
+                setHasMore(response.data.current_page < response.data.last_page);
             } else {
                 setError(response.message || 'Failed to fetch posts');
             }

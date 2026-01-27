@@ -11,6 +11,7 @@ import { useUserData } from '@/hooks/useUserData';
 import styles from './PostItem.module.css';
 import LikeButton from '@/components/likes/LikeButton';
 import likesService from '@/services/api/likes/likesService';
+import LikesModal from '@/components/likes/LikesModal';
 
 interface PostItemProps {
     post: {
@@ -25,6 +26,7 @@ interface PostItemProps {
         images: string[];
         likes_count: number;
         comments_count: number;
+        showUserInfo?: boolean;
         created_at: string;
         tags?: Array<{
             id: number;
@@ -42,9 +44,10 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     const [commentsCount, setCommentsCount] = useState(post.comments_count);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showCommentsModal, setShowCommentsModal] = useState(false);
-    const [showTagModal, setShowTagModal] = useState(false); // ⬅️ حالة للـTagModal
-    const [selectedTag, setSelectedTag] = useState<string>(''); // ⬅️ التاغ المختار
+    const [showTagModal, setShowTagModal] = useState(false);
+    const [selectedTag, setSelectedTag] = useState<string>('');
     const [currentPost, setCurrentPost] = useState(post);
+    const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
 
     const { userData } = useUserData();
     const isCurrentUser = userData?.id === post.user.id;
@@ -52,7 +55,15 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     useEffect(() => {
         const checkLikeStatus = async () => {
             try {
-                const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+                
+                if (!userData?.id) {
+                    setIsLiked(false);
+                    return;
+                }
+
+                
+                const likedKey = `liked_posts_user_${userData.id}`;
+                const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
                 const isLikedLocally = likedPosts.includes(post.id);
 
                 if (isLikedLocally) {
@@ -60,14 +71,15 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     return;
                 }
 
+                
                 const isLikedFromAPI = await likesService.checkUserLike(post.id);
                 setIsLiked(isLikedFromAPI);
 
+                
                 if (isLikedFromAPI) {
-                    const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
                     if (!likedPosts.includes(post.id)) {
                         likedPosts.push(post.id);
-                        localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+                        localStorage.setItem(likedKey, JSON.stringify(likedPosts));
                     }
                 }
 
@@ -77,7 +89,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         };
 
         checkLikeStatus();
-    }, [post.id]);
+    }, [post.id, userData?.id]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -96,7 +108,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         });
     };
 
-    // ⭐ دالة لاستخراج التاغات من النص
+    
     const extractTagsFromText = (text: string): string[] => {
         if (!text) return [];
         const hashtagRegex = /#(\w+)/g;
@@ -105,12 +117,12 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         return matches.map(tag => tag.substring(1));
     };
 
-    // ⭐ دالة لاستخراج التاغات الفريدة
+    
     const getUniqueTags = () => {
         const allTags = new Set<string>();
         const uniqueTags: Array<{ id: number, name: string, source: 'api' | 'text' }> = [];
 
-        // جمع التاغات من API
+        
         if (currentPost.tags && currentPost.tags.length > 0) {
             currentPost.tags.forEach(tag => {
                 if (!allTags.has(tag.tag_name.toLowerCase())) {
@@ -124,7 +136,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
             });
         }
 
-        // جمع التاغات من النص
+        
         const textTags = extractTagsFromText(currentPost.caption);
         let textTagId = 1000;
 
@@ -144,13 +156,13 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
 
     const uniqueTags = getUniqueTags();
 
-    // ⭐ دالة للضغط على التاغ
+    
     const handleTagClick = (tagName: string) => {
         setSelectedTag(tagName);
         setShowTagModal(true);
     };
 
-    // ⭐ دالة لإغلاق TagModal
+    
     const handleTagModalClose = () => {
         setShowTagModal(false);
         setSelectedTag('');
@@ -162,6 +174,14 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
 
     const handleEditClick = () => {
         setShowUpdateModal(true);
+    };
+
+    const handleLikesModalOpen = () => {
+        setIsLikesModalOpen(true);
+    };
+
+    const handleLikesModalClose = () => {
+        setIsLikesModalOpen(false);
     };
 
     const handleCommentAdded = () => {
@@ -201,21 +221,29 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         setLikesCount(newCount);
         setIsLiked(liked);
 
-        try {
-            const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
-            if (liked) {
-                if (!likedPosts.includes(post.id)) {
-                    likedPosts.push(post.id);
+        
+        if (userData?.id) {
+            try {
+                const likedKey = `liked_posts_user_${userData.id}`;
+                const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
+
+                if (liked) {
+                    
+                    if (!likedPosts.includes(post.id)) {
+                        likedPosts.push(post.id);
+                    }
+                } else {
+                    
+                    const index = likedPosts.indexOf(post.id);
+                    if (index > -1) {
+                        likedPosts.splice(index, 1);
+                    }
                 }
-            } else {
-                const index = likedPosts.indexOf(post.id);
-                if (index > -1) {
-                    likedPosts.splice(index, 1);
-                }
+
+                localStorage.setItem(likedKey, JSON.stringify(likedPosts));
+            } catch (error) {
+                console.error('Error updating localStorage:', error);
             }
-            localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
-        } catch (error) {
-            console.error('Error updating localStorage:', error);
         }
     };
 
@@ -233,15 +261,14 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     onEditPost={handleEditClick}
                 />
 
-                {/* ⬅️ أضفنا onTagClick */}
+                
                 <PostContent 
                     title={currentPost.title} 
                     caption={currentPost.caption}
                     onTagClick={handleTagClick}
                 />
                 
-
-                {/* ⬅️ جعلنا التاغات في الأسفل clickable أيضاً */}
+                
                 {uniqueTags.length > 0 && (
                     <div className={styles.tagsContainer}>
                         <div className={styles.tagsLabel}></div>
@@ -269,22 +296,32 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 )}
 
                 <div className={styles.postStats}>
-                    <LikeButton
-                        postId={post.id}
-                        initialLikesCount={likesCount}
-                        isInitiallyLiked={isLiked}
-                        onLikeUpdate={handleLikeUpdate}
-                    />
+                    <div onClick={handleLikesModalOpen} style={{ cursor: 'pointer' }}>
+                        <LikeButton
+                            postId={post.id}
+                            initialLikesCount={likesCount}
+                            isInitiallyLiked={isLiked}
+                            onLikeUpdate={handleLikeUpdate}
+                        />
+                    </div>
                     
                     <div 
                         className={styles.statItem}
                         onClick={handleCommentsClick}
+                        style={{ cursor: 'pointer' }}
                     >
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
                     </div>
                 </div>
+
+                <LikesModal
+                    postId={post.id.toString()}
+                    postTitle={post.title}
+                    isOpen={isLikesModalOpen}
+                    onClose={handleLikesModalClose}
+                />
 
                 <div className={styles.commentPlaceholder}>
                     <button
@@ -314,7 +351,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 />
             )}
 
-            {/* ⬅️ TagModal الجديد */}
+            
             {showTagModal && (
                 <TagPostsModal
                     tagName={selectedTag}
