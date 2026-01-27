@@ -1,4 +1,3 @@
-// components/posts/post-content/PostContent.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,27 +6,45 @@ import styles from './PostContent.module.css';
 interface PostContentProps {
     title: string;
     caption: string;
+    onTagClick?: (tagName: string) => void; // ⬅️ أضفنا هذا
 }
 
-const PostContent = ({ title, caption }: PostContentProps) => {
+const PostContent = ({ title, caption, onTagClick }: PostContentProps) => {
     const [isExpanded, setIsExpanded] = useState(false);
-    const maxLength = 200; // Character limit before truncation
+    const maxLength = 200;
 
-    // ⭐ دالة لتمييز التاغات داخل النص
-    const highlightHashtagsInText = (text: string) => {
-        if (!text) return '';
-        return text.replace(
-            /#(\w+)/g,
-            '<span style="color: #007bff; font-weight: 500;">#$1</span>'
-        );
+    // ⭐ دالة لتقسيم النص إلى أجزاء (نص عادي و تاغات)
+    const renderCaptionWithClickableTags = () => {
+        if (!caption) return null;
+
+        const parts = caption.split(/(#\w+)/g);
+        
+        return parts.map((part, index) => {
+            if (part.startsWith('#')) {
+                const tagName = part.substring(1); // إزالة #
+                return (
+                    <span
+                        key={index}
+                        className={styles.hashtag}
+                        onClick={() => onTagClick && onTagClick(tagName)}
+                        style={{ 
+                            cursor: 'pointer',
+                            color: '#007bff',
+                            fontWeight: 500 
+                        }}
+                    >
+                        {part}
+                    </span>
+                );
+            }
+            return <span key={index}>{part}</span>;
+        });
     };
 
     const shouldTruncate = caption.length > maxLength;
     const displayText = isExpanded || !shouldTruncate 
         ? caption 
         : caption.substring(0, maxLength) + '...';
-    
-    const highlightedText = highlightHashtagsInText(displayText);
 
     return (
         <div className={styles.postContent}>
@@ -39,10 +56,34 @@ const PostContent = ({ title, caption }: PostContentProps) => {
             {/* Post Caption */}
             {caption && (
                 <div className={styles.captionContainer}>
-                    <p 
-                        className={`${styles.captionText} ${!isExpanded && shouldTruncate ? styles.truncated : ''}`}
-                        dangerouslySetInnerHTML={{ __html: highlightedText }}
-                    />
+                    <p className={`${styles.captionText} ${!isExpanded && shouldTruncate ? styles.truncated : ''}`}>
+                        {shouldTruncate ? (
+                            <>
+                                {displayText.split(/(#\w+)/g).map((part, index) => {
+                                    if (part.startsWith('#')) {
+                                        const tagName = part.substring(1);
+                                        return (
+                                            <span
+                                                key={index}
+                                                className={styles.hashtag}
+                                                onClick={() => onTagClick && onTagClick(tagName)}
+                                                style={{ 
+                                                    cursor: 'pointer',
+                                                    color: '#007bff',
+                                                    fontWeight: 500 
+                                                }}
+                                            >
+                                                {part}
+                                            </span>
+                                        );
+                                    }
+                                    return <span key={index}>{part}</span>;
+                                })}
+                            </>
+                        ) : (
+                            renderCaptionWithClickableTags()
+                        )}
+                    </p>
                     
                     {/* Show More/Less Button */}
                     {shouldTruncate && (
