@@ -133,8 +133,11 @@ function MyNotifications() {
         ));
     };
 
-    const handleFilter = () => {
-        console.log('Filter applied');
+    const resetFilters = () => {
+        setFilterType('all');
+        setDateFrom('');
+        setDateTo('');
+        console.log('All filters have been reset');
     };
 
     // إزالة حسابات الـ Pagination
@@ -203,9 +206,10 @@ function MyNotifications() {
 
                         <button
                             className={styles.filterButton}
-                            onClick={handleFilter}
+                            onClick={resetFilters}
+                            disabled={filterType === 'all' && dateFrom === '' && dateTo === ''}
                         >
-                            Apply Filters
+                            Reset All Filters
                         </button>
 
                         {/* Stats Section */}
