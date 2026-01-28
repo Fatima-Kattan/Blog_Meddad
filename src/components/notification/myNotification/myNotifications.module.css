@@ -135,10 +135,14 @@
     background: linear-gradient(90deg, #8a2be2, transparent);
     border-radius: 3px;
 }
+
 .notificationsList > * {
     border: 1px solid #691bb259;
     box-shadow: inset 0 2px 15px #4310787d, 0 10px 15px #00000049;
+    
   }
+
+  
 /* Right Section (Main Content) */
 .rightSection {
     /* background: linear-gradient(180deg,
@@ -289,7 +293,6 @@
     font-size: 15px;
     font-weight: 700;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 0.8px;
     position: relative;
     overflow: hidden;
     text-transform: uppercase;
@@ -399,7 +402,6 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    letter-spacing: 0.5px;
     position: relative;
     overflow: hidden;
     text-transform: uppercase;
@@ -925,6 +927,8 @@
     font-weight: normal;
 }
 
+
+
 /* Adjust right section for the new layout */
 .rightSection {
     /* ... إبقاء التنسيقات الموجودة ... */
@@ -955,4 +959,27 @@
     .notificationsList {
         max-height: 350px;
     }
+}
+.notificationsListItems {
+    flex: 1;
+    overflow: hidden;
+}
+
+.notificationsList {
+    height: 600px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.notificationsList::-webkit-scrollbar {
+    width: 8px;
+}
+
+.notificationsList::-webkit-scrollbar-track {
+    background: #2a0b4f;
+}
+
+.notificationsList::-webkit-scrollbar-thumb {
+    background: #8a2be2;
+    border-radius: 4px;
 }

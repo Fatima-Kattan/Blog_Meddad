@@ -58,11 +58,6 @@ export const getPosts = async (page = 1, limit = 10): Promise<PostsResponse> => 
         }
 
         const data = await response.json();
-        console.log('📦 getPosts response:', {
-            success: data.success,
-            postsCount: data.data?.data?.length || 0
-        });
-        
         return data;
 
     } catch (error) {
@@ -208,31 +203,15 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
         if (token) {
             headers['Authorization'] = `Bearer ${token}`;
         }
-
-        console.log(`🔗 [getPostsByTagId] Fetching posts for tag ID: ${tagId}, page: ${page}`);
-        
         const apiUrl = `${API_URL}/api/v1/post-tags/tag/${tagId}/posts?page=${page}&limit=${limit}`;
-        console.log(`🔗 API URL: ${apiUrl}`);
         
         const response = await fetch(apiUrl, { headers, cache: 'no-store' });
-
-        console.log(`🔗 Response status: ${response.status}`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        
-        console.log('🔍 [getPostsByTagId] Response structure:', {
-            success: data.success,
-            hasData: !!data.data,
-            dataKeys: data.data ? Object.keys(data.data) : [],
-            hasTag: !!(data.data && data.data.tag),
-            hasPosts: !!(data.data && data.data.posts),
-            postsInTag: data.data?.tag?.posts?.length || 0,
-            postsInData: data.data?.posts?.data?.length || 0
-        });
         
         let postsData: Post[] = [];
         let currentPage = 1;
@@ -243,10 +222,7 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
             // 👇 **المشكلة: البوستات في data.posts.data ما عندها user object**
             const rawPosts = data.data.posts.data || [];
             // 👇 **الحل: نأخذ معلومات الـ user من data.tag.posts**
-            const tagPostsWithUsers = data.data.tag?.posts || [];
-            
-            console.log(`📊 [getPostsByTagId] Found ${rawPosts.length} raw posts and ${tagPostsWithUsers.length} posts with user info`);
-            
+            const tagPostsWithUsers = data.data.tag?.posts || [];            
             // 🔧 **دمج البيانات: نأخذ البوستات من posts.data ونضيف لها user من tag.posts**
             postsData = rawPosts.map((post: any) => {
                 // البحث عن الـ user object المقابل لهذا البوست في tag.posts
@@ -304,16 +280,7 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
             lastPage = data.data.posts.last_page || 1;
             total = data.data.posts.total || 0;
             
-            console.log(`✅ [getPostsByTagId] Merged ${postsData.length} posts with user info`);
             if (postsData.length > 0) {
-                console.log('🔍 [getPostsByTagId] First merged post:', {
-                    id: postsData[0].id,
-                    hasUser: !!postsData[0].user,
-                    userName: postsData[0].user?.full_name,
-                    userId: postsData[0].user?.id,
-                    userImage: postsData[0].user?.image,
-                    tagsCount: postsData[0].tags?.length || 0
-                });
             }
         } else if (data.success && data.data && Array.isArray(data.data.data)) {
             // Fallback: إذا كان الهيكل مختلف
@@ -331,16 +298,7 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
             lastPage = data.data.last_page || 1;
             total = data.data.total || 0;
             
-            console.log(`✅ [getPostsByTagId] Extracted ${postsData.length} posts from data.data`);
         }
-        
-        console.log(`✅ [getPostsByTagId] Total posts: ${postsData.length}`);
-        console.log('📊 [getPostsByTagId] Pagination:', { 
-            currentPage, 
-            lastPage, 
-            total, 
-            hasMore: currentPage < lastPage 
-        });
         
         return {
             success: true,

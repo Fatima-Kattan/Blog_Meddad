@@ -53,7 +53,7 @@
     text-decoration: none;
 }
 
-.logoIcon {
+/* .logoIcon {
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     width: 40px;
     height: 40px;
@@ -63,7 +63,7 @@
     justify-content: center;
     color: white;
     box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
-}
+} */
 
 .logoText {
     color: var(--color-text);

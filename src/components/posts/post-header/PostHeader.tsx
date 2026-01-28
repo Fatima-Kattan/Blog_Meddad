@@ -138,7 +138,7 @@ const PostHeader = ({
                 >
                     <div className={styles.avatarContainer}>
                         <Image
-                            src={user?.image || '/default-avatar.png'}
+                            src={user?.image}
                             alt={user?.full_name || 'User'}
                             width={40}
                             height={40}
