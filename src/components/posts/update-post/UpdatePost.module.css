@@ -37,7 +37,7 @@
     background: var(--color-surface);
     border-radius: 20px;
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
     display: flex;
@@ -46,6 +46,29 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     border: 1px solid var(--color-border);
     position: relative; /* ⭐ مهم */
+}
+.modalContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modalContainer::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 4px;
+}
+
+.modalContainer::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.5);
+    border-radius: 4px;
+}
+
+.modalContainer::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.7);
+}
+
+/* للسكرول بار في Firefox */
+.modalContainer {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.5) rgba(139, 92, 246, 0.1);
 }
 
 .modalContentWrapper {

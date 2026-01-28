@@ -215,7 +215,7 @@
 }
 
 .dropdownItem.deleteItem:hover:not(:disabled) {
-    background: rgba(239, 68, 68, 0.05);
+    background: #241145;
     color: #dc2626;
 }
 
@@ -532,7 +532,7 @@
     }
 
     .dropdownMenu {
-        background: #1f2937;
+        background: #33215b;
         border-color: #374151;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 
                     0 4px 12px rgba(0, 0, 0, 0.3);
@@ -544,7 +544,7 @@
     }
 
     .dropdownItem:hover:not(:disabled) {
-        background: #374151;
+        background: #241145;
         color: #a78bfa;
     }
 

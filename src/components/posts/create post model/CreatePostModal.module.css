@@ -38,7 +38,7 @@
     background: var(--color-surface);
     border-radius: 20px;
     width: 90%;
-    max-width: 500px;
+    max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
     display: flex;
@@ -46,6 +46,30 @@
     animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     border: 1px solid var(--color-border);
+    position: relative; /* ⭐ مهم */
+}
+.modalContainer::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modalContainer::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 4px;
+}
+
+.modalContainer::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.5);
+    border-radius: 4px;
+}
+
+.modalContainer::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.7);
+}
+
+/* للسكرول بار في Firefox */
+.modalContainer {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(139, 92, 246, 0.5) rgba(139, 92, 246, 0.1);
 }
 
 @keyframes fadeIn {
@@ -351,7 +375,7 @@
     border-radius: 4px;
 }
 
-.urlSubmitButton {
+/* .urlSubmitButton {
     padding: 8px 16px;
     background: var(--color-primary);
     border: none;
@@ -363,7 +387,7 @@
     transition: all 0.2s ease;
     white-space: nowrap;
     min-width: 60px;
-}
+} */
 
 .urlSubmitButton:hover:not(:disabled) {
     background: var(--color-primary-dark);
@@ -581,7 +605,7 @@
     width: 100%;
 }
 
-.urlSubmitButton {
+/* .urlSubmitButton {
     padding: 0.75rem 1.5rem;
     background: var(--color-primary);
     border: none;
@@ -595,7 +619,7 @@
     height: fit-content;
     margin-top: 11px;
 }
-
+ */
 
 .inputFieldWrapper :global(.input-group) {
     margin-bottom: 0; 
@@ -664,7 +688,7 @@
     transition: all 0.2s ease;
     white-space: nowrap;
     height: fit-content;
-    margin-top: 1.5rem; 
+    margin-top: 10px; 
 }
 
 /* ⭐ تحسينات للعرض على الجوال */

@@ -203,7 +203,7 @@ const PostFeed = (props: any) => {
                 </div>
             ) : (
                 <>
-                    {validPosts.length > 0 ? (
+                    {
                         validPosts.map((post: any) => {
                             // 🔧 **أضف فحص إضافي قبل الـ render**
                             if (!post || !post.id) {
@@ -235,14 +235,7 @@ const PostFeed = (props: any) => {
                                 />
                             );
                         })
-                    ) : (
-                        <div className={styles.emptyState}>
-                            <p className={styles.emptyMessage}>
-                                No valid posts to display
-                                {postsToDisplay.length > 0 && ` (${postsToDisplay.length} invalid posts)`}
-                            </p>
-                        </div>
-                    )}
+                    }
 
                     {loading && (
                         <div className={styles.loadingContainer}>

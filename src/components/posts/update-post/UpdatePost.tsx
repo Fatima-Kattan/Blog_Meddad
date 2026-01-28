@@ -382,9 +382,9 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
                                     You have reached the maximum limit of 4 images
                                 </p>
                             )}
-                            <p className={styles.urlHint}>
+                            {/* <p className={styles.urlHint}>
                                 Enter a direct link to an image (e.g., https://example.com/image.jpg)
-                            </p>
+                            </p> */}
                         </div>
                     </div>
 

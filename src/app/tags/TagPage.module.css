@@ -1,0 +1,103 @@
+/* TagPage.module.css */
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.header {
+    margin-bottom: 30px;
+}
+
+.title {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.tagName {
+    color: #8b5cf6;
+}
+
+.description {
+    color: #666;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.tagId {
+    color: #999;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.debugInfo {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9fafb;
+}
+
+.debugText {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.debugCode {
+    font-family: monospace;
+    background-color: #f3f0ff;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.loadingContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+    text-align: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f0ff;
+    border-top: 3px solid #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+.loadingText {
+    color: #666;
+    font-size: 16px;
+}
+
+.backLinkContainer {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.backLink {
+    color: #8b5cf6;
+    text-decoration: none;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid #4a337c;
+    border-radius: 8px;
+    transition: all 0.3s;
+    background-color: #1c1036;
+}
+
+.backLink:hover {
+    background-color: #371d6f;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

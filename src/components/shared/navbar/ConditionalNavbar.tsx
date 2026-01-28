@@ -1,4 +1,3 @@
-// src/components/shared/navbar/ConditionalNavbar.tsx
 'use client';
 
 import { usePathname } from 'next/navigation';
@@ -9,7 +8,11 @@ const ConditionalNavbar = () => {
   const pathname = usePathname();
   
   // صفحات لا نريد فيها النافبار
-  const hiddenPaths = ['/login', '/register'];
+  const hiddenPaths = [
+    '/login', 
+    '/register',
+    '/search' // ⭐ أضف صفحة البحث هنا
+  ];
   
   // تحقق إذا كان المسار يحتوي على /profile/
   const isProfilePage = pathname?.startsWith('/profile/');
