@@ -1,15 +1,19 @@
-// components/posts/post-header/PostHeader.tsx
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { deletePost } from '@/services/api/posts/delete-post';
 import { addImagesToPost } from '@/services/api/posts/add-images';
-import { removeImageFromPost } from '@/services/api/posts/remove-image';
 import { useUserData } from '@/hooks/useUserData';
 import styles from './PostHeader.module.css';
-import Link from 'next/link';
-import { HiPencil, HiPhotograph, HiTrash } from 'react-icons/hi';
+import {
+    HiPencil,
+    HiPhotograph,
+    HiTrash,
+    HiX,
+    HiCheck
+} from 'react-icons/hi';
 
 interface PostHeaderProps {
     user: {
@@ -22,7 +26,7 @@ interface PostHeaderProps {
     imagesCount?: number;
     onPostDeleted?: (postId: number) => void;
     onImagesUpdated?: () => void;
-    onEditPost?: () => void; // ⬅️ أضفنا هذا
+    onEditPost?: () => void;
 }
 
 const PostHeader = ({
@@ -32,7 +36,7 @@ const PostHeader = ({
     imagesCount = 0,
     onPostDeleted,
     onImagesUpdated,
-    onEditPost // ⬅️ استقبلنا الدالة
+    onEditPost
 }: PostHeaderProps) => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [showAddImagesModal, setShowAddImagesModal] = useState(false);
@@ -44,6 +48,7 @@ const PostHeader = ({
     const { userData } = useUserData();
     const isCurrentUser = userData?.id === user.id;
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const canAddMoreImages = imagesCount < 4;
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -101,6 +106,11 @@ const PostHeader = ({
             return;
         }
 
+        if (!canAddMoreImages) {
+            setError('Maximum limit reached (4 images)');
+            return;
+        }
+
         try {
             setIsLoading(true);
             setError(null);
@@ -125,7 +135,9 @@ const PostHeader = ({
         }
     };
 
-    const canAddMoreImages = imagesCount < 4;
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        e.currentTarget.src = 'https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff&size=40';
+    };
 
     return (
         <>
@@ -138,14 +150,12 @@ const PostHeader = ({
                 >
                     <div className={styles.avatarContainer}>
                         <Image
-                            src={user?.image}
+                            src={user?.image || '/default-avatar.png'}
                             alt={user?.full_name || 'User'}
                             width={40}
                             height={40}
                             className={styles.avatar}
-                            onError={(e) => {
-                                e.currentTarget.src = '/default-avatar.png';
-                            }}
+                            onError={handleImageError}
                         />
                     </div>
 
@@ -169,7 +179,7 @@ const PostHeader = ({
 
                         {showDropdown && (
                             <div className={styles.dropdownMenu}>
-                                {/* Edit Post - زر التعديل */}
+                                {/* Edit Post */}
                                 <button
                                     className={styles.dropdownItem}
                                     onClick={handleEdit}
@@ -206,25 +216,27 @@ const PostHeader = ({
                 )}
             </div>
 
-            {/* Add Images Modal */}
+            {/* Add Images Modal - المعدل */}
             {showAddImagesModal && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent}>
                         <div className={styles.modalHeader}>
                             <h3>Add Image to Post</h3>
                             <button
-                                className={styles.closeButton}
+                                className={styles.modalCloseButton}
                                 onClick={() => setShowAddImagesModal(false)}
                                 disabled={isLoading}
+                                aria-label="Close modal"
                             >
-                                ×
+                                <HiX size={18} />
                             </button>
                         </div>
 
                         <div className={styles.modalBody}>
-                            <p className={styles.imageCountInfo}>
-                                Current images: {imagesCount}/4
-                            </p>
+                            <div className={styles.imageCountInfo}>
+                                <HiPhotograph className={styles.imageCountIcon} />
+                                <span>Current images: {imagesCount}/4</span>
+                            </div>
 
                             <div className={styles.inputGroup}>
                                 <label htmlFor="imageUrl">Image URL</label>
@@ -235,18 +247,28 @@ const PostHeader = ({
                                     onChange={(e) => setImageUrl(e.target.value)}
                                     placeholder="https://example.com/image.jpg"
                                     className={styles.urlInput}
-                                    disabled={isLoading}
+                                    disabled={isLoading || !canAddMoreImages}
                                 />
+                                {!canAddMoreImages && (
+                                    <span className={styles.modalHint}>
+                                        Maximum limit reached (4 images)
+                                    </span>
+                                )}
+                                <span className={styles.modalHint}>
+                                    Supported formats: jpg
+                                </span>
                             </div>
 
                             {error && (
                                 <div className={styles.errorMessage}>
+                                    <HiX className={styles.errorIcon} />
                                     {error}
                                 </div>
                             )}
 
                             {success && (
-                                <div className={styles.successMessage}>
+                                <div className={`${styles.successMessage} ${styles.successPulse}`}>
+                                    <HiCheck className={styles.successIcon} />
                                     {success}
                                 </div>
                             )}
@@ -263,9 +285,16 @@ const PostHeader = ({
                             <button
                                 className={styles.submitButton}
                                 onClick={handleSubmitImage}
-                                disabled={isLoading || !imageUrl.trim()}
+                                disabled={isLoading || !imageUrl.trim() || !canAddMoreImages}
                             >
-                                {isLoading ? 'Adding...' : 'Add Image'}
+                                {isLoading ? (
+                                    <>
+                                        <span className={styles.loadingSpinner}></span>
+                                        Adding...
+                                    </>
+                                ) : (
+                                    'Add Image'
+                                )}
                             </button>
                         </div>
                     </div>
