@@ -115,6 +115,12 @@ a.secondary {
   overflow-y: hidden;
 }
 
+@media (min-width: 1200px) and (max-width: 1250px){
+  .leftSidebar{
+    flex: 0 0 245px;
+  }
+}
+
 /* المحتوى الرئيسي */
 .contentSection {
   flex: 1;
