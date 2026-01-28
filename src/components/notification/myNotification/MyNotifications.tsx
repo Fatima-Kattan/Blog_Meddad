@@ -14,8 +14,9 @@ function MyNotifications() {
     const [filterType, setFilterType] = useState('all');
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5;
+    // إزالة المتغيرات الخاصة بالـ Pagination
+    // const [currentPage, setCurrentPage] = useState(1); ❌ حذف
+    // const itemsPerPage = 5; ❌ حذف
 
     useEffect(() => {
         const fetchData = async () => {
@@ -26,7 +27,7 @@ function MyNotifications() {
                 setNotifications(response.data);
                 setFilteredNotifications(response.data);
             } catch (err: any) {
-                setError("Failed to fetch notifications. Please try again later.");
+                setError("You can't view notifications without signing in. Please sign in.");
             } finally {
                 setLoading(false);
             }
@@ -38,18 +39,17 @@ function MyNotifications() {
     useEffect(() => {
         let filtered = [...notifications];
 
-        // Apply type filter
         if (filterType !== 'all') {
+            const shouldBeRead = filterType === 'read';
             filtered = filtered.filter(notification =>
-                notification.status?.toLowerCase() === filterType
+                notification.is_read === shouldBeRead
             );
         }
 
-        // Apply date filters
         if (dateFrom) {
             const fromDate = new Date(dateFrom);
             filtered = filtered.filter(notification =>
-                new Date(notification.createdAt) >= fromDate
+                new Date(notification.created_at) >= fromDate
             );
         }
 
@@ -57,87 +57,15 @@ function MyNotifications() {
             const toDate = new Date(dateTo);
             toDate.setHours(23, 59, 59, 999);
             filtered = filtered.filter(notification =>
-                new Date(notification.createdAt) <= toDate
+                new Date(notification.created_at) <= toDate
             );
         }
 
         setFilteredNotifications(filtered);
-        setCurrentPage(1);
+        // إزالة هذا السطر لأنه مرتبط بالـ Pagination
+        // setCurrentPage(1); ❌ حذف
     }, [filterType, dateFrom, dateTo, notifications]);
 
-
-
-    // const handleMarkAllAsRead = async () => {
-    //     try {
-    //         const token = localStorage.getItem("token");
-    //         if (!token) {
-    //             setError("No token found");
-    //             return;
-    //         }
-
-    //         console.log("Calling markAllAsRead function...");
-    //         const result = await  markAllAsRead(token); // استخدم markAllAsRead مباشرة
-    //         console.log("Result:", result);
-
-    //         if (result?.data) {
-    //             setNotifications(result.data);
-    //         }
-    //     } catch (err: any) {
-    //         console.error("Error:", err);
-    //         setError(err.response?.data?.message || "Failed to mark notifications as read");
-    //     }
-    // };
-   
-    // const handleMarkAllAsRead = async () => {
-    //     try {
-    //         const token = localStorage.getItem("token");
-    //         if (!token) {
-    //             setError("No token found");
-    //             return;
-    //         }
-
-    //         // تنفيذ العملية
-    //         await markAllAsRead(token);
-
-    //         // تحديث محلي فوري
-    //         // setNotifications(prevNotifications =>
-    //         //     prevNotifications.map(notification => ({
-    //         //         ...notification,
-    //         //         isRead: true,
-    //         //         status: 'read'
-    //         //     }))
-    //         // );
-    //         setNotifications(prev =>
-    //             prev.map(n => ({ ...n, isRead: true, status: "read" }))
-    //         );
-
-    //         // مزامنة بالخلفية بدون انتظار
-    //         notificationsService.getNotifications(token)
-    //             .then(updatedResponse => {
-    //                 if (updatedResponse?.data) {
-    //                     setNotifications(updatedResponse.data);
-    //                 }
-    //             })
-    //             .catch(() => {
-    //                 console.log("Background refresh failed, using local update");
-    //             });
-
-
-    //         // إعادة جلب البيانات في الخلفية للتأكد من المزامنة
-    //         try {
-    //             const updatedResponse = await notificationsService.getNotifications(token);
-    //             if (updatedResponse?.data) {
-    //                 setNotifications(updatedResponse.data);
-    //             }
-    //         } catch (e) {
-    //             console.log("Background refresh failed, using local update");
-    //         }
-
-    //     } catch (err: any) {
-    //         console.error("Error:", err);
-    //         setError(err.response?.data?.message || "Failed to mark notifications as read");
-    //     }
-    // };
     const handleMarkAllAsRead = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -145,21 +73,43 @@ function MyNotifications() {
                 setError("No token found");
                 return;
             }
-    
-            // 1. تحديث واجهة المستخدم فورياً
-            setNotifications(prev =>
-                prev.map(n => ({ ...n, isRead: true, status: "read" }))
-            );
-    
-            // 2. تنفيذ العملية على الخادم (بدون انتظار)
-            markAllAsRead(token).catch(err => {
-                console.error("Server update failed:", err);
-                // يمكنك إعادة حالة "unread" إذا فشلت
-                // أو عرض رسالة خطأ للمستخدم
-            });
-    
-            // 3. إعادة جلب البيانات في الخلفية (اختياري)
-            // انتظر قليلاً للتأكد من تحديث الخادم
+
+            const updatedNotifications = notifications.map(n => ({
+                ...n,
+                is_read: true,
+                status: "read"
+            }));
+
+            setNotifications(updatedNotifications);
+
+            let updatedFiltered = [...updatedNotifications];
+
+            if (filterType !== 'all') {
+                const shouldBeRead = filterType === 'read';
+                updatedFiltered = updatedFiltered.filter(notification =>
+                    notification.is_read === shouldBeRead
+                );
+            }
+
+            if (dateFrom) {
+                const fromDate = new Date(dateFrom);
+                updatedFiltered = updatedFiltered.filter(notification =>
+                    new Date(notification.created_at) >= fromDate
+                );
+            }
+
+            if (dateTo) {
+                const toDate = new Date(dateTo);
+                toDate.setHours(23, 59, 59, 999);
+                updatedFiltered = updatedFiltered.filter(notification =>
+                    new Date(notification.created_at) <= toDate
+                );
+            }
+
+            setFilteredNotifications(updatedFiltered);
+
+            await markAllAsRead(token);
+
             setTimeout(async () => {
                 try {
                     const updatedResponse = await notificationsService.getNotifications(token);
@@ -169,28 +119,37 @@ function MyNotifications() {
                 } catch (e) {
                     console.log("Background refresh skipped");
                 }
-            }, 1000); // انتظر ثانية واحدة
-    
+            }, 1000);
+
         } catch (err: any) {
             console.error("Error:", err);
             setError(err.response?.data?.message || "Failed to mark notifications as read");
         }
     };
+
+    const handleNotificationRead = (id: string) => {
+        setNotifications(prev => prev.map(n =>
+            n.id === id ? { ...n, is_read: true, status: "read" } : n
+        ));
+    };
+
     const handleFilter = () => {
-        // Filter logic is handled in useEffect
         console.log('Filter applied');
     };
 
-    const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentNotifications = filteredNotifications.slice(startIndex, endIndex);
+    // إزالة حسابات الـ Pagination
+    // const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage); ❌ حذف
+    // const startIndex = (currentPage - 1) * itemsPerPage; ❌ حذف
+    // const endIndex = startIndex + itemsPerPage; ❌ حذف
+    // const currentNotifications = filteredNotifications.slice(startIndex, endIndex); ❌ حذف
 
-    // Calculate stats
-    const unreadCount = notifications.filter(n => !n.isRead).length;
+    // استخدام filteredNotifications مباشرة بدلاً من currentNotifications
+    const currentNotifications = filteredNotifications; // ✅ بسيط!
+
+    const unreadCount = notifications.filter(n => !n.is_read).length;
     const todayCount = notifications.filter(n => {
         const today = new Date();
-        const notificationDate = new Date(n.createdAt);
+        const notificationDate = new Date(n.created_at);
         return notificationDate.toDateString() === today.toDateString();
     }).length;
 
@@ -215,7 +174,6 @@ function MyNotifications() {
                                 <option value="all">All Notifications</option>
                                 <option value="unread">Unread</option>
                                 <option value="read">Read</option>
-                                <option value="important">Important</option>
                             </select>
                         </div>
 
@@ -283,40 +241,36 @@ function MyNotifications() {
                                 Mark all as read
                             </button>
                         </div>
+                        <div className={styles.notificationsListItems}>
+                            {loading && (
+                                <div className={styles.loadingContainer}>
+                                    <div className={styles.loadingSpinner}></div>
+                                    <div className={styles.loadingText}>Loading notifications...</div>
+                                </div>
+                            )}
 
-                        {/* Loading State */}
-                        {loading && (
-                            <div className={styles.loadingContainer}>
-                                <div className={styles.loadingSpinner}></div>
-                                <div className={styles.loadingText}>Loading notifications...</div>
-                            </div>
-                        )}
+                            {error && <div className={styles.error}>{error}</div>}
 
-                        {/* Error State */}
-                        {error && <div className={styles.error}>{error}</div>}
+                            {!loading && !error && filteredNotifications.length === 0 && (
+                                <div className={styles.noNotifications}>
+                                    <h3>No notifications found</h3>
+                                    <p>Try adjusting your filters or check back later</p>
+                                </div>
+                            )}
 
-                        {/* Empty State */}
-                        {!loading && !error && filteredNotifications.length === 0 && (
-                            <div className={styles.noNotifications}>
-                                <h3>No notifications found</h3>
-                                <p>Try adjusting your filters or check back later</p>
-                            </div>
-                        )}
-
-                        {/* Notifications List */}
-                        {!loading && !error && filteredNotifications.length > 0 && (
-                            <>
+                            {/* التغيير هنا: استخدام filteredNotifications مباشرة */}
+                            {!loading && !error && filteredNotifications.length > 0 && (
                                 <div className={styles.notificationsList}>
-                                    {currentNotifications.map((notification) => (
+                                    {filteredNotifications.map((notification) => ( // ✅ بدون slice
                                         <NotificationItem
                                             key={notification.id}
                                             notification={notification}
+                                            onMarkAsRead={() => handleNotificationRead(notification.id)}
                                         />
                                     ))}
-
                                 </div>
-                            </>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
