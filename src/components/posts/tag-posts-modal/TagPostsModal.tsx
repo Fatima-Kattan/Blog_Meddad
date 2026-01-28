@@ -117,14 +117,14 @@ const TagPostsModal = ({ tagName, isOpen, onClose }: TagPostsModalProps) => {
                                 </div>
                             </div>
                         )}
-                        renderError={(error) => (
+                        /* renderError={(error) => (
                             <div className={styles.error}>
                                 <p>Error loading posts</p>
                                 <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
                                     {error}
                                 </p>
                             </div>
-                        )}
+                        )} */
                     />
                 </div>
             </div>
