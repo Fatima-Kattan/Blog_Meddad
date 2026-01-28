@@ -325,7 +325,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="delete-account-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2 className="modal-title">Delete Account</h2>
                     <button className="modal-close_delete" onClick={onClose}>
@@ -351,7 +351,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
                     <form onSubmit={handleSubmit} className="delete-form">
                         <div className="form-group">
-                            <label className="form-label">
+                            {/*  <label className="form-label">
                                 Enter your password to confirm
                             </label>
                             <input
@@ -364,7 +364,22 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                                 className="form-input"
                                 placeholder="Current password"
                                 disabled={isDeleting}
-                            />
+                            /> */}
+                            <div className="form-group">
+                                <InputField
+                                    label="Enter your password to confirm"
+                                    name="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    setError('');
+                                }}
+                                    placeholder="Current password"
+                                    required
+                                    disabled={isDeleting}
+                                />
+                            </div>
                         </div>
 
                         {error && (
@@ -374,7 +389,7 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                         <div className="form-actions">
                             <button
                                 type="button"
-                                className="btn btn-cancel"
+                                className="btn btn-secondary"
                                 onClick={onClose}
                                 disabled={isDeleting}
                             >
