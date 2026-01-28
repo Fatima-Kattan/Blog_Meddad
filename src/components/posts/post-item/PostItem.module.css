@@ -1,18 +1,20 @@
 /* components/posts/post-item/PostItem.module.css */
 .postContainer {
-    background: #1a1a1a;
-    border-radius: 12px;
-    padding: 16px;
-    border: 1px solid #333;
+    background: #1a0b2e;
+    padding: 40px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
-    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    margin-bottom: 10px;
+   /*  overflow: hidden; */
+    /* transition: all 0.3s ease; */
 }
 
 .postContainer:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    border-color: #444;
+    transform: translateY(3px);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
 }
 
 /* Post Stats */
@@ -126,19 +128,19 @@
     }
 }
 /* components/posts/post-item/PostItem.module.css */
-.postContainer {
+/* .postContainer {
     background: #1a0b2e;
     border-radius: 16px;
     border: 1px solid rgba(139, 92, 246, 0.2);
     margin-bottom: 10px;
-   /*  overflow: hidden; */
+    
     transition: all 0.3s ease;
-}
+} */
 
-.postContainer:hover {
+/* .postContainer:hover {
     border-color: rgba(139, 92, 246, 0.4);
     box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
-}
+} */
 
 /* قسم زر التعديل */
 .editSection {
