@@ -81,9 +81,6 @@ const PostImages = ({ images, compact = false, maxHeight = 400 }: PostImagesProp
                             className={styles.postImage}
                             unoptimized={true}
                             loading="eager"
-                            onError={(e) => {
-                                e.currentTarget.src = '/default-image.png';
-                            }}
                         />
                         
                         {/* Overlay for second image when there are more than 2 images */}

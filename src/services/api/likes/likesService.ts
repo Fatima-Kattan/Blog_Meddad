@@ -38,7 +38,6 @@ class LikesService {
     // جلب الإعجابات لمنشور محدد
     async getPostLikes(postId: number, page: number = 1) {
         try {
-            console.log('Fetching likes for post:', postId, 'page:', page);
             const response = await api.get<LikesResponse>(
                 `/posts/${postId}/likes`,
                 {
@@ -56,7 +55,6 @@ class LikesService {
     // toggle like
     async toggleLike(postId: number) {
         try {
-            console.log('Toggling like for post:', postId);
             const response = await api.post('/likes/toggle', {
                 post_id: postId
             });
@@ -68,21 +66,6 @@ class LikesService {
         }
     }
 
-    // check if user liked
-/*     async checkUserLike(postId: number) {
-        try {
-            console.log('Checking like for post:', postId);
-            const response = await api.post('/likes/check', {
-                post_id: postId
-            });
-            console.log('Check like response:', response.data);
-            return response.data.data.is_liked || response.data.data.has_liked || false;
-        } catch (error: any) {
-            console.error('Error checking like:', error.response?.data || error.message);
-            return false;
-        }
-    }
- */
     // get my likes
     async getMyLikes() {
         try {
@@ -96,11 +79,9 @@ class LikesService {
 
     async checkUserLike(postId: number) {
     try {
-        console.log('[Service] Checking like for post:', postId);
         const response = await api.post('/likes/check', {
             post_id: postId
         });
-        console.log('[Service] Check response:', response.data);
         return response.data.data.is_liked || response.data.data.has_liked || false;
     } catch (error: any) {
         console.error('[Service] Error checking like:', error.response?.data || error.message);

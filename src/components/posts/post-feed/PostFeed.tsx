@@ -79,15 +79,6 @@ const PostFeed = (props: any) => {
     const loading = isSearchResults ? searchLoading : postsLoading;
     const error = isSearchResults ? null : postsError;
 
-    console.log('📊 PostFeed Debug:', {
-        isSearchResults,
-        tagId,
-        tagName,
-        postsToDisplayCount: postsToDisplay.length,
-        postsToDisplay: postsToDisplay, // 👈 **أضف هذا للـ debugging**
-        loading
-    });
-
     // 🔧 **تصفية البوستات الناقصة**
     const validPosts = postsToDisplay.filter(post => {
         // تأكد من وجود post ووجود id
@@ -106,9 +97,6 @@ const PostFeed = (props: any) => {
         
         return true;
     });
-
-    console.log(`✅ Valid posts: ${validPosts.length}/${postsToDisplay.length}`);
-
     const observerRef = useRef<HTMLDivElement>(null);
 
     // Auto infinite scroll - للبيانات العادية فقط
@@ -142,14 +130,12 @@ const PostFeed = (props: any) => {
     };
 
     const handleImagesUpdated = () => {
-        console.log('🖼️ Images updated, refreshing...');
         if (!isSearchResults) {
             refreshPosts();
         }
     };
 
     const handlePostUpdated = () => {
-        console.log('🔄 Post updated, refreshing...');
         if (!isSearchResults) {
             refreshPosts();
         }

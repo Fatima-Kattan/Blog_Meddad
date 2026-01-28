@@ -35,7 +35,7 @@ const fetcher = async () => {
     return {
       id: userData.id,
       full_name: userData.full_name,
-      image: userData.image || '/default-avatar.png',
+      image: userData.image,
       email: userData.email,
       bio: userData.bio,
       phone_number: userData.phone_number,

@@ -50,18 +50,8 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
         try {
             setLoading(true);
             setError(null);
-            
-            console.log('🔄 [usePosts] fetchPosts called with:', {
-                tagId,
-                tagName,
-                searchKeyword,
-                page,
-                isLoadMore
-            });
 
-            if (singlePostMode && postId) {
-                console.log(`📦 [usePosts] Fetching single post: ${postId}`);
-                
+            if (singlePostMode && postId) {                
                 const response = await getPost(postId);
                 
                 if (response.success && response.data) {
@@ -76,9 +66,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
             }
 
             
-            if (tagId) {
-                console.log(`🏷️ [usePosts] Fetching posts by tag ID: ${tagId}, page: ${page}`);
-                
+            if (tagId) {                
                 const response = await getPostsByTagId(tagId, page, limit);
                 
                 console.log('🔍 [usePosts] Tag response:', {
@@ -90,13 +78,6 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                 
                 if (response.success && response.data) {
                     const postsData = response.data.data || [];
-                    
-                    console.log(`✅ [usePosts] Found ${postsData.length} posts for tag ID ${tagId}`);
-                    console.log('📊 [usePosts] Pagination:', {
-                        current_page: response.data.current_page,
-                        last_page: response.data.last_page,
-                        hasMore: response.data.current_page < response.data.last_page
-                    });
                     
                     if (isLoadMore) {
                         setPosts(prev => [...prev, ...postsData]);
@@ -112,9 +93,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                 return;
             }
 
-            if (userId) {
-                console.log(`👤 [usePosts] Fetching posts for user: ${userId}`);
-                
+            if (userId) {                
                 const response = await getUserPosts(userId, page, limit);
                 
                 if (response.success && response.data) {
@@ -134,7 +113,6 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
             }
 
             if (searchKeyword) {
-                console.log(`🔍 [usePosts] Searching posts: ${searchKeyword}`);
                 
                 const response = await searchPosts(searchKeyword, page, limit);
                 
@@ -155,7 +133,6 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
             }
 
             if (tagName) {
-                console.log(`🏷️ [usePosts] Fetching posts with tag: ${tagName}`);
                 
                 const response = await searchPosts(`#${tagName}`, page, limit);
                 
@@ -173,10 +150,7 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
                     setError(response.message || 'Failed to fetch tag posts');
                 }
                 return;
-            }
-
-            console.log(`📄 [usePosts] Fetching all posts, page: ${page}`);
-            
+            }            
             const response = await getPosts(page, limit);
             
             if (response.success && response.data) {
@@ -203,22 +177,11 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
     }, [limit, singlePostMode, postId, userId, searchKeyword, tagName, tagId]);
 
     useEffect(() => {
-        console.log('🚀 [usePosts] Initializing with:', { 
-            tagId, 
-            tagName, 
-            searchKeyword, 
-            userId, 
-            postId,
-            initialPostsLength: initialPosts.length 
-        });
-        
         if (initialPosts.length > 0 && !tagId && !tagName && !searchKeyword && !userId && !postId) {
-            console.log('✅ [usePosts] Using initial posts');
             setPosts(initialPosts);
             setLoading(false);
             setHasMore(false);
         } else {
-            console.log('🔄 [usePosts] Fetching posts from API...');
             fetchPosts(1, false);
         }
     }, [initialPosts.length, tagId, tagName, searchKeyword, userId, postId, fetchPosts]);
@@ -233,7 +196,6 @@ export const usePosts = (options: UsePostsOptions = {}): UsePostsReturn => {
     };
 
     const refreshPosts = () => {
-        console.log('🔄 [usePosts] Refreshing posts...');
         setCurrentPage(1);
         fetchPosts(1, false);
     };
