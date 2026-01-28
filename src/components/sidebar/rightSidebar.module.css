@@ -14,13 +14,12 @@
 }
 .suggestedFriends {
   padding: 5px;
-  background: linear-gradient(90deg, #d2c4e8, #8b5cf6);
+  background: linear-gradient(90deg, #d2c4e8);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   font-size: 18px;
   font-weight: 600;
-  margin-bottom: 24px;
   filter: drop-shadow(0px 4px 8px rgba(240, 240, 240, 0.275));
   flex-shrink: 0;
 }
@@ -294,4 +293,16 @@
 .statement:active {
   transform: scale(0.98);
   transition: transform 0.1s ease;
+}
+
+.title_follower{
+  display:flex;
+  align-items: center;
+  padding: 12px 6px;
+}
+
+.icon{
+  color: #814aec;
+  width: 30px;
+  height: 30px;
 }

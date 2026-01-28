@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import styles from './rightSidebar.module.css';
 import UserCard from '../shared/UserCard/UserCard';
 import { notFollowingService, NotFollowingResponse } from "@/services/api/follow_api/notFollowings";
+import { MdOutlineGroupAdd, MdOutlinePeopleAlt } from "react-icons/md";
+import { FaPeopleArrows } from "react-icons/fa";
 
 function RightSidebar() {
   const [users, setUsers] = useState<NotFollowingResponse | null>(null);
@@ -89,7 +91,10 @@ function RightSidebar() {
 
   return (
     <div className={styles.sidebarSection}>
+      <div className={styles.title_follower}>
+        <MdOutlinePeopleAlt className={styles.icon}/>
       <h3 className={styles.suggestedFriends}>Suggested Friends</h3>
+      </div>
       
       <div className={styles.scrollContainer}>
         <div>
