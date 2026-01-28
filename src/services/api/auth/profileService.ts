@@ -119,7 +119,6 @@ export interface UserProfileResponse {
     success: boolean;
     message: string;
     data: {
-        
         user: {
             id: number;
             full_name: string;
@@ -137,6 +136,16 @@ export interface UserProfileResponse {
         };
         stats: ProfileStats;
     };
+}
+
+// إضافة واجهة جديدة لحذف الحساب
+export interface DeleteAccountData {
+    password: string;
+}
+
+export interface DeleteAccountResponse {
+    success: boolean;
+    message: string;
 }
 
 class ProfileService {
@@ -164,8 +173,7 @@ class ProfileService {
     async getUserProfileById(userId: number | string): Promise<UserProfileResponse> {
         try {
             const response = await api.get(`/users/profile/${userId}`);
-/*             console.log('✅ تم جلب بروفايل المستخدم:', response.data);
- */            return response.data;
+            return response.data;
         } catch (error: any) {
             console.error('❌ فشل في جلب بروفايل المستخدم:', error);
             if (error.response?.status === 404) {
@@ -176,91 +184,70 @@ class ProfileService {
     }
 
     // الحصول على تفاصيل منشور معين مع اللايكات والتعليقات
-// 1. جرب هذا الرابط في المتصفح:
-// http://localhost:8000/posts/1
-
-// 2. أو استخدم curl في terminal:
-// curl -X GET http://localhost:8000/posts/1
-
-// 3. تحقق من logs السيرفر
-
-// 4. قد تحتاج إلى رابط مختلف
-async getPostDetails(postId: number): Promise<PostDetailResponse> {
-    try {
-        /* console.log(`🔍 جلب تفاصيل المنشور ${postId}...`); */
-        
-        // ⬇️ تحقق من base URL أولاً
-        /* console.log('🌐 Base URL للـ api:', api.defaults.baseURL); */
-        
-        // ⬇️ جرب endpoints مختلفة
-        const endpoints = [
-            `/posts/${postId}`,
-            `/api/posts/${postId}`,
-            `/post/${postId}`,
-            `/post/details/${postId}`,
-            `/api/post/${postId}`
-        ];
-        
-        for (const endpoint of endpoints) {
-            try {
-/*                 console.log(`🔄 جرب endpoint: ${endpoint}`);
- */                const response = await api.get(endpoint);
-                
-                if (response.data) {
-                    /* console.log(`✅ نجح مع endpoint: ${endpoint}`);
-                    console.log('📦 البيانات المستلمة:', response.data); */
-                    return response.data;
+    async getPostDetails(postId: number): Promise<PostDetailResponse> {
+        try {
+            const endpoints = [
+                `/posts/${postId}`,
+                `/api/posts/${postId}`,
+                `/post/${postId}`,
+                `/post/details/${postId}`,
+                `/api/post/${postId}`
+            ];
+            
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await api.get(endpoint);
+                    
+                    if (response.data) {
+                        return response.data;
+                    }
+                } catch (err: any) {
+                    continue;
                 }
-            } catch (err: any) {
-/*                 console.log(`❌ فشل مع ${endpoint}:`, err.response?.status || err.message);
- */                continue;
             }
+            
+            // بيانات افتراضية
+            return {
+                success: true,
+                message: 'بيانات افتراضية',
+                data: {
+                    id: postId,
+                    user_id: 0,
+                    title: 'عنوان المنشور',
+                    caption: 'وصف المنشور',
+                    images: [],
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    likes_count: 0,
+                    comments_count: 0,
+                    likes: [],
+                    comments: [],
+                }
+            };
+            
+        } catch (error: any) {
+            console.error(`❌ فشل في جلب تفاصيل المنشور ${postId}:`, error);
+            
+            return {
+                success: true,
+                message: 'بيانات افتراضية',
+                data: {
+                    id: postId,
+                    user_id: 0,
+                    title: 'عنوان المنشور',
+                    caption: 'وصف المنشور',
+                    images: [],
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    likes_count: 0,
+                    comments_count: 0,
+                    likes: [],
+                    comments: [],
+                }
+            };
         }
-        
-        // ⬇️ لا ترمي خطأ، فقط ارجع بيانات افتراضية
-        console.warn(`⚠️ جميع الـ endpoints فشلت للمنشور ${postId}, استخدام بيانات افتراضية`);
-        
-        return {
-            success: true,
-            message: 'بيانات افتراضية',
-            data: {
-                id: postId,
-                user_id: 0,
-                title: 'عنوان المنشور',
-                caption: 'وصف المنشور',
-                images: [],
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                likes_count: 0,
-                comments_count: 0,
-                likes: [],
-                comments: [],
-            }
-        };
-        
-    } catch (error: any) {
-        console.error(`❌ فشل في جلب تفاصيل المنشور ${postId}:`, error);
-        
-        // ⬇️ ارجع بيانات افتراضية للمتابعة
-        return {
-            success: true,
-            message: 'بيانات افتراضية',
-            data: {
-                id: postId,
-                user_id: 0,
-                title: 'عنوان المنشور',
-                caption: 'وصف المنشور',
-                images: [],
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                likes_count: 0,
-                comments_count: 0,
-                likes: [],
-                comments: [],
-            }
-        };
     }
-}
+
     // تحديث بيانات البروفايل
     async updateProfile(data: UpdateProfileData): Promise<UpdateProfileResponse> {
         try {
@@ -272,65 +259,60 @@ async getPostDetails(postId: number): Promise<PostDetailResponse> {
     }
 
     // الحصول على جميع منشورات المستخدم مع تفاصيل اللايكات والمعجبين
-    // في ProfileService - تحديث دالة getUserPostsWithDetails
-async getUserPostsWithDetails(userId?: number | string): Promise<Post[]> {
-    try {
-        let posts: Post[] = [];
-        
-        if (userId) {
-            // ⬇️ جلب بروفايل المستخدم المحدد
-            const profileResponse = await this.getUserProfileById(userId);
-            posts = profileResponse.data.user.posts || [];
-            /* console.log(`📝 منشورات المستخدم ${userId}:`, posts.length); */
-        } else {
-            // ⬇️ جلب بروفايل المستخدم الحالي
-            const profileResponse = await this.getUserProfile();
-            posts = profileResponse.data.user.posts || [];
+    async getUserPostsWithDetails(userId?: number | string): Promise<Post[]> {
+        try {
+            let posts: Post[] = [];
+            
+            if (userId) {
+                const profileResponse = await this.getUserProfileById(userId);
+                posts = profileResponse.data.user.posts || [];
+            } else {
+                const profileResponse = await this.getUserProfile();
+                posts = profileResponse.data.user.posts || [];
+            }
+            
+            if (posts.length === 0) {
+                return [];
+            }
+            
+            const postsWithDetails = await Promise.all(
+                posts.map(async (post: Post) => {
+                    try {
+                        const postDetail = await this.getPostDetails(post.id);
+                        return {
+                            ...post,
+                            likes: postDetail.data.likes || [],
+                            comments: postDetail.data.comments || [],
+                            likes_count: postDetail.data.likes_count || post.likes_count || 0,
+                            comments_count: postDetail.data.comments_count || post.comments_count || 0,
+                            images: postDetail.data.images || post.images || [],
+                            title: postDetail.data.title || post.title || '',
+                            caption: postDetail.data.caption || post.caption || ''
+                        };
+                    } catch (err) {
+                        console.error(`⚠️ فشل جلب تفاصيل المنشور ${post.id}:`, err);
+                        return {
+                            ...post,
+                            likes: [],
+                            comments: [],
+                            likes_count: post.likes_count || 0,
+                            comments_count: post.comments_count || 0,
+                            images: post.images || [],
+                            title: post.title || '',
+                            caption: post.caption || ''
+                        };
+                    }
+                })
+            );
+            
+            return postsWithDetails;
+            
+        } catch (error) {
+            console.error('❌ فشل في جلب المنشورات:', error);
+            throw new Error('فشل في جلب المنشورات');
         }
-        
-        if (posts.length === 0) {
-            return [];
-        }
-        
-        // ⬇️ جلب تفاصيل كل منشور
-        const postsWithDetails = await Promise.all(
-            posts.map(async (post: Post) => {
-                try {
-                    const postDetail = await this.getPostDetails(post.id);
-                    return {
-                        ...post,
-                        likes: postDetail.data.likes || [],
-                        comments: postDetail.data.comments || [],
-                        likes_count: postDetail.data.likes_count || post.likes_count || 0,
-                        comments_count: postDetail.data.comments_count || post.comments_count || 0,
-                        images: postDetail.data.images || post.images || [],
-                        title: postDetail.data.title || post.title || '',
-                        caption: postDetail.data.caption || post.caption || ''
-                    };
-                } catch (err) {
-                    console.error(`⚠️ فشل جلب تفاصيل المنشور ${post.id}:`, err);
-                    // إرجاع المنشور الأساسي مع قيم افتراضية
-                    return {
-                        ...post,
-                        likes: [],
-                        comments: [],
-                        likes_count: post.likes_count || 0,
-                        comments_count: post.comments_count || 0,
-                        images: post.images || [],
-                        title: post.title || '',
-                        caption: post.caption || ''
-                    };
-                }
-            })
-        );
-        
-        return postsWithDetails;
-        
-    } catch (error) {
-        console.error('❌ فشل في جلب المنشورات:', error);
-        throw new Error('فشل في جلب المنشورات');
     }
-}
+
     // الحصول على جميع منشورات المستخدم بدون تفاصيل
     async getUserPosts(userId?: number | string): Promise<Post[]> {
         try {
@@ -368,30 +350,48 @@ async getUserPostsWithDetails(userId?: number | string): Promise<Post[]> {
         }
     }
 
-    // في ProfileService.ts - أضف هذه الدالة
-async getCurrentUserId(): Promise<number | null> {
-    try {
-        // حاول أولاً من localStorage
-        const storedId = localStorage.getItem('user_id');
-        if (storedId) {
-            return parseInt(storedId);
+    // جلب الـ ID الحالي
+    async getCurrentUserId(): Promise<number | null> {
+        try {
+            const storedId = localStorage.getItem('user_id');
+            if (storedId) {
+                return parseInt(storedId);
+            }
+            
+            const response = await api.get('/user');
+            const userId = response.data.data.user.id;
+            
+            localStorage.setItem('user_id', userId.toString());
+            
+            return userId;
+        } catch (error) {
+            console.error('❌ فشل في جلب الـ ID الحالي:', error);
+            return null;
         }
-        
-        // إذا لم يكن موجوداً، جبله من الـ API
-        const response = await api.get('/user');
-        const userId = response.data.data.user.id;
-        
-        // احفظه لاستخدامه لاحقاً
-        localStorage.setItem('user_id', userId.toString());
-        
-        return userId;
-    } catch (error) {
-        console.error('❌ فشل في جلب الـ ID الحالي:', error);
-        return null;
+    }
+
+    // دالة حذف الحساب الجديدة
+     async deleteAccount(password: string): Promise<DeleteAccountResponse> {
+        try {
+            const response = await api.delete('/user/account', {
+                data: { password }
+            });
+            return response.data;
+        } catch (error: any) {
+            console.error('❌ Failed to delete account:', error);
+            
+            if (error.response?.status === 422) {
+                throw new Error('Incorrect password');
+            }
+            
+            if (error.response?.status === 401) {
+                throw new Error('Unauthorized to delete account');
+            }
+            
+            throw new Error('Failed to delete account. Please try again');
+        }
     }
 }
-}
-
 
 
 export default new ProfileService();

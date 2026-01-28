@@ -17,7 +17,7 @@ import MyFollowers from '@/components/follow/myFollowers/MyFollowers';
 import InputField from '@/components/shared/InputField';
 import SelectField from '@/components/shared/SelectField';
 import DatePickerField from '@/components/shared/DatePickerField';
-import { MdEdit, MdOutlineEmail } from 'react-icons/md';
+import { MdEdit, MdOutlineEmail, MdDelete } from 'react-icons/md';
 import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -76,6 +76,122 @@ interface UserPostsResponse {
     message: string;
 }
 
+// مكون المودال لحذف الحساب باللغة الإنجليزية
+interface DeleteAccountModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onDelete: (password: string) => Promise<void>;
+}
+
+const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ 
+    isOpen, 
+    onClose, 
+    onDelete 
+}) => {
+    const [password, setPassword] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!password.trim()) {
+            setError('Please enter your password');
+            return;
+        }
+
+        setIsDeleting(true);
+        setError('');
+
+        try {
+            await onDelete(password);
+        } catch (err: any) {
+            setError(err.message || 'An error occurred while deleting your account');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="delete-account-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2 className="modal-title">Delete Account</h2>
+                    <button className="modal-close_delete" onClick={onClose}>
+                        ✕
+                    </button>
+                </div>
+
+                <div className="modal-body">
+                    <div className="warning-message">
+                        <div className="warning-icon">⚠️</div>
+                        <h3>Important Warning!</h3>
+                        <p>
+                            By deleting your account, you will:
+                            <strong>This action cannot be undone.</strong>
+                        </p>
+                        <ul>
+                                <li>❌ Permanently delete all your posts</li>
+                                <li>❌ Delete all your comments and likes</li>
+                                <li>❌ Remove all your followers and following</li>
+                                <li>❌ Lose all data associated with your account</li>
+                            </ul>
+                    </div>
+
+                    <form onSubmit={handleSubmit} className="delete-form">
+                        <div className="form-group">
+                            <label className="form-label">
+                                Enter your password to confirm
+                            </label>
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    setError('');
+                                }}
+                                className="form-input"
+                                placeholder="Current password"
+                                disabled={isDeleting}
+                            />
+                        </div>
+
+                        {error && (
+                            <div className="error-message">{error}</div>
+                        )}
+
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="btn btn-cancel"
+                                onClick={onClose}
+                                disabled={isDeleting}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="btn btn-delete"
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <div className="loading-spinner"></div>
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    'Delete Account'
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: propIsOwnProfile }) => {
     const router = useRouter();
     const params = useParams();
@@ -99,116 +215,82 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [saveError, setSaveError] = useState<string | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [today, setToday] = useState('');
+    
+    // States for delete account
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
-    // دالة محسنة لاستخراج الـ ID من التوكن
+    // Improved function to extract ID from token
     const getCurrentUserIdFromToken = (): string | number | null => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                console.log('❌ لا يوجد توكن في localStorage');
+                console.log('❌ No token in localStorage');
                 return null;
             }
             
-            console.log('🔍 فحص التوكن:', token.substring(0, 20) + '...');
-            
             try {
-                // التحقق من أن التوكن صالح وبتنسيق JWT
+                // Check if token is valid and in JWT format
                 if (typeof token !== 'string') {
-                    console.log('⚠️ التوكن ليس نصياً');
+                    console.log('⚠️ Token is not a string');
                     return null;
                 }
                 
-                // التحقق من أن التوكن يحتوي على نقطتين (JWT format)
+                // Check if token contains two dots (JWT format)
                 const parts = token.split('.');
                 if (parts.length !== 3) {
-                    console.log('⚠️ التوكن ليس بتنسيق JWT صالح');
+                    console.log('⚠️ Token is not in valid JWT format');
                     return null;
                 }
                 
-                // محاولة فك التشفير Base64
+                // Try to decode Base64
                 const payloadBase64 = parts[1];
                 
-                // إضافة padding إذا لزم الأمر
+                // Add padding if necessary
                 const paddedBase64 = payloadBase64.padEnd(payloadBase64.length + (4 - payloadBase64.length % 4) % 4, '=');
                 
-                // فك التشفير
+                // Decode
                 const payloadJson = atob(paddedBase64);
                 
-                // تحليل JSON
+                // Parse JSON
                 const payload = JSON.parse(payloadJson);
-                console.log('📄 Payload التوكن:', payload);
                 
-                // البحث عن الـ ID في أماكن محتملة
+                // Search for ID in possible places
                 const userId = payload.id || payload.user_id || payload.userId || payload.sub || payload.user?.id;
                 
                 if (userId) {
-                    console.log(`✅ تم العثور على ID المستخدم في التوكن: ${userId}`);
                     return userId;
                 } else {
-                    console.log('⚠️ لم يتم العثور على ID في payload التوكن:', payload);
                     return null;
                 }
             } catch (parseError) {
-                console.error('❌ خطأ في تحليل التوكن JWT:', parseError);
-                
-                // محاولة بديلة: البحث مباشرة في التوكن إذا كان JSON
-                try {
-                    if (token.startsWith('{')) {
-                        const parsedToken = JSON.parse(token);
-                        console.log('🔍 التوكن كـ JSON:', parsedToken);
-                        
-                        const userId = parsedToken.id || parsedToken.user_id || parsedToken.userId || 
-                                      parsedToken.sub || parsedToken.user?.id || parsedToken.data?.id;
-                        
-                        if (userId) {
-                            console.log(`✅ تم العثور على ID في JSON التوكن: ${userId}`);
-                            return userId;
-                        }
-                    }
-                    
-                    // إذا لم ينجح أي شيء، حاول استخراج ID من أي مكان في النص
-                    const idMatch = token.match(/"id":\s*"([^"]+)"/) || token.match(/"id":\s*(\d+)/) || 
-                                   token.match(/"user_id":\s*"([^"]+)"/) || token.match(/"user_id":\s*(\d+)/) ||
-                                   token.match(/"userId":\s*"([^"]+)"/) || token.match(/"userId":\s*(\d+)/) ||
-                                   token.match(/"sub":\s*"([^"]+)"/);
-                    
-                    if (idMatch && idMatch[1]) {
-                        console.log(`✅ تم العثور على ID باستخدام regex: ${idMatch[1]}`);
-                        return idMatch[1];
-                    }
-                    
-                    return null;
-                } catch {
-                    console.log('⚠️ التوكن ليس JSON ولا JWT ولا يحتوي على ID واضح');
-                    return null;
-                }
+                console.error('❌ Error parsing JWT token:', parseError);
+                return null;
             }
         } catch (error) {
-            console.error('❌ خطأ في getCurrentUserIdFromToken:', error);
+            console.error('❌ Error in getCurrentUserIdFromToken:', error);
             return null;
         }
     };
 
-    // دالة بديلة أكثر أماناً لاستخراج ID من التوكن
+    // Alternative safer function to extract ID from token
     const getCurrentUserIdFromTokenAlternative = (): string | number | null => {
         try {
             const token = localStorage.getItem('token');
             if (!token) return null;
 
-            // طريقة أكثر أماناً مع try-catch متداخل
             let payload;
             try {
-                // التحقق من أن token نصي وله طول
+                // Check if token is a string and has length
                 if (typeof token !== 'string' || token.length < 10) {
-                    console.warn('توكن غير صالح');
+                    console.warn('Invalid token');
                     return null;
                 }
 
-                // محاولة JWT أولاً
+                // Try JWT first
                 const parts = token.split('.');
                 if (parts.length === 3) {
                     try {
-                        // استخدام decodeURIComponent للتعامل مع ترميز URL
                         const base64Url = parts[1];
                         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                         const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
@@ -217,81 +299,81 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                         
                         payload = JSON.parse(jsonPayload);
                     } catch (jwtError) {
-                        console.warn('فشل تحليل JWT:', jwtError);
+                        console.warn('Failed to parse JWT:', jwtError);
                         payload = null;
                     }
                 }
 
-                // إذا لم يكن JWT، جرب كـ JSON مباشرة
-                if (!payload && token.startsWith('{')) {
-                    try {
-                        payload = JSON.parse(token);
-                    } catch (jsonError) {
-                        console.warn('فشل تحليل JSON:', jsonError);
-                    }
-                }
-
-                // استخراج ID من payload
+                // Extract ID from payload
                 if (payload) {
                     return payload.id || payload.user_id || payload.userId || payload.sub || 
                            payload.user?.id || payload.data?.id;
                 }
 
-                // محاولة أخيرة: البحث عن ID في النص
+                // Last attempt: search for ID in text
                 const idRegex = /"id"\s*:\s*"?(\d+)/;
                 const match = token.match(idRegex);
                 if (match) return match[1];
 
             } catch (innerError) {
-                console.error('خطأ داخلي:', innerError);
+                console.error('Internal error:', innerError);
             }
 
             return null;
         } catch (error) {
-            console.error('خطأ خارجي:', error);
+            console.error('External error:', error);
             return null;
         }
     };
 
-    // التحقق من صحة التوكن
-    const isValidToken = (token: string): boolean => {
-        if (!token || typeof token !== 'string') return false;
-        
-        // التحقق من تنسيق JWT (ثلاثة أجزاء مفصولة بنقاط)
-        const parts = token.split('.');
-        if (parts.length !== 3) return false;
-        
-        // التحقق من أن كل جزء يحتوي على محتوى
-        return parts.every(part => part.length > 0);
-    };
-
-    // الحصول على ID المستخدم الحالي من API مباشرة
+    // Get current user ID from API directly
     const getCurrentUserIdFromAPI = async (): Promise<string | number | null> => {
         try {
             const response = await ProfileService.getUserProfile();
             if (response.success && response.data.user.id) {
-                console.log(`✅ تم الحصول على ID من API: ${response.data.user.id}`);
                 return response.data.user.id;
             }
             return null;
         } catch (error) {
-            console.error('❌ خطأ في الحصول على ID من API:', error);
+            console.error('❌ Error getting ID from API:', error);
             return null;
         }
     };
 
-    // دالة موحدة للحصول على الـ ID الحالي
+    // Unified function to get current ID
     const getCurrentUserId = async (): Promise<string | number | null> => {
-        // أولاً حاول من التوكن باستخدام الدالة المحسنة
         const fromToken = getCurrentUserIdFromTokenAlternative();
         if (fromToken) return fromToken;
         
-        // إذا لم ينجح، حاول من API
         const fromAPI = await getCurrentUserIdFromAPI();
         return fromAPI;
     };
 
-    // إعادة تعيين الحالة عند تغيير المستخدم
+    // Delete account function
+    const handleDeleteAccount = async (password: string) => {
+        setIsDeletingAccount(true);
+        try {
+            const response = await ProfileService.deleteAccount(password);
+            
+            if (response.success) {
+                // Clear all local data
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Redirect to register page
+                router.push('/register');
+                
+                // Show success message
+                alert('Your account has been successfully deleted. We\'re sorry to see you go!');
+            }
+        } catch (error: any) {
+            throw error;
+        } finally {
+            setIsDeletingAccount(false);
+        }
+    };
+
+    // Reset state when user changes
     useEffect(() => {
         const resetState = () => {
             setUser(null);
@@ -312,28 +394,25 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, [targetUserId]);
 
-    // تحديث حالة isOwnProfile عند تغيير المسار أو المستخدم
+    // Update isOwnProfile status when path or user changes
     useEffect(() => {
         const updateOwnProfileStatus = async () => {
             if (!targetUserId) {
-                setIsOwnProfile(true); // إذا لا يوجد target، فهو البروفايل الشخصي
+                setIsOwnProfile(true);
                 return;
             }
             
             try {
                 const currentUserId = await getCurrentUserId();
-                console.log(`🔄 تحديث isOwnProfile: currentUserId=${currentUserId}, targetUserId=${targetUserId}`);
                 
                 if (currentUserId) {
                     const isOwn = targetUserId.toString() === currentUserId.toString();
-                    console.log(`✅ isOwnProfile: ${isOwn}`);
                     setIsOwnProfile(isOwn);
                 } else {
-                    console.log('❌ لا يمكن تحديد المستخدم الحالي');
                     setIsOwnProfile(false);
                 }
             } catch (error) {
-                console.error('❌ خطأ في updateOwnProfileStatus:', error);
+                console.error('❌ Error in updateOwnProfileStatus:', error);
                 setIsOwnProfile(false);
             }
         };
@@ -348,57 +427,40 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             
             let profileResponse: ProfileResponse | UserProfileResponse;
 
-            console.log(`🔍 جلب بيانات للمستخدم: ${targetUserId}`);
-
             if (targetUserId) {
                 try {
                     profileResponse = await ProfileService.getUserProfileById(targetUserId);
 
-                    // تحقق من هوية المستخدم الحالي
                     const currentUserId = await getCurrentUserId();
-                    console.log(`👤 المقارنة: المستخدم الحالي=${currentUserId}, المستخدم المستهدف=${targetUserId}`);
                     
                     if (currentUserId && currentUserId.toString() === targetUserId.toString()) {
-                        console.log('✅ هذا هو الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(true);
-                        // تحديث localStorage للتوافق مع المكونات الأخرى
                         localStorage.setItem('user_id', currentUserId.toString());
                     } else {
-                        console.log('❌ هذا ليس الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(false);
                     }
 
                 } catch (fetchError) {
-                    console.error('❌ خطأ في جلب بروفايل المستخدم:', fetchError);
-                    throw new Error('فشل في جلب بروفايل المستخدم');
+                    console.error('❌ Error fetching user profile:', fetchError);
+                    throw new Error('Failed to fetch user profile');
                 }
             } else {
-                // إذا لم يتم توفير ID، احصل على بروفايل المستخدم الحالي
                 profileResponse = await ProfileService.getUserProfile();
                 
                 const currentUserId = profileResponse.data.user.id;
                 if (currentUserId) {
-                    // تحديث localStorage للتوافق
                     localStorage.setItem('user_id', currentUserId.toString());
                 }
                 
                 setIsOwnProfile(true);
-                console.log(`✅ بروفايل المستخدم الحالي، ID: ${currentUserId}`);
             }
 
             if (!profileResponse.success) {
-                throw new Error(profileResponse.message || 'فشل في تحميل البروفايل');
+                throw new Error(profileResponse.message || 'Failed to load profile');
             }
 
-            // تحويل البيانات إلى الشكل الصحيح
             const userData = profileResponse.data.user;
             const statsData = profileResponse.data.stats;
-
-            console.log(`📊 بيانات المستخدم المستلمة:`, {
-                id: userData.id,
-                name: userData.full_name,
-                isOwnProfile: isOwnProfile
-            });
 
             const formattedUser: UserProfile = {
                 id: userData.id,
@@ -426,7 +488,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(formattedUser);
             setStats(formattedStats);
 
-            // جلب المنشورات مع تفاصيل اللايكات
             const userOldPosts = userData.posts || [];
             if (userOldPosts.length > 0) {
                 const postsWithLikes = await Promise.all(
@@ -454,12 +515,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 setProfilePosts([]);
             }
 
-            console.log(`✅ تم تحميل بيانات الملف الشخصي بنجاح للمستخدم: ${formattedUser.full_name}`);
-            console.log(`👁️ isOwnProfile الحالي: ${isOwnProfile}`);
-
         } catch (err) {
-            console.error('🔥 خطأ في جلب البيانات:', err);
-            const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في جلب البيانات';
+            console.error('🔥 Error fetching data:', err);
+            const errorMessage = err instanceof Error ? err.message : 'An error occurred while fetching data';
             setError(errorMessage);
         } finally {
             setLoading(false);
@@ -532,7 +590,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             await fetchProfileData();
 
         } catch (err) {
-            setSaveError(err instanceof Error ? err.message : 'حدث خطأ في حفظ البيانات');
+            setSaveError(err instanceof Error ? err.message : 'An error occurred while saving data');
         } finally {
             setIsSaving(false);
         }
@@ -555,7 +613,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 router.push('/login');
             }
         } catch (error) {
-            console.error('❌ فشل في تحميل البروفايل الشخصي:', error);
+            console.error('❌ Failed to load own profile:', error);
             router.push('/login');
         }
     };
@@ -565,18 +623,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     };
 
     const handleImagesUpdated = () => {
-        // لا حاجة لتنفيذ أي شيء هنا لأن UserPostsFeed يتعامل مع ذلك
+        // No action needed
     };
 
     const handlePostUpdated = () => {
-        // لا حاجة لتنفيذ أي شيء هنا لأن UserPostsFeed يتعامل مع ذلك
-    };
-
-    const checkIfOwnProfile = async () => {
-        const currentUserId = await getCurrentUserId();
-        const isOwn = currentUserId && targetUserId && currentUserId.toString() === targetUserId.toString();
-        console.log(`🔍 فحص isOwnProfile: ${isOwn} (current: ${currentUserId}, target: ${targetUserId})`);
-        return isOwn;
+        // No action needed
     };
 
     if (loading) {
@@ -671,88 +722,109 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             <div className="profile-content">
                 <div className="profile-sidebar">
                     <div>
-                    {isOwnProfile && (
-                        <div className='display'>
-                            <button className="edit-avatar-btn" onClick={handleEditClick}>
-                                <MdEdit style={{ width: 20, height: 20 }} />
-                            </button>
-                        </div>
-                    )}
-
-                    {!isOwnProfile && (
-                        <div className="display-not-owner">
-                            <button
-                                onClick={loadOwnProfile}
-                                className="edit-avatar-btn-not-owner"
-                            >
-                                <HiArrowNarrowRight style={{ width: 20, height: 20 }} />
-                                back to my profile
-                            </button>
-                        </div>
-                    )}
-
-                    <div className="profile-avatar-section">
-                        <img
-                            src={user.image || 'https://via.placeholder.com/150'}
-                            alt={user.full_name}
-                            className="profile-avatar"
-                        />
-                    </div>
-
-                    <div className="user-info">
-                        <h2 className="user-name">{user.full_name}</h2>
-                        <div className="user-email">
-                            <MdOutlineEmail className='email_icon' />
-                            <span>{user.email}</span>
-                        </div>
-                        <div className="member-since">
-                            Member since {formatDate(user.created_at)}
-                        </div>
-                    </div>
-                    
-                    <div className="profile-stats">
-                        <div className="stat-card">
-                            <div className="stat-number">{stats.followers_count}</div>
-                            <div className="stat-label">FOLLOWERS</div>
-                        </div>
-                        <div className="stat-card">
-                            <div className="stat-number">{stats.following_count}</div>
-                            <div className="stat-label">FOLLOWING</div>
-                        </div>
-                    </div>
-
-                    <div className="profile-info-section">
-                        <h3 className="section-title">About me</h3>
-                        <p className="bio-text">{user.bio || 'No bio provided'}</p>
-
-                        <div className="info-grid">
-                            <div className="info-item">
-                                <span className="info-label">PHONE</span>
-                                <span className="info-value">{user.phone_number || 'Not provided'}</span>
+                        {isOwnProfile && (
+                            <div className='display'>
+                                <button className="edit-avatar-btn" onClick={handleEditClick}>
+                                    <MdEdit style={{ width: 20, height: 20 }} />
+                                </button>
                             </div>
+                        )}
 
-                            <div className="info-item">
-                                <span className="info-label">GENDER</span>
-                                <span className="info-value">{user.gender || 'Not specified'}</span>
+                        {!isOwnProfile && (
+                            <div className="display-not-owner">
+                                <button
+                                    onClick={loadOwnProfile}
+                                    className="edit-avatar-btn-not-owner"
+                                >
+                                    <HiArrowNarrowRight style={{ width: 20, height: 20 }} />
+                                    back to my profile
+                                </button>
                             </div>
+                        )}
 
-                            <div className="info-item">
-                                <span className="info-label">BIRTH DATE</span>
-                                <span className="info-value">
-                                    {user.birth_date ? (
+                        <div className="profile-avatar-section">
+                            <img
+                                src={user.image || 'https://via.placeholder.com/150'}
+                                alt={user.full_name}
+                                className="profile-avatar"
+                            />
+                        </div>
+
+                        <div className="user-info">
+                            <h2 className="user-name">{user.full_name}</h2>
+                            <div className="user-email">
+                                <MdOutlineEmail className='email_icon' />
+                                <span>{user.email}</span>
+                            </div>
+                            <div className="member-since">
+                                Member since {formatDate(user.created_at)}
+                            </div>
+                        </div>
+                        
+                        <div className="profile-stats">
+                            <div className="stat-card">
+                                <div className="stat-number">{stats.followers_count}</div>
+                                <div className="stat-label">FOLLOWERS</div>
+                            </div>
+                            <div className="stat-card">
+                                <div className="stat-number">{stats.following_count}</div>
+                                <div className="stat-label">FOLLOWING</div>
+                            </div>
+                        </div>
+
+                        <div className="profile-info-section">
+                            <h3 className="section-title">About me</h3>
+                            <p className="bio-text">{user.bio || 'No bio provided'}</p>
+
+                            <div className="info-grid">
+                                <div className="info-item">
+                                    <span className="info-label">PHONE</span>
+                                    <span className="info-value">{user.phone_number || 'Not provided'}</span>
+                                </div>
+
+                                <div className="info-item">
+                                    <span className="info-label">GENDER</span>
+                                    <span className="info-value">{user.gender || 'Not specified'}</span>
+                                </div>
+
+                                <div className="info-item">
+                                    <span className="info-label">BIRTH DATE</span>
+                                    <span className="info-value">
+                                        {user.birth_date ? (
+                                            <>
+                                                {formatDate(user.birth_date)}
+                                                {calculateAge(user.birth_date) && (
+                                                    <div style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '4px' }}>
+                                                        ({calculateAge(user.birth_date)})
+                                                    </div>
+                                                )}
+                                            </>
+                                        ) : 'Not provided'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Simple delete account button - only shows for owner */}
+                        {isOwnProfile && (
+                            <div className="account-actions-section">
+                                <button
+                                    className="btn-delete-account-simple"
+                                    onClick={() => setShowDeleteModal(true)}
+                                    disabled={isDeletingAccount}
+                                >
+                                    <MdDelete style={{ width: 18, height: 18, marginRight: 8 }} />
+                                    {isDeletingAccount ? (
                                         <>
-                                            {formatDate(user.birth_date)}
-                                            {calculateAge(user.birth_date) && (
-                                                <div style={{ color: '#94a3b8', fontSize: '0.9rem', marginTop: '4px' }}>
-                                                    ({calculateAge(user.birth_date)})
-                                                </div>
-                                            )}
+                                            <div className="loading-spinner"></div>
+                                            Processing...
                                         </>
-                                    ) : 'Not provided'}
-                                </span>
+                                    ) : (
+                                        'Delete Account'
+                                    )}
+                                </button>
                             </div>
-                        </div>
-                    </div>
+                        )}
                     </div>
                 </div>
 
@@ -857,6 +929,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 </div>
             </div>
 
+            {/* Edit Profile Modal */}
             {showEditModal && isOwnProfile && (
                 <div className="edit-modal-overlay" onClick={() => setShowEditModal(false)}>
                     <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
@@ -1002,12 +1075,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 </div>
             )}
 
-            <style jsx>{`
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `}</style>
+            {/* Delete Account Modal */}
+            <DeleteAccountModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onDelete={handleDeleteAccount}
+            />
         </div>
     );
 };
