@@ -138,6 +138,23 @@ export interface UserProfileResponse {
     };
 }
 
+// إضافة واجهة جديدة لتحديث كلمة السر
+export interface UpdatePasswordData {
+    current_password: string;
+    new_password: string;
+    new_password_confirmation: string;
+}
+
+export interface UpdatePasswordResponse {
+    success: boolean;
+    message: string;
+    data?: {
+        user: UserProfile;
+        token: string;
+        token_type: string;
+    };
+}
+
 // إضافة واجهة جديدة لحذف الحساب
 export interface DeleteAccountData {
     password: string;
@@ -180,6 +197,49 @@ class ProfileService {
                 throw new Error('المستخدم غير موجود');
             }
             throw new Error('فشل في جلب بروفايل المستخدم');
+        }
+    }
+
+    // تحديث كلمة السر
+    async updatePassword(data: UpdatePasswordData): Promise<UpdatePasswordResponse> {
+        try {
+            const response = await api.put('/user/password', {
+                current_password: data.current_password,
+                new_password: data.new_password,
+                new_password_confirmation: data.new_password_confirmation
+            });
+            
+            return response.data;
+            
+        } catch (error: any) {
+            console.error('❌ فشل في تحديث كلمة السر:', error);
+            
+            // التعامل مع أخطاء التحقق
+            if (error.response?.status === 422) {
+                const errors = error.response.data.errors;
+                
+                if (errors?.current_password) {
+                    throw new Error('كلمة السر الحالية غير صحيحة');
+                }
+                
+                if (errors?.new_password) {
+                    const passwordError = errors.new_password[0];
+                    throw new Error(passwordError);
+                }
+                
+                if (errors?.new_password_confirmation) {
+                    throw new Error('كلمات السر الجديدة غير متطابقة');
+                }
+                
+                throw new Error('بيانات غير صحيحة');
+            }
+            
+            // التعامل مع أخطاء أخرى
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            
+            throw new Error('فشل في تحديث كلمة السر. حاول مرة أخرى');
         }
     }
 
@@ -370,8 +430,8 @@ class ProfileService {
         }
     }
 
-    // دالة حذف الحساب الجديدة
-     async deleteAccount(password: string): Promise<DeleteAccountResponse> {
+    // دالة حذف الحساب
+    async deleteAccount(password: string): Promise<DeleteAccountResponse> {
         try {
             const response = await api.delete('/user/account', {
                 data: { password }
@@ -392,6 +452,5 @@ class ProfileService {
         }
     }
 }
-
 
 export default new ProfileService();

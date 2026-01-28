@@ -17,7 +17,7 @@ import MyFollowers from '@/components/follow/myFollowers/MyFollowers';
 import InputField from '@/components/shared/InputField';
 import SelectField from '@/components/shared/SelectField';
 import DatePickerField from '@/components/shared/DatePickerField';
-import { MdEdit, MdOutlineEmail, MdDelete } from 'react-icons/md';
+import { MdEdit, MdOutlineEmail, MdDelete, MdLock } from 'react-icons/md';
 import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -76,6 +76,216 @@ interface UserPostsResponse {
     message: string;
 }
 
+// مكون المودال لتعديل كلمة السر
+interface UpdatePasswordModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onUpdate: (data: {
+        current_password: string;
+        new_password: string;
+        new_password_confirmation: string;
+    }) => Promise<void>;
+}
+
+const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
+    isOpen,
+    onClose,
+    onUpdate
+}) => {
+    const [formData, setFormData] = useState({
+        current_password: '',
+        new_password: '',
+        new_password_confirmation: ''
+    });
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        setError('');
+        setFieldErrors({});
+
+        // التحقق من صحة المدخلات
+        if (!formData.current_password.trim()) {
+            setFieldErrors(prev => ({ ...prev, current_password: 'Please enter your current password' }));
+            return;
+        }
+
+        if (!formData.new_password.trim()) {
+            setFieldErrors(prev => ({ ...prev, new_password: 'Please enter new password' }));
+            return;
+        }
+
+        if (formData.new_password.length < 8) {
+            setFieldErrors(prev => ({ ...prev, new_password: 'Password must be at least 8 characters' }));
+            return;
+        }
+
+        if (formData.new_password !== formData.new_password_confirmation) {
+            setFieldErrors(prev => ({ ...prev, new_password_confirmation: 'Passwords do not match' }));
+            return;
+        }
+
+        if (formData.current_password === formData.new_password) {
+            setFieldErrors(prev => ({ ...prev, new_password: 'New password must be different from current password' }));
+            return;
+        }
+
+        setIsUpdating(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            await onUpdate(formData);
+            setSuccess('Password updated successfully!');
+
+            // إعادة تعيين النموذج بعد النجاح
+            setTimeout(() => {
+                setFormData({
+                    current_password: '',
+                    new_password: '',
+                    new_password_confirmation: ''
+                });
+                onClose();
+            }, 1500);
+        } catch (err: any) {
+            setError(err.message || 'An error occurred while updating password');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        if (fieldErrors[name]) {
+            setFieldErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
+
+        if (error) setError('');
+        if (success) setSuccess('');
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h2 className="modal-title">Change Password</h2>
+                    <button className="modal-close_delete" onClick={onClose}>
+                        ✕
+                    </button>
+                </div>
+
+                <div className="modal-body">
+                    <form onSubmit={handleSubmit} className="password-form">
+                        <div className="form-group">
+                            <InputField
+                                label="Current Password"
+                                name="current_password"
+                                type="password"
+                                value={formData.current_password}
+                                onChange={handleInputChange}
+                                placeholder="Enter current password"
+                                required={true}
+                                error={fieldErrors.current_password}
+                                disabled={isUpdating}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <InputField
+                                label="New Password"
+                                name="new_password"
+                                type="password"
+                                value={formData.new_password}
+                                onChange={handleInputChange}
+                                placeholder="Enter new password (min 8 characters)"
+                                required={true}
+                                error={fieldErrors.new_password}
+                                disabled={isUpdating}
+                            />
+                            <div className="warning-message-password">
+                                Password must be at least 8 characters
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <InputField
+                                label="Confirm New Password"
+                                name="new_password_confirmation"
+                                type="password"
+                                value={formData.new_password_confirmation}
+                                onChange={handleInputChange}
+                                placeholder="Confirm new password"
+                                required={true}
+                                error={fieldErrors.new_password_confirmation}
+                                disabled={isUpdating}
+                            />
+                        </div>
+
+
+                        {error && (
+                            <div className="error-message">{error}</div>
+                        )}
+
+                        {success && (
+                            <div className="success-message">{success}</div>
+                        )}
+
+                        {/*   <div className="password-tips">
+                            <h4>Password Tips:</h4>
+                            <ul>
+                                <li>✓ Use at least 8 characters</li>
+                                <li>✓ Mix letters, numbers, and symbols</li>
+                                <li>✓ Avoid common words or patterns</li>
+                                <li>✓ Don't reuse old passwords</li>
+                            </ul>
+                        </div> */}
+
+                        <div className="form-actions">
+                            <button
+                                type="button"
+                                className="btn btn-secondary"
+                                onClick={onClose}
+                                disabled={isUpdating}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="btn btn-primary"
+                                disabled={isUpdating}
+                            >
+                                {isUpdating ? (
+                                    <>
+                                        <div className="loading-spinner"></div>
+                                        Updating...
+                                    </>
+                                ) : (
+                                    'Update Password'
+                                )}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // مكون المودال لحذف الحساب باللغة الإنجليزية
 interface DeleteAccountModalProps {
     isOpen: boolean;
@@ -83,10 +293,10 @@ interface DeleteAccountModalProps {
     onDelete: (password: string) => Promise<void>;
 }
 
-const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({ 
-    isOpen, 
-    onClose, 
-    onDelete 
+const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
+    isOpen,
+    onClose,
+    onDelete
 }) => {
     const [password, setPassword] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -132,11 +342,11 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                             <strong>This action cannot be undone.</strong>
                         </p>
                         <ul>
-                                <li>❌ Permanently delete all your posts</li>
-                                <li>❌ Delete all your comments and likes</li>
-                                <li>❌ Remove all your followers and following</li>
-                                <li>❌ Lose all data associated with your account</li>
-                            </ul>
+                            <li>❌ Permanently delete all your posts</li>
+                            <li>❌ Delete all your comments and likes</li>
+                            <li>❌ Remove all your followers and following</li>
+                            <li>❌ Lose all data associated with your account</li>
+                        </ul>
                     </div>
 
                     <form onSubmit={handleSubmit} className="delete-form">
@@ -215,10 +425,14 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [saveError, setSaveError] = useState<string | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [today, setToday] = useState('');
-    
+
     // States for delete account
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeletingAccount, setIsDeletingAccount] = useState(false);
+
+    // States for password update
+    const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
+    const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
     // Improved function to extract ID from token
     const getCurrentUserIdFromToken = (): string | number | null => {
@@ -228,36 +442,36 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 console.log('❌ No token in localStorage');
                 return null;
             }
-            
+
             try {
                 // Check if token is valid and in JWT format
                 if (typeof token !== 'string') {
                     console.log('⚠️ Token is not a string');
                     return null;
                 }
-                
+
                 // Check if token contains two dots (JWT format)
                 const parts = token.split('.');
                 if (parts.length !== 3) {
                     console.log('⚠️ Token is not in valid JWT format');
                     return null;
                 }
-                
+
                 // Try to decode Base64
                 const payloadBase64 = parts[1];
-                
+
                 // Add padding if necessary
                 const paddedBase64 = payloadBase64.padEnd(payloadBase64.length + (4 - payloadBase64.length % 4) % 4, '=');
-                
+
                 // Decode
                 const payloadJson = atob(paddedBase64);
-                
+
                 // Parse JSON
                 const payload = JSON.parse(payloadJson);
-                
+
                 // Search for ID in possible places
                 const userId = payload.id || payload.user_id || payload.userId || payload.sub || payload.user?.id;
-                
+
                 if (userId) {
                     return userId;
                 } else {
@@ -293,10 +507,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     try {
                         const base64Url = parts[1];
                         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
                             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                         }).join(''));
-                        
+
                         payload = JSON.parse(jsonPayload);
                     } catch (jwtError) {
                         console.warn('Failed to parse JWT:', jwtError);
@@ -306,8 +520,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
                 // Extract ID from payload
                 if (payload) {
-                    return payload.id || payload.user_id || payload.userId || payload.sub || 
-                           payload.user?.id || payload.data?.id;
+                    return payload.id || payload.user_id || payload.userId || payload.sub ||
+                        payload.user?.id || payload.data?.id;
                 }
 
                 // Last attempt: search for ID in text
@@ -344,7 +558,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const getCurrentUserId = async (): Promise<string | number | null> => {
         const fromToken = getCurrentUserIdFromTokenAlternative();
         if (fromToken) return fromToken;
-        
+
         const fromAPI = await getCurrentUserIdFromAPI();
         return fromAPI;
     };
@@ -354,15 +568,15 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         setIsDeletingAccount(true);
         try {
             const response = await ProfileService.deleteAccount(password);
-            
+
             if (response.success) {
                 // Clear all local data
                 localStorage.clear();
                 sessionStorage.clear();
-                
+
                 // Redirect to register page
                 router.push('/register');
-                
+
                 // Show success message
                 alert('Your account has been successfully deleted. We\'re sorry to see you go!');
             }
@@ -370,6 +584,38 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             throw error;
         } finally {
             setIsDeletingAccount(false);
+        }
+    };
+
+    // Update password function
+    const handleUpdatePassword = async (data: {
+        current_password: string;
+        new_password: string;
+        new_password_confirmation: string;
+    }) => {
+        setIsUpdatingPassword(true);
+        try {
+            const response = await ProfileService.updatePassword({
+                current_password: data.current_password,
+                new_password: data.new_password,
+                new_password_confirmation: data.new_password_confirmation
+            });
+
+            if (response.success) {
+                // تحديث التوكن في localStorage
+                if (response.data?.token) {
+                    localStorage.setItem('token', response.data.token);
+                }
+
+                alert('Password updated successfully! You have been logged in with your new password.');
+
+                // إعادة تحميل الصفحة لتطبيق التغييرات
+                window.location.reload();
+            }
+        } catch (error: any) {
+            throw error;
+        } finally {
+            setIsUpdatingPassword(false);
         }
     };
 
@@ -385,7 +631,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         };
 
         resetState();
-        
+
         const todayDate = new Date().toISOString().split('T')[0];
         setToday(todayDate);
 
@@ -401,10 +647,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 setIsOwnProfile(true);
                 return;
             }
-            
+
             try {
                 const currentUserId = await getCurrentUserId();
-                
+
                 if (currentUserId) {
                     const isOwn = targetUserId.toString() === currentUserId.toString();
                     setIsOwnProfile(isOwn);
@@ -424,7 +670,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         try {
             setLoading(true);
             setError(null);
-            
+
             let profileResponse: ProfileResponse | UserProfileResponse;
 
             if (targetUserId) {
@@ -432,7 +678,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     profileResponse = await ProfileService.getUserProfileById(targetUserId);
 
                     const currentUserId = await getCurrentUserId();
-                    
+
                     if (currentUserId && currentUserId.toString() === targetUserId.toString()) {
                         setIsOwnProfile(true);
                         localStorage.setItem('user_id', currentUserId.toString());
@@ -446,12 +692,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 }
             } else {
                 profileResponse = await ProfileService.getUserProfile();
-                
+
                 const currentUserId = profileResponse.data.user.id;
                 if (currentUserId) {
                     localStorage.setItem('user_id', currentUserId.toString());
                 }
-                
+
                 setIsOwnProfile(true);
             }
 
@@ -727,6 +973,15 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 <button className="edit-avatar-btn" onClick={handleEditClick}>
                                     <MdEdit style={{ width: 20, height: 20 }} />
                                 </button>
+                                 {/* زر تحديث كلمة السر */}
+                                <button
+                                    className="edit-avatar-btn"
+                                    onClick={() => setShowUpdatePasswordModal(true)}
+                                    disabled={isUpdatingPassword}
+                                >
+                                    <MdLock style={{ width: 20, height: 20 }} />
+                                    {/* {isUpdatingPassword ? 'Updating...' : 'Change Password'} */}
+                                </button>
                             </div>
                         )}
 
@@ -760,7 +1015,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 Member since {formatDate(user.created_at)}
                             </div>
                         </div>
-                        
+
                         <div className="profile-stats">
                             <div className="stat-card">
                                 <div className="stat-number">{stats.followers_count}</div>
@@ -808,20 +1063,14 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                         {/* Simple delete account button - only shows for owner */}
                         {isOwnProfile && (
                             <div className="account-actions-section">
+                                {/* زر حذف الحساب */}
                                 <button
                                     className="btn-delete-account-simple"
                                     onClick={() => setShowDeleteModal(true)}
                                     disabled={isDeletingAccount}
                                 >
                                     <MdDelete style={{ width: 18, height: 18, marginRight: 8 }} />
-                                    {isDeletingAccount ? (
-                                        <>
-                                            <div className="loading-spinner"></div>
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        'Delete Account'
-                                    )}
+                                    {isDeletingAccount ? 'Processing...' : 'Delete Account'}
                                 </button>
                             </div>
                         )}
@@ -869,7 +1118,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
                     {activeTab === 'posts' && (
                         <div className="recent-activity">
-                            <UserPostsFeed 
+                            <UserPostsFeed
                                 userId={targetUserId || ''}
                                 isOwnProfile={isOwnProfile}
                                 onPostDeleted={handlePostDeleted}
@@ -1074,6 +1323,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     </div>
                 </div>
             )}
+
+            {/* Update Password Modal */}
+            <UpdatePasswordModal
+                isOpen={showUpdatePasswordModal}
+                onClose={() => setShowUpdatePasswordModal(false)}
+                onUpdate={handleUpdatePassword}
+            />
 
             {/* Delete Account Modal */}
             <DeleteAccountModal
