@@ -5,7 +5,9 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useSearch } from '@/hooks/use-search';
 import SearchBar from '@/components/shared/SearchBar/SearchBar';
 import Link from 'next/link';
+import PostFeed from '@/components/posts/post-feed/PostFeed';
 import { SearchResponse } from '@/services/api/search/search';
+import styles from './SearchPage.module.css';
 
 export default function SearchPage() {
     const searchParams = useSearchParams();
@@ -38,165 +40,214 @@ export default function SearchPage() {
         }
     };
 
+    const navigateToHome = () => {
+        router.push('/');
+    };
+
     const searchData = results as SearchResponse;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4">
-            <div className="max-w-6xl mx-auto">
+        <div className={styles.searchPage}>
+            <div className={styles.container}>
+                {/* زر العودة للصفحة الرئيسية */}
+                <div className={styles.homeButtonContainer}>
+                    <button 
+                        onClick={navigateToHome}
+                        className={styles.homeButton}
+                    >
+                        ← Back to Home
+                    </button>
+                </div>
+
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                <div className={styles.header}>
+                    <h1 className={styles.title}>
                         {query ? `Search results for "${query}"` : 'Search'}
                     </h1>
-                    <div className="mb-6">
+                    <div className={styles.searchBarWrapper}>
                         <SearchBar initialQuery={query} onSearch={handleSearch} />
                     </div>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex gap-4 mb-6 border-b pb-2">
-                    <button
-                        className={`px-4 py-2 ${activeTab === 'all' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
-                        onClick={() => handleTabChange('all')}
-                    >
-                        All {searchData && `(${searchData.total})`}
-                    </button>
-                    <button
-                        className={`px-4 py-2 ${activeTab === 'users' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
-                        onClick={() => handleTabChange('users')}
-                    >
-                        Users {searchData && `(${searchData.users_count})`}
-                    </button>
-                    <button
-                        className={`px-4 py-2 ${activeTab === 'posts' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
-                        onClick={() => handleTabChange('posts')}
-                    >
-                        Posts {searchData && `(${searchData.posts_count})`}
-                    </button>
-                    <button
-                        className={`px-4 py-2 ${activeTab === 'tags' ? 'border-b-2 border-purple-600 text-purple-600' : 'text-gray-600'}`}
-                        onClick={() => handleTabChange('tags')}
-                    >
-                        Tags {searchData && `(${searchData.tags_count})`}
-                    </button>
+                <div className={styles.tabsContainer}>
+                    <div className={styles.tabs}>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'all' ? styles.activeTab : ''}`}
+                            onClick={() => handleTabChange('all')}
+                        >
+                            <span className={styles.tabLabel}>All</span>
+                            {searchData && <span className={styles.tabCount}>{searchData.total}</span>}
+                        </button>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'users' ? styles.activeTab : ''}`}
+                            onClick={() => handleTabChange('users')}
+                        >
+                            <span className={styles.tabLabel}>Users</span>
+                            {searchData && <span className={styles.tabCount}>{searchData.users_count}</span>}
+                        </button>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'posts' ? styles.activeTab : ''}`}
+                            onClick={() => handleTabChange('posts')}
+                        >
+                            <span className={styles.tabLabel}>Posts</span>
+                            {searchData && <span className={styles.tabCount}>{searchData.posts_count}</span>}
+                        </button>
+                        <button
+                            className={`${styles.tab} ${activeTab === 'tags' ? styles.activeTab : ''}`}
+                            onClick={() => handleTabChange('tags')}
+                        >
+                            <span className={styles.tabLabel}>Tags</span>
+                            {searchData && <span className={styles.tabCount}>{searchData.tags_count}</span>}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Results */}
-                {loading ? (
-                    <div className="text-center py-12">
-                        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-600"></div>
-                        <p className="mt-4 text-gray-600">Searching...</p>
-                    </div>
-                ) : error ? (
-                    <div className="text-center py-12">
-                        <p className="text-red-600">{error}</p>
-                    </div>
-                ) : !query ? (
-                    <div className="text-center py-12">
-                        <p className="text-gray-600">Enter a search term to find posts, users, or tags</p>
-                    </div>
-                ) : searchData && searchData.total === 0 ? (
-                    <div className="text-center py-12">
-                        <p className="text-gray-600">No results found for "{query}"</p>
-                    </div>
-                ) : searchData ? (
-                    <>
-                        {/* Users */}
-                        {(activeTab === 'all' || activeTab === 'users') && 
-                         searchData.results.users.length > 0 && (
-                            <div className="mb-8">
-                                <h2 className="text-xl font-semibold mb-4">Users</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {searchData.results.users.map((user) => (
-                                        <Link
-                                            key={user.id}
-                                            href={`/profile/${user.id}`}
-                                            className="bg-white rounded-lg shadow p-4 hover:shadow-md transition"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <img
-                                                    src={user.image || `https://ui-avatars.com/api/?name=${user.full_name}&background=8b5cf6&color=fff`}
-                                                    alt={user.full_name}
-                                                    className="w-12 h-12 rounded-full"
-                                                />
-                                                <div>
-                                                    <h3 className="font-medium">{user.full_name}</h3>
-                                                    <p className="text-sm text-gray-500">{user.email}</p>
-                                                    {user.bio && (
-                                                        <p className="text-sm text-gray-600 mt-1">
-                                                            {user.bio.length > 60 ? user.bio.substring(0, 60) + '...' : user.bio}
-                                                        </p>
-                                                    )}
+                <div className={styles.resultsContainer}>
+                    {loading ? (
+                        <div className={styles.loadingState}>
+                            <div className={styles.spinner}></div>
+                            <p className={styles.loadingText}>Searching...</p>
+                        </div>
+                    ) : error ? (
+                        <div className={styles.errorState}>
+                            <div className={styles.errorIcon}>⚠️</div>
+                            <h3 className={styles.errorTitle}>Search Error</h3>
+                            <p className={styles.errorMessage}>An error occurred while searching</p>
+                            <button 
+                                onClick={() => search(query, activeTab)}
+                                className={styles.retryButton}
+                            >
+                                Try Again
+                            </button>
+                            <button 
+                                onClick={navigateToHome}
+                                className={styles.homeButtonError}
+                            >
+                                Back to Home
+                            </button>
+                        </div>
+                    ) : !query ? (
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>🔍</div>
+                            <h3 className={styles.emptyTitle}>Start Searching</h3>
+                            <p className={styles.emptyText}>
+                                Enter keywords to find posts, users, or tags
+                            </p>
+                        </div>
+                    ) : searchData && searchData.total === 0 ? (
+                        <div className={styles.noResults}>
+                            <div className={styles.noResultsIcon}>😕</div>
+                            <h3 className={styles.noResultsTitle}>No Results Found</h3>
+                            <p className={styles.noResultsText}>
+                                No results found for "{query}"
+                            </p>
+                            <p className={styles.noResultsHint}>
+                                Try different keywords or search in all categories
+                            </p>
+                        </div>
+                    ) : searchData ? (
+                        <div className={styles.resultsContent}>
+                            {/* Users Section */}
+                            {(activeTab === 'all' || activeTab === 'users') && 
+                             searchData.results.users.length > 0 && (
+                                <div className={styles.section}>
+                                    <div className={styles.sectionHeader}>
+                                        <h2 className={styles.sectionTitle}>Users</h2>
+                                        <span className={styles.sectionCount}>{searchData.users_count} users</span>
+                                    </div>
+                                    <div className={styles.usersGrid}>
+                                        {searchData.results.users.map((user) => (
+                                            <Link
+                                                key={user.id}
+                                                href={`/profile/${user.id}`}
+                                                className={styles.userCard}
+                                            >
+                                                <div className={styles.userCardContent}>
+                                                    <div className={styles.userAvatar}>
+                                                        <img
+                                                            src={user.image || `https://ui-avatars.com/api/?name=${user.full_name}&background=8b5cf6&color=fff`}
+                                                            alt={user.full_name}
+                                                            className={styles.avatarImage}
+                                                        />
+                                                        <div className={styles.onlineStatus}></div>
+                                                    </div>
+                                                    <div className={styles.userInfo}>
+                                                        <h3 className={styles.userName}>{user.full_name}</h3>
+                                                        <p className={styles.userEmail}>{user.email}</p>
+                                                        {user.bio && (
+                                                            <p className={styles.userBio}>
+                                                                {user.bio.length > 80 ? user.bio.substring(0, 80) + '...' : user.bio}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                    <div className={styles.viewProfile}>
+                                                        View Profile
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </Link>
-                                    ))}
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Posts */}
-                        {(activeTab === 'all' || activeTab === 'posts') && 
-                         searchData.results.posts.length > 0 && (
-                            <div className="mb-8">
-                                <h2 className="text-xl font-semibold mb-4">Posts</h2>
-                                <div className="grid grid-cols-1 gap-4">
-                                    {searchData.results.posts.map((post) => (
-                                        <Link
-                                            key={post.id}
-                                            href={`/post/${post.id}`}
-                                            className="bg-white rounded-lg shadow p-4 hover:shadow-md transition"
-                                        >
-                                            <div className="flex items-center gap-3 mb-3">
-                                                <img
-                                                    src={post.user?.image || `https://ui-avatars.com/api/?name=${post.user?.full_name}&background=8b5cf6&color=fff`}
-                                                    alt={post.user?.full_name}
-                                                    className="w-8 h-8 rounded-full"
+                            {/* Posts Section - التصحيح */}
+                            {(activeTab === 'all' || activeTab === 'posts') && 
+                             searchData.results.posts.length > 0 && (
+                                <div className={styles.section}>
+                                    <div className={styles.sectionHeader}>
+                                        <h2 className={styles.sectionTitle}>Posts</h2>
+                                        <span className={styles.sectionCount}>{searchData.posts_count} posts</span>
+                                    </div>
+                                    <div className={styles.postsContainer}>
+                                        {searchData.results.posts.map((post) => (
+                                            <div key={post.id} className={styles.postWrapper}>
+                                                <PostFeed 
+                                                    singlePostMode={true}
+                                                    postId={post.id}
+                                                    hideInfiniteScroll={true}
+                                                    showLoadingOnly={false}
+                                                    isSearchResults={true} // 👈 أضف هذا!
+                                                    initialPosts={[post]}  // 👈 أرسل البيانات مباشرة
                                                 />
-                                                <span className="font-medium">{post.user?.full_name}</span>
                                             </div>
-                                            <h3 className="font-semibold text-lg mb-2">{post.title}</h3>
-                                            <p className="text-gray-600 mb-3">
-                                                {post.caption?.length > 150 ? post.caption.substring(0, 150) + '...' : post.caption}
-                                            </p>
-                                            {post.tags && post.tags.length > 0 && (
-                                                <div className="flex flex-wrap gap-2">
-                                                    {post.tags.map((tag) => (
-                                                        <span 
-                                                            key={tag.id} 
-                                                            className="px-2 py-1 bg-purple-100 text-purple-700 text-sm rounded"
-                                                        >
-                                                            #{tag.tag_name}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </Link>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Tags */}
-                        {(activeTab === 'all' || activeTab === 'tags') && 
-                         searchData.results.tags.length > 0 && (
-                            <div className="mb-8">
-                                <h2 className="text-xl font-semibold mb-4">Tags</h2>
-                                <div className="flex flex-wrap gap-3">
-                                    {searchData.results.tags.map((tag) => (
-                                        <Link
-                                            key={tag.id}
-                                            href={`/tags/${tag.id}`}
-                                            className="bg-white rounded-lg shadow px-4 py-3 hover:shadow-md transition"
-                                        >
-                                            <span className="text-purple-600 font-medium">#{tag.tag_name}</span>
-                                        </Link>
-                                    ))}
+                            {/* Tags Section */}
+                            {(activeTab === 'all' || activeTab === 'tags') && 
+                             searchData.results.tags.length > 0 && (
+                                <div className={styles.section}>
+                                    <div className={styles.sectionHeader}>
+                                        <h2 className={styles.sectionTitle}>Tags</h2>
+                                        <span className={styles.sectionCount}>{searchData.tags_count} tags</span>
+                                    </div>
+                                    <div className={styles.tagsGrid}>
+                                        {searchData.results.tags.map((tag) => (
+                                            <Link
+                                                key={tag.id}
+                                                href={`/tags/${tag.id}`}
+                                                className={styles.tagCard}
+                                            >
+                                                <div className={styles.tagContent}>
+                                                    <div className={styles.tagIcon}>#</div>
+                                                    <div className={styles.tagInfo}>
+                                                        <h3 className={styles.tagName}>{tag.tag_name}</h3>
+                                                        <p className={styles.tagDescription}>Click to explore posts</p>
+                                                    </div>
+                                                    <div className={styles.tagArrow}>→</div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </>
-                ) : null}
+                            )}
+                        </div>
+                    ) : null}
+                </div>
             </div>
         </div>
     );

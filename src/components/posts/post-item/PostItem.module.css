@@ -424,3 +424,15 @@
         min-height: 30px;
     }
 }
+/* في أسفل الملف أضف */
+
+.tag {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tag:hover {
+    background-color: #e0e7ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}

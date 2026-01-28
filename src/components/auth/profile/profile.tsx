@@ -1,6 +1,6 @@
 'use client'
 // components/Profile.tsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './profile.css';
 import ProfileService, {
     UserProfile,
@@ -23,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import PostItem from '@/components/posts/post-item/PostItem';
 import axios from 'axios';
+import UserPostsFeed from '@/components/auth/profile/UserPostsFeed';
 
 type TabType = 'overview' | 'posts' | 'followers' | 'following';
 
@@ -99,13 +100,196 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [today, setToday] = useState('');
 
-    // States for UserPostsFeed
-    const [userPosts, setUserPosts] = useState<ApiPost[]>([]);
-    const [postsLoading, setPostsLoading] = useState(true);
-    const [postsError, setPostsError] = useState<string | null>(null);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const observerRef = useRef<HTMLDivElement>(null);
+    // دالة محسنة لاستخراج الـ ID من التوكن
+    const getCurrentUserIdFromToken = (): string | number | null => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log('❌ لا يوجد توكن في localStorage');
+                return null;
+            }
+            
+            console.log('🔍 فحص التوكن:', token.substring(0, 20) + '...');
+            
+            try {
+                // التحقق من أن التوكن صالح وبتنسيق JWT
+                if (typeof token !== 'string') {
+                    console.log('⚠️ التوكن ليس نصياً');
+                    return null;
+                }
+                
+                // التحقق من أن التوكن يحتوي على نقطتين (JWT format)
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    console.log('⚠️ التوكن ليس بتنسيق JWT صالح');
+                    return null;
+                }
+                
+                // محاولة فك التشفير Base64
+                const payloadBase64 = parts[1];
+                
+                // إضافة padding إذا لزم الأمر
+                const paddedBase64 = payloadBase64.padEnd(payloadBase64.length + (4 - payloadBase64.length % 4) % 4, '=');
+                
+                // فك التشفير
+                const payloadJson = atob(paddedBase64);
+                
+                // تحليل JSON
+                const payload = JSON.parse(payloadJson);
+                console.log('📄 Payload التوكن:', payload);
+                
+                // البحث عن الـ ID في أماكن محتملة
+                const userId = payload.id || payload.user_id || payload.userId || payload.sub || payload.user?.id;
+                
+                if (userId) {
+                    console.log(`✅ تم العثور على ID المستخدم في التوكن: ${userId}`);
+                    return userId;
+                } else {
+                    console.log('⚠️ لم يتم العثور على ID في payload التوكن:', payload);
+                    return null;
+                }
+            } catch (parseError) {
+                console.error('❌ خطأ في تحليل التوكن JWT:', parseError);
+                
+                // محاولة بديلة: البحث مباشرة في التوكن إذا كان JSON
+                try {
+                    if (token.startsWith('{')) {
+                        const parsedToken = JSON.parse(token);
+                        console.log('🔍 التوكن كـ JSON:', parsedToken);
+                        
+                        const userId = parsedToken.id || parsedToken.user_id || parsedToken.userId || 
+                                      parsedToken.sub || parsedToken.user?.id || parsedToken.data?.id;
+                        
+                        if (userId) {
+                            console.log(`✅ تم العثور على ID في JSON التوكن: ${userId}`);
+                            return userId;
+                        }
+                    }
+                    
+                    // إذا لم ينجح أي شيء، حاول استخراج ID من أي مكان في النص
+                    const idMatch = token.match(/"id":\s*"([^"]+)"/) || token.match(/"id":\s*(\d+)/) || 
+                                   token.match(/"user_id":\s*"([^"]+)"/) || token.match(/"user_id":\s*(\d+)/) ||
+                                   token.match(/"userId":\s*"([^"]+)"/) || token.match(/"userId":\s*(\d+)/) ||
+                                   token.match(/"sub":\s*"([^"]+)"/);
+                    
+                    if (idMatch && idMatch[1]) {
+                        console.log(`✅ تم العثور على ID باستخدام regex: ${idMatch[1]}`);
+                        return idMatch[1];
+                    }
+                    
+                    return null;
+                } catch {
+                    console.log('⚠️ التوكن ليس JSON ولا JWT ولا يحتوي على ID واضح');
+                    return null;
+                }
+            }
+        } catch (error) {
+            console.error('❌ خطأ في getCurrentUserIdFromToken:', error);
+            return null;
+        }
+    };
+
+    // دالة بديلة أكثر أماناً لاستخراج ID من التوكن
+    const getCurrentUserIdFromTokenAlternative = (): string | number | null => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return null;
+
+            // طريقة أكثر أماناً مع try-catch متداخل
+            let payload;
+            try {
+                // التحقق من أن token نصي وله طول
+                if (typeof token !== 'string' || token.length < 10) {
+                    console.warn('توكن غير صالح');
+                    return null;
+                }
+
+                // محاولة JWT أولاً
+                const parts = token.split('.');
+                if (parts.length === 3) {
+                    try {
+                        // استخدام decodeURIComponent للتعامل مع ترميز URL
+                        const base64Url = parts[1];
+                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                        }).join(''));
+                        
+                        payload = JSON.parse(jsonPayload);
+                    } catch (jwtError) {
+                        console.warn('فشل تحليل JWT:', jwtError);
+                        payload = null;
+                    }
+                }
+
+                // إذا لم يكن JWT، جرب كـ JSON مباشرة
+                if (!payload && token.startsWith('{')) {
+                    try {
+                        payload = JSON.parse(token);
+                    } catch (jsonError) {
+                        console.warn('فشل تحليل JSON:', jsonError);
+                    }
+                }
+
+                // استخراج ID من payload
+                if (payload) {
+                    return payload.id || payload.user_id || payload.userId || payload.sub || 
+                           payload.user?.id || payload.data?.id;
+                }
+
+                // محاولة أخيرة: البحث عن ID في النص
+                const idRegex = /"id"\s*:\s*"?(\d+)/;
+                const match = token.match(idRegex);
+                if (match) return match[1];
+
+            } catch (innerError) {
+                console.error('خطأ داخلي:', innerError);
+            }
+
+            return null;
+        } catch (error) {
+            console.error('خطأ خارجي:', error);
+            return null;
+        }
+    };
+
+    // التحقق من صحة التوكن
+    const isValidToken = (token: string): boolean => {
+        if (!token || typeof token !== 'string') return false;
+        
+        // التحقق من تنسيق JWT (ثلاثة أجزاء مفصولة بنقاط)
+        const parts = token.split('.');
+        if (parts.length !== 3) return false;
+        
+        // التحقق من أن كل جزء يحتوي على محتوى
+        return parts.every(part => part.length > 0);
+    };
+
+    // الحصول على ID المستخدم الحالي من API مباشرة
+    const getCurrentUserIdFromAPI = async (): Promise<string | number | null> => {
+        try {
+            const response = await ProfileService.getUserProfile();
+            if (response.success && response.data.user.id) {
+                console.log(`✅ تم الحصول على ID من API: ${response.data.user.id}`);
+                return response.data.user.id;
+            }
+            return null;
+        } catch (error) {
+            console.error('❌ خطأ في الحصول على ID من API:', error);
+            return null;
+        }
+    };
+
+    // دالة موحدة للحصول على الـ ID الحالي
+    const getCurrentUserId = async (): Promise<string | number | null> => {
+        // أولاً حاول من التوكن باستخدام الدالة المحسنة
+        const fromToken = getCurrentUserIdFromTokenAlternative();
+        if (fromToken) return fromToken;
+        
+        // إذا لم ينجح، حاول من API
+        const fromAPI = await getCurrentUserIdFromAPI();
+        return fromAPI;
+    };
 
     // إعادة تعيين الحالة عند تغيير المستخدم
     useEffect(() => {
@@ -113,14 +297,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(null);
             setStats(null);
             setProfilePosts([]);
-            setUserPosts([]);
             setLoading(true);
             setError(null);
-            setPostsLoading(true);
-            setPostsError(null);
-            setPage(1);
-            setHasMore(true);
-            setIsOwnProfile(propIsOwnProfile || false);
             setActiveTab('posts');
         };
 
@@ -134,99 +312,34 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, [targetUserId]);
 
-    // التعامل مع تغيير المسار
+    // تحديث حالة isOwnProfile عند تغيير المسار أو المستخدم
     useEffect(() => {
-        if (pathname && pathname.includes('/profile/')) {
-            const urlUserId = params?.id as string;
-            const currentUserId = localStorage.getItem('user_id');
+        const updateOwnProfileStatus = async () => {
+            if (!targetUserId) {
+                setIsOwnProfile(true); // إذا لا يوجد target، فهو البروفايل الشخصي
+                return;
+            }
             
-            if (urlUserId && currentUserId) {
-                const isOwn = urlUserId === currentUserId.toString();
-                console.log(`🔄 تحديث isOwnProfile: ${isOwn} (المستخدم الحالي: ${currentUserId}, المستخدم المستهدف: ${urlUserId})`);
-                setIsOwnProfile(isOwn);
-            }
-        }
-    }, [pathname, params?.id]);
-
-    useEffect(() => {
-        if (targetUserId && activeTab === 'posts') {
-            fetchUserPosts(1, true);
-        }
-    }, [targetUserId, activeTab]);
-
-    // Auto infinite scroll
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !postsLoading) {
-                    loadMore();
-                }
-            },
-            { threshold: 0.5 }
-        );
-
-        if (observerRef.current) {
-            observer.observe(observerRef.current);
-        }
-
-        return () => observer.disconnect();
-    }, [hasMore, postsLoading]);
-
-    const fetchUserPosts = useCallback(async (pageNum: number = 1, isRefresh: boolean = false) => {
-        if (!targetUserId) {
-            setPostsError('No user ID provided');
-            setPostsLoading(false);
-            return;
-        }
-
-        try {
-            setPostsLoading(true);
-            const response = await axios.get<UserPostsResponse>(
-                `http://localhost:8000/api/v1/user/${targetUserId}/posts`,
-                {
-                    params: { page: pageNum },
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                }
-            );
-
-            if (response.data.success) {
-                const newPosts = response.data.data.posts.data;
+            try {
+                const currentUserId = await getCurrentUserId();
+                console.log(`🔄 تحديث isOwnProfile: currentUserId=${currentUserId}, targetUserId=${targetUserId}`);
                 
-                if (isRefresh) {
-                    setUserPosts(newPosts);
+                if (currentUserId) {
+                    const isOwn = targetUserId.toString() === currentUserId.toString();
+                    console.log(`✅ isOwnProfile: ${isOwn}`);
+                    setIsOwnProfile(isOwn);
                 } else {
-                    setUserPosts(prev => [...prev, ...newPosts]);
+                    console.log('❌ لا يمكن تحديد المستخدم الحالي');
+                    setIsOwnProfile(false);
                 }
-                
-                setHasMore(pageNum < response.data.data.posts.last_page);
-                setPage(pageNum + 1);
-                setPostsError(null);
-            } else {
-                setPostsError(response.data.message || 'Failed to fetch user posts');
+            } catch (error) {
+                console.error('❌ خطأ في updateOwnProfileStatus:', error);
+                setIsOwnProfile(false);
             }
-        } catch (err: any) {
-            setPostsError(err.response?.data?.message || 'Error fetching user posts');
-            console.error('Error fetching user posts:', err);
-        } finally {
-            setPostsLoading(false);
-        }
-    }, [targetUserId]);
+        };
 
-    const loadMore = () => {
-        if (!postsLoading && hasMore) {
-            fetchUserPosts(page, false);
-        }
-    };
-
-    const refreshUserPosts = () => {
-        setPage(1);
-        setHasMore(true);
-        fetchUserPosts(1, true);
-    };
+        updateOwnProfileStatus();
+    }, [targetUserId, pathname]);
 
     const fetchProfileData = async () => {
         try {
@@ -241,12 +354,15 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 try {
                     profileResponse = await ProfileService.getUserProfileById(targetUserId);
 
-                    const currentUserId = localStorage.getItem('user_id');
+                    // تحقق من هوية المستخدم الحالي
+                    const currentUserId = await getCurrentUserId();
                     console.log(`👤 المقارنة: المستخدم الحالي=${currentUserId}, المستخدم المستهدف=${targetUserId}`);
                     
                     if (currentUserId && currentUserId.toString() === targetUserId.toString()) {
                         console.log('✅ هذا هو الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(true);
+                        // تحديث localStorage للتوافق مع المكونات الأخرى
+                        localStorage.setItem('user_id', currentUserId.toString());
                     } else {
                         console.log('❌ هذا ليس الملف الشخصي للمستخدم الحالي');
                         setIsOwnProfile(false);
@@ -257,12 +373,17 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     throw new Error('فشل في جلب بروفايل المستخدم');
                 }
             } else {
+                // إذا لم يتم توفير ID، احصل على بروفايل المستخدم الحالي
                 profileResponse = await ProfileService.getUserProfile();
-                setIsOwnProfile(true);
-
-                if (profileResponse.data.user.id) {
-                    localStorage.setItem('user_id', profileResponse.data.user.id.toString());
+                
+                const currentUserId = profileResponse.data.user.id;
+                if (currentUserId) {
+                    // تحديث localStorage للتوافق
+                    localStorage.setItem('user_id', currentUserId.toString());
                 }
+                
+                setIsOwnProfile(true);
+                console.log(`✅ بروفايل المستخدم الحالي، ID: ${currentUserId}`);
             }
 
             if (!profileResponse.success) {
@@ -427,11 +548,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
     const loadOwnProfile = async () => {
         try {
-            const currentId = await ProfileService.getCurrentUserId();
+            const currentId = await getCurrentUserId();
             if (currentId) {
                 router.push(`/profile/${currentId}`);
             } else {
-                router.push('/');
+                router.push('/login');
             }
         } catch (error) {
             console.error('❌ فشل في تحميل البروفايل الشخصي:', error);
@@ -440,21 +561,19 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     };
 
     const handlePostDeleted = (deletedPostId: number) => {
-        // تحديث القائمتين
-        refreshUserPosts();
         setProfilePosts(prev => prev.filter(post => post.id !== deletedPostId));
     };
 
     const handleImagesUpdated = () => {
-        refreshUserPosts();
+        // لا حاجة لتنفيذ أي شيء هنا لأن UserPostsFeed يتعامل مع ذلك
     };
 
     const handlePostUpdated = () => {
-        refreshUserPosts();
+        // لا حاجة لتنفيذ أي شيء هنا لأن UserPostsFeed يتعامل مع ذلك
     };
 
-      const checkIfOwnProfile = () => {
-        const currentUserId = localStorage.getItem('user_id');
+    const checkIfOwnProfile = async () => {
+        const currentUserId = await getCurrentUserId();
         const isOwn = currentUserId && targetUserId && currentUserId.toString() === targetUserId.toString();
         console.log(`🔍 فحص isOwnProfile: ${isOwn} (current: ${currentUserId}, target: ${targetUserId})`);
         return isOwn;
@@ -547,8 +666,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         );
     }
 
-    const finalIsOwnProfile = checkIfOwnProfile();
-
     return (
         <div className="profile-container">
             <div className="profile-content">
@@ -637,8 +754,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                         </div>
                     </div>
                     </div>
-
-                   
                 </div>
 
                 <div className="profile-main">
@@ -682,113 +797,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
                     {activeTab === 'posts' && (
                         <div className="recent-activity">
-                            {postsError ? (
-                                <div style={{
-                                    textAlign: 'center',
-                                    padding: '2rem',
-                                    background: '#fff5f5',
-                                    border: '1px solid #fed7d7',
-                                    borderRadius: '8px',
-                                    marginBottom: '1rem'
-                                }}>
-                                    <p style={{ color: '#e53e3e', marginBottom: '1rem' }}>{postsError}</p>
-                                    <button
-                                        onClick={refreshUserPosts}
-                                        style={{
-                                            background: '#3182ce',
-                                            color: 'white',
-                                            border: 'none',
-                                            padding: '0.75rem 1.5rem',
-                                            borderRadius: '6px',
-                                            cursor: 'pointer'
-                                        }}
-                                    >
-                                        Try Again
-                                    </button>
-                                </div>
-                            ) : (
-                                <>
-                                    {userPosts.length === 0 && !postsLoading ? (
-                                        <div style={{
-                                            textAlign: 'center',
-                                            padding: '3rem 1rem',
-                                            background: '#341c53',
-                                            borderRadius: '12px',
-                                            border: '1px solid #7c3aed'
-                                        }}>
-                                            <p style={{
-                                                fontSize: '1.25rem',
-                                                fontWeight: '600',
-                                                color: '#ffffffff',
-                                                marginBottom: '0.5rem'
-                                            }}>
-                                                There are no posts yet.
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <>
-                                            {userPosts.map((post) => (
-                                                <PostItem 
-                                                    key={post.id} 
-                                                    post={post}
-                                                    onPostDeleted={handlePostDeleted}
-                                                    onImagesUpdated={handleImagesUpdated}
-                                                    onPostUpdated={handlePostUpdated}
-                                                />
-                                            ))}
-
-                                            {postsLoading && (
-                                                <div style={{ textAlign: 'center', padding: '2rem' }}>
-                                                    <div style={{
-                                                        width: '40px',
-                                                        height: '40px',
-                                                        border: '3px solid #e2e8f0',
-                                                        borderTop: '3px solid #3182ce',
-                                                        borderRadius: '50%',
-                                                        animation: 'spin 1s linear infinite',
-                                                        margin: '0 auto 1rem'
-                                                    }}></div>
-                                                    <p>Loading user's posts...</p>
-                                                </div>
-                                            )}
-
-                                            {hasMore && !postsLoading && (
-                                                <div ref={observerRef} style={{ textAlign: 'center', padding: '1rem' }}>
-                                                    <button
-                                                        onClick={loadMore}
-                                                        style={{
-                                                            background: '#edf2f7',
-                                                            color: '#2d3748',
-                                                            border: '1px solid #cbd5e0',
-                                                            padding: '0.75rem 1.5rem',
-                                                            borderRadius: '6px',
-                                                            cursor: 'pointer',
-                                                            fontWeight: '200',
-                                                            transition: 'all 0.2s'
-                                                        }}
-                                                        onMouseOver={(e) => {
-                                                            e.currentTarget.style.background = '#e2e8f0';
-                                                            e.currentTarget.style.borderColor = '#a0aec0';
-                                                        }}
-                                                        onMouseOut={(e) => {
-                                                            e.currentTarget.style.background = '#edf2f7';
-                                                            e.currentTarget.style.borderColor = '#cbd5e0';
-                                                        }}
-                                                    >
-                                                        Load More
-                                                    </button>
-                                                </div>
-                                            )}
-
-                                            {!hasMore && userPosts.length > 0 && (
-                                                <div style={{ textAlign: 'center', padding: '2rem', color: '#718096', fontStyle: 'italic' }}>
-                                                    <p>You've seen all of this user's posts</p>
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                </>
-                            )}
+                            <UserPostsFeed 
+                                userId={targetUserId || ''}
+                                isOwnProfile={isOwnProfile}
+                                onPostDeleted={handlePostDeleted}
+                                onImagesUpdated={handleImagesUpdated}
+                                onPostUpdated={handlePostUpdated}
+                            />
                         </div>
                     )}
 
@@ -877,14 +892,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             </div>
 
                             <div className="form-group">
-                                <label className="form-label">Profile Image URL</label>
-                                <input
-                                    type="url"
+                                <InputField
+                                    label="Profile Image URL"
                                     name="image"
                                     value={editForm.image || ''}
                                     onChange={handleInputChange}
-                                    className="form-input"
-                                    placeholder="https://example.com/your-image.jpg"
+                                    placeholder="Enter your image"
                                 />
                             </div>
 

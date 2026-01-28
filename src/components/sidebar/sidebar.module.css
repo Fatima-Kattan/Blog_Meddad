@@ -278,7 +278,7 @@
 /* الأساسيات */
 .sidebar {
   width: 280px;
-  min-height: 75vh;
+  min-height: 77vh;
   background: #1a0b2e;
   color: white;
   position: sticky;
@@ -791,4 +791,22 @@
 
 .color_icon{
   color: #9763f1;
+}
+
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 258px;
+    padding: 20px 12px;
+    gap: 5px;
+    top: 25%;
+  }}
+
+@media (min-width: 1200px) and (max-width: 1250px) {
+  .sidebar {
+    width: 250px;
+    padding: 24px 12px;
+    gap: 5px;
+    top: 25%;
+    flex: 0 0 246px;
+  }
 }

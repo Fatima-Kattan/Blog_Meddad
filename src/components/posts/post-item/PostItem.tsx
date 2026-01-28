@@ -1,4 +1,3 @@
-// src/components/posts/post-item/PostItem.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,10 +6,10 @@ import PostContent from '../post-content/PostContent';
 import PostImages from '../post-images/PostImages';
 import UpdatePost from '../update-post/UpdatePost';
 import PostCommentsModal from '../post-comments/PostCommentsModal';
+import TagPostsModal from '../tag-posts-modal/TagPostsModal'; 
 import { useUserData } from '@/hooks/useUserData';
 import styles from './PostItem.module.css';
 import LikeButton from '@/components/likes/LikeButton';
-import Link from 'next/link';
 import likesService from '@/services/api/likes/likesService';
 import LikesModal from '@/components/likes/LikesModal';
 
@@ -34,7 +33,6 @@ interface PostItemProps {
             tag_name: string;
         }>;
     };
-
     onPostDeleted?: (postId: number) => void;
     onImagesUpdated?: () => void;
     onPostUpdated?: (updatedPost?: any) => void;
@@ -46,7 +44,10 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     const [commentsCount, setCommentsCount] = useState(post.comments_count);
     const [showUpdateModal, setShowUpdateModal] = useState(false);
     const [showCommentsModal, setShowCommentsModal] = useState(false);
+    const [showTagModal, setShowTagModal] = useState(false);
+    const [selectedTag, setSelectedTag] = useState<string>('');
     const [currentPost, setCurrentPost] = useState(post);
+    const [isLikesModalOpen, setIsLikesModalOpen] = useState(false);
 
     const { userData } = useUserData();
     const isCurrentUser = userData?.id === post.user.id;
@@ -54,35 +55,28 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
     useEffect(() => {
         const checkLikeStatus = async () => {
             try {
-                console.log('Checking like status for post:', post.id);
-                console.log('Current user ID:', userData?.id); // 🔍 تأكد من user ID
-
-                // 1. تأكد إنه في user مسجل دخول
+                
                 if (!userData?.id) {
                     setIsLiked(false);
                     return;
                 }
 
-                // 2. جيب من localStorage بحسب user ID
+                
                 const likedKey = `liked_posts_user_${userData.id}`;
                 const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
                 const isLikedLocally = likedPosts.includes(post.id);
 
                 if (isLikedLocally) {
                     setIsLiked(true);
-                    console.log(`Found in localStorage for user ${userData.id}: liked`);
                     return;
                 }
 
-                // 3. إذا مش موجود في localStorage، روح جيب من API
+                
                 const isLikedFromAPI = await likesService.checkUserLike(post.id);
-                console.log('From API:', isLikedFromAPI);
                 setIsLiked(isLikedFromAPI);
 
-                // 4. خزن في localStorage بحسب user ID
+                
                 if (isLikedFromAPI) {
-                    const likedKey = `liked_posts_user_${userData.id}`;
-                    const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
                     if (!likedPosts.includes(post.id)) {
                         likedPosts.push(post.id);
                         localStorage.setItem(likedKey, JSON.stringify(likedPosts));
@@ -95,7 +89,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         };
 
         checkLikeStatus();
-    }, [post.id, userData?.id]); // ⭐ اضف userData?.id للـ dependencies
+    }, [post.id, userData?.id]);
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString);
@@ -114,25 +108,21 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         });
     };
 
-    // ⭐ دالة لاستخراج التاغات من النص
+    
     const extractTagsFromText = (text: string): string[] => {
         if (!text) return [];
-
         const hashtagRegex = /#(\w+)/g;
         const matches = text.match(hashtagRegex);
-
         if (!matches) return [];
-
-        // إزالة علامة # والحصول على اسم التاغ فقط
         return matches.map(tag => tag.substring(1));
     };
 
-    // ⭐ دالة لاستخراج التاغات الفريدة (من API أو النص)
+    
     const getUniqueTags = () => {
         const allTags = new Set<string>();
         const uniqueTags: Array<{ id: number, name: string, source: 'api' | 'text' }> = [];
 
-        // جمع التاغات من API أولاً
+        
         if (currentPost.tags && currentPost.tags.length > 0) {
             currentPost.tags.forEach(tag => {
                 if (!allTags.has(tag.tag_name.toLowerCase())) {
@@ -146,9 +136,9 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
             });
         }
 
-        // جمع التاغات من النص (تجاهل المكررة)
+        
         const textTags = extractTagsFromText(currentPost.caption);
-        let textTagId = 1000; // ID مؤقت للتاغات من النص
+        let textTagId = 1000;
 
         textTags.forEach(tag => {
             if (!allTags.has(tag.toLowerCase())) {
@@ -166,6 +156,18 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
 
     const uniqueTags = getUniqueTags();
 
+    
+    const handleTagClick = (tagName: string) => {
+        setSelectedTag(tagName);
+        setShowTagModal(true);
+    };
+
+    
+    const handleTagModalClose = () => {
+        setShowTagModal(false);
+        setSelectedTag('');
+    };
+
     const handleCommentsClick = () => {
         setShowCommentsModal(true);
     };
@@ -174,19 +176,16 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
         setShowUpdateModal(true);
     };
 
+    const handleLikesModalOpen = () => {
+        setIsLikesModalOpen(true);
+    };
+
+    const handleLikesModalClose = () => {
+        setIsLikesModalOpen(false);
+    };
+
     const handleCommentAdded = () => {
         setCommentsCount(prev => prev + 1);
-    };
-
-    
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const handleOpenModal = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
     };
 
     const handlePostUpdateSuccess = (updatedPost?: any) => {
@@ -215,29 +214,26 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
 
         if (onPostUpdated) {
             onPostUpdated(updatedPost);
-        } else {
-            console.warn('⚠️ onPostUpdated prop is not provided to PostItem');
         }
     };
 
-    // دالة تحديث عدد الإعجابات
     const handleLikeUpdate = (newCount: number, liked: boolean) => {
         setLikesCount(newCount);
         setIsLiked(liked);
 
-        // تحديث localStorage بحسب user ID
+        
         if (userData?.id) {
             try {
                 const likedKey = `liked_posts_user_${userData.id}`;
                 const likedPosts = JSON.parse(localStorage.getItem(likedKey) || '[]');
 
                 if (liked) {
-                    // أضف إذا مش موجود
+                    
                     if (!likedPosts.includes(post.id)) {
                         likedPosts.push(post.id);
                     }
                 } else {
-                    // شيل إذا موجود
+                    
                     const index = likedPosts.indexOf(post.id);
                     if (index > -1) {
                         likedPosts.splice(index, 1);
@@ -245,19 +241,16 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 }
 
                 localStorage.setItem(likedKey, JSON.stringify(likedPosts));
-                console.log(`Updated localStorage for user ${userData.id}, post: ${post.id}, liked: ${liked}`);
             } catch (error) {
                 console.error('Error updating localStorage:', error);
             }
-        } else {
-            console.warn('No user ID available for localStorage update');
         }
     };
 
     return (
         <>
             <article className={styles.postContainer}>
-
+                
                 <PostHeader
                     user={currentPost.user}
                     postDate={formatDate(currentPost.created_at)}
@@ -268,14 +261,14 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     onEditPost={handleEditClick}
                 />
 
-
-                <PostContent
-                    title={currentPost.title}
+                
+                <PostContent 
+                    title={currentPost.title} 
                     caption={currentPost.caption}
+                    onTagClick={handleTagClick}
                 />
-
-
-
+                
+                
                 {uniqueTags.length > 0 && (
                     <div className={styles.tagsContainer}>
                         <div className={styles.tagsLabel}></div>
@@ -284,6 +277,8 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                                 <span
                                     key={`${tag.source}-${tag.id}`}
                                     className={`${styles.tag} ${tag.source === 'api' ? styles.tagApi : styles.tagText}`}
+                                    onClick={() => handleTagClick(tag.name)}
+                                    style={{ cursor: 'pointer' }}
                                 >
                                     #{tag.name}
                                 </span>
@@ -301,32 +296,32 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 )}
 
                 <div className={styles.postStats}>
-                    {/* زر الإعجاب */}
-                    <LikeButton
-                        postId={post.id}
-                        initialLikesCount={likesCount}
-                        isInitiallyLiked={isLiked}
-                        onLikeUpdate={handleLikeUpdate}
-                    />
-
-
-                    <div
+                    <div onClick={handleLikesModalOpen} style={{ cursor: 'pointer' }}>
+                        <LikeButton
+                            postId={post.id}
+                            initialLikesCount={likesCount}
+                            isInitiallyLiked={isLiked}
+                            onLikeUpdate={handleLikeUpdate}
+                        />
+                    </div>
+                    
+                    <div 
                         className={styles.statItem}
                         onClick={handleCommentsClick}
-
+                        style={{ cursor: 'pointer' }}
                     >
                         <span className={styles.statIcon}>💬</span>
                         <span className={styles.statCount}>{commentsCount}</span>
                         <span className={styles.statLabel}>Comments</span>
                     </div>
-
-<LikesModal
-                postId={post.id.toString()}
-                postTitle={post.title}
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-            />
                 </div>
+
+                <LikesModal
+                    postId={post.id.toString()}
+                    postTitle={post.title}
+                    isOpen={isLikesModalOpen}
+                    onClose={handleLikesModalClose}
+                />
 
                 <div className={styles.commentPlaceholder}>
                     <button
@@ -338,8 +333,7 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                 </div>
             </article>
 
-                
-
+            {/* Modals */}
             {showUpdateModal && (
                 <UpdatePost
                     post={currentPost}
@@ -354,6 +348,15 @@ const PostItem = ({ post, onPostDeleted, onImagesUpdated, onPostUpdated }: PostI
                     isOpen={showCommentsModal}
                     onClose={() => setShowCommentsModal(false)}
                     onCommentAdded={handleCommentAdded}
+                />
+            )}
+
+            
+            {showTagModal && (
+                <TagPostsModal
+                    tagName={selectedTag}
+                    isOpen={showTagModal}
+                    onClose={handleTagModalClose}
                 />
             )}
         </>

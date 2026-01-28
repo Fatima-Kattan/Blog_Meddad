@@ -115,13 +115,20 @@ a.secondary {
   overflow-y: hidden;
 }
 
+@media (min-width: 1200px) and (max-width: 1250px){
+  .leftSidebar{
+    flex: 0 0 245px;
+  }
+}
+
 /* المحتوى الرئيسي */
 .contentSection {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 /* الشريط الجانبي الأيمن */
@@ -137,7 +144,7 @@ a.secondary {
 .mainContent {
   display: flex;
   padding: 20px 10px;
-  gap: 15px;
+  gap: 10px;
   min-height: calc(100vh - 140px);
   /* ارتفاع مناسب */
   align-items: flex-start;

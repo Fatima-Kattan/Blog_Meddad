@@ -182,7 +182,7 @@ const Navbar = () => {
     const handleProfileMenuClick = () => {
         // افتح القائمة فوراً
         setShowProfileMenu(!showProfileMenu);
-        
+
         // إذا بتفتح القائمة وكانت البيانات قديمة
         if (!showProfileMenu) {
             const now = new Date();
@@ -264,30 +264,44 @@ const Navbar = () => {
             label: 'Profile',
             icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
         },
-        { id: 'posts', href: '/posts', label: 'Posts', icon: <FaFeatherAlt size={22} /> },
+        { id: 'posts', href: '#', label: 'MyPosts', icon: <FaFeatherAlt size={22} /> }, // ⭐⭐ غير هنا!
     ];
 
     // ⭐⭐ **تعديل handleTabClick** ⭐⭐
     const handleTabClick = useCallback(async (tabId: string, href: string) => {
         setActiveTab(tabId);
-        
+
         // ⭐⭐ التعامل الخاص بالبروفايل من القائمة السفلية
         if (tabId === 'profile') {
             // ⭐⭐ تأكد من إزالة العلامة إذا فُتح من الأسفل
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('profileOpenedFromTop');
             }
-            
+
             const userId = getCurrentUserId();
             if (userId) {
                 router.push(`/profile/${userId}`);
             }
-            
+
             setIsMenuOpen(false);
             setShowProfileMenu(false);
             return;
         }
-        
+
+        if (tabId === 'posts') {
+            const userId = getCurrentUserId();
+            if (userId) {
+                router.push(`/myPost/${userId}`);
+            } else {
+                // إذا لم يكن مسجل دخول، أرسله لصفحة تسجيل الدخول
+                router.push('/login');
+            }
+
+            setIsMenuOpen(false);
+            setShowProfileMenu(false);
+            return;
+        }
+
         // لباقي التبويبات
         router.push(href);
         setIsMenuOpen(false);
@@ -333,7 +347,20 @@ const Navbar = () => {
                     <div className={styles.leftSection}>
                         <div className={styles.logo}>
                             <div className={styles.logoIcon}>
-                                <FaMagic size={24} />
+                                {/*  <FaMagic size={24} /> */}
+                                <svg
+                                    version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="40"
+                                    height="40"
+                                    viewBox="-5.12 -5.12 522.24 522.24"
+                                    fill="#814aec"
+                                >
+                                    <g>
+                                        <path d="M421.073,221.719c-0.578,11.719-9.469,26.188-23.797,40.094v183.25c-0.016,4.719-1.875,8.719-5.016,11.844 c-3.156,3.063-7.25,4.875-12.063,4.906H81.558c-4.781-0.031-8.891-1.844-12.047-4.906c-3.141-3.125-4.984-7.125-5-11.844V152.219 c0.016-4.703,1.859-8.719,5-11.844c3.156-3.063,7.266-4.875,12.047-4.906h158.609c12.828-16.844,27.781-34.094,44.719-49.906 c0.078-0.094,0.141-0.188,0.219-0.281H81.558c-18.75-0.016-35.984,7.531-48.25,19.594c-12.328,12.063-20.016,28.938-20,47.344 v292.844c-0.016,18.406,7.672,35.313,20,47.344C45.573,504.469,62.808,512,81.558,512h298.641c18.781,0,36.016-7.531,48.281-19.594 c12.297-12.031,20-28.938,19.984-47.344V203.469c0,0-0.125-0.156-0.328-0.313C440.37,209.813,431.323,216.156,421.073,221.719z" />
+                                        <path d="M498.058,0c0,0-15.688,23.438-118.156,58.109C275.417,93.469,211.104,237.313,211.104,237.313 c-15.484,29.469-76.688,151.906-76.688,151.906c-16.859,31.625,14.031,50.313,32.156,17.656 c34.734-62.688,57.156-119.969,109.969-121.594c77.047-2.375,129.734-69.656,113.156-66.531c-21.813,9.5-69.906,0.719-41.578-3.656 c68-5.453,109.906-56.563,96.25-60.031c-24.109,9.281-46.594,0.469-51-2.188C513.386,138.281,498.058,0,498.058,0z" />
+                                    </g>
+                                </svg>
                             </div>
                             <span className={styles.logoText}>WeShare</span>
                         </div>
@@ -359,7 +386,20 @@ const Navbar = () => {
                     <div className={styles.leftSection}>
                         <Link href="/" className={styles.logo}>
                             <div className={styles.logoIcon}>
-                                <FaMagic size={24} />
+                                {/* <FaMagic size={24} /> */}
+                                <svg
+                                    version="1.1"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="40"
+                                    height="40"
+                                    viewBox="-5.12 -5.12 522.24 522.24"
+                                    fill="#814aec"
+                                >
+                                    <g>
+                                        <path d="M421.073,221.719c-0.578,11.719-9.469,26.188-23.797,40.094v183.25c-0.016,4.719-1.875,8.719-5.016,11.844 c-3.156,3.063-7.25,4.875-12.063,4.906H81.558c-4.781-0.031-8.891-1.844-12.047-4.906c-3.141-3.125-4.984-7.125-5-11.844V152.219 c0.016-4.703,1.859-8.719,5-11.844c3.156-3.063,7.266-4.875,12.047-4.906h158.609c12.828-16.844,27.781-34.094,44.719-49.906 c0.078-0.094,0.141-0.188,0.219-0.281H81.558c-18.75-0.016-35.984,7.531-48.25,19.594c-12.328,12.063-20.016,28.938-20,47.344 v292.844c-0.016,18.406,7.672,35.313,20,47.344C45.573,504.469,62.808,512,81.558,512h298.641c18.781,0,36.016-7.531,48.281-19.594 c12.297-12.031,20-28.938,19.984-47.344V203.469c0,0-0.125-0.156-0.328-0.313C440.37,209.813,431.323,216.156,421.073,221.719z" />
+                                        <path d="M498.058,0c0,0-15.688,23.438-118.156,58.109C275.417,93.469,211.104,237.313,211.104,237.313 c-15.484,29.469-76.688,151.906-76.688,151.906c-16.859,31.625,14.031,50.313,32.156,17.656 c34.734-62.688,57.156-119.969,109.969-121.594c77.047-2.375,129.734-69.656,113.156-66.531c-21.813,9.5-69.906,0.719-41.578-3.656 c68-5.453,109.906-56.563,96.25-60.031c-24.109,9.281-46.594,0.469-51-2.188C513.386,138.281,498.058,0,498.058,0z" />
+                                    </g>
+                                </svg>
                             </div>
                             <span className={styles.logoText}>WeShare</span>
                         </Link>
@@ -372,12 +412,12 @@ const Navbar = () => {
 
                     {/* الجزء الأيمن: أيقونات */}
                     <div className={styles.rightSection}>
-                        
+
 
                         {/* إشعارات (في الجزء العلوي للأجهزة الكبيرة فقط) */}
                         {isAuthenticated && (
                             <div className={styles.notificationContainer}>
-                                <NotificationIcon/>
+                                <NotificationIcon />
                             </div>
                         )}
 
@@ -414,7 +454,7 @@ const Navbar = () => {
                                             <div className={styles.profileInfo}>
                                                 <h4>{currentUser?.full_name || 'User'}</h4>
                                                 <p>{currentUser?.email || 'No email'}</p>
-                                                
+
                                             </div>
                                         </div>
 
@@ -428,13 +468,13 @@ const Navbar = () => {
                                                 if (typeof window !== 'undefined') {
                                                     localStorage.setItem('profileOpenedFromTop', 'true');
                                                 }
-                                                
+
                                                 // انتقل إلى صفحة البروفايل
                                                 const userId = getCurrentUserId();
                                                 if (userId) {
                                                     router.push(`/profile/${userId}`);
                                                 }
-                                                
+
                                                 // أغلق القائمة المنسدلة
                                                 setShowProfileMenu(false);
                                             }}
@@ -442,14 +482,20 @@ const Navbar = () => {
                                             <RiUserStarLine size={20} />
                                             <span>My Profile</span>
                                         </button>
-                                        <Link
-                                            href="/posts"
+                                        {/* ⭐⭐ تعديل هنا! ⭐⭐ */}
+                                        <button
                                             className={styles.menuItem}
-                                            onClick={() => setShowProfileMenu(false)}
+                                            onClick={() => {
+                                                const userId = getCurrentUserId();
+                                                if (userId) {
+                                                    router.push(`/myPost/${userId}`);
+                                                }
+                                                setShowProfileMenu(false);
+                                            }}
                                         >
                                             <FaFeatherAlt size={20} />
                                             <span>My Posts</span>
-                                        </Link>
+                                        </button>
 
                                         <div className={styles.menuDivider} />
 
@@ -549,7 +595,7 @@ const Navbar = () => {
                                         if (typeof window !== 'undefined') {
                                             localStorage.setItem('profileOpenedFromTop', 'true');
                                         }
-                                        
+
                                         const userId = getCurrentUserId();
                                         if (userId) {
                                             router.push(`/profile/${userId}`);
@@ -563,8 +609,8 @@ const Navbar = () => {
                                     Profile
                                 </button>
 
-                                {/* روابط أخرى */}
-                                {navLinks.filter(link => link.id !== 'profile').map((link) => (
+                                {/* ⭐⭐ تعديل هنا! ⭐⭐ */}
+                                {navLinks.filter(link => link.id !== 'profile' && link.id !== 'posts').map((link) => (
                                     <Link
                                         key={link.id}
                                         href={link.href}
@@ -579,6 +625,25 @@ const Navbar = () => {
                                         {link.label}
                                     </Link>
                                 ))}
+
+                                {/* ⭐⭐ رابط Posts خاص في قائمة الجوال ⭐⭐ */}
+                                <button
+                                    className={`${styles.mobileLink} ${activeTab === 'posts' ? styles.active : ''}`}
+                                    onClick={() => {
+                                        const userId = getCurrentUserId();
+                                        if (userId) {
+                                            router.push(`/myPost/${userId}`);
+                                            setActiveTab('posts');
+                                            setIsMenuOpen(false);
+                                            setShowProfileMenu(false);
+                                        }
+                                    }}
+                                >
+                                    <span className={styles.mobileLinkIcon}>
+                                        <FaFeatherAlt size={24} />
+                                    </span>
+                                    Posts
+                                </button>
 
                                 <div className={styles.mobileDivider} />
 

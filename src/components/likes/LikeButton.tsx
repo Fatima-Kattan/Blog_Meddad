@@ -24,11 +24,6 @@ export default function LikeButton({
 
     // تحديث مباشر مع القيم الأولية
     useEffect(() => {
-        console.log('LikeButton: initial state', {
-            initialLikesCount,
-            isInitiallyLiked,
-            postId
-        });
         setLikesCount(initialLikesCount);
         setIsLiked(isInitiallyLiked);
     }, [initialLikesCount, isInitiallyLiked, postId]);
@@ -50,13 +45,6 @@ export default function LikeButton({
             // تحديث مباشر بدون انتظار
             const newLiked = !isLiked;
             const newCount = newLiked ? likesCount + 1 : likesCount - 1;
-
-            console.log('Toggling like:', {
-                from: isLiked,
-                to: newLiked,
-                countFrom: likesCount,
-                countTo: newCount
-            });
 
             // تحديث الواجهة فوراً
             setLikesCount(newCount);
@@ -80,8 +68,6 @@ export default function LikeButton({
     // دالة لإرسال الطلب للـ API في الخلفية
     const sendLikeRequest = async (postId: number, token: string, expectedLiked: boolean, expectedCount: number) => {
         try {
-            console.log('Sending API request for post:', postId);
-
             const response = await fetch('http://localhost:8000/api/v1/likes/toggle', {
                 method: 'POST',
                 headers: {
@@ -92,7 +78,6 @@ export default function LikeButton({
             });
 
             const data = await response.json();
-            console.log('API response:', data);
 
             if (!response.ok || !data.success) {
                 console.error('API request failed:', data.message);
@@ -104,9 +89,6 @@ export default function LikeButton({
             // إذا نجح الـ API، تأكدي من أن القيم متطابقة
             const apiLiked = data.action === 'added';
             const apiCount = data.data?.likes_count || expectedCount;
-
-            console.log('API returned:', { apiLiked, apiCount, expectedLiked, expectedCount });
-
             if (apiLiked !== expectedLiked || apiCount !== expectedCount) {
                 // إذا في اختلاف، عدلي الواجهة لتتطابق مع الـ API
                 console.log('Updating UI to match API');
@@ -128,14 +110,6 @@ export default function LikeButton({
     const revertChanges = (postId: number, expectedLiked: boolean, expectedCount: number) => {
         const revertedLiked = !expectedLiked;
         const revertedCount = revertedLiked ? expectedCount + 1 : expectedCount - 1;
-
-        console.log('Reverting changes:', {
-            postId,
-            from: expectedLiked,
-            to: revertedLiked,
-            countFrom: expectedCount,
-            countTo: revertedCount
-        });
 
         setLikesCount(revertedCount);
         setIsLiked(revertedLiked);
