@@ -29,7 +29,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" dir="ltr">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body 
+        className={`${geistSans.variable} ${geistMono.variable}`}
+        suppressHydrationWarning 
+      >
         <NotificationsProvider>
           <ConditionalNavbar />
           <main>{children}</main>
