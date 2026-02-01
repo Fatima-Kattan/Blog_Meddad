@@ -255,6 +255,7 @@
     border-color: rgba(138, 43, 226, 0.6);
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(138, 43, 226, 0.2);
+    cursor: pointer;
 }
 
 .filterSelect:focus,
@@ -272,6 +273,7 @@
     color: #f3e8ff;
     padding: 12px;
 }
+
 
 .filterDate::-webkit-calendar-picker-indicator {
     filter: invert(0.5) sepia(1) saturate(20) hue-rotate(260deg);
@@ -326,6 +328,8 @@
         #9a3bf2 0%, 
         #7a2bd2 50%,
         #9a3bf2 100%);
+        cursor: pointer;
+
 }
 
 .filterButton:active {
