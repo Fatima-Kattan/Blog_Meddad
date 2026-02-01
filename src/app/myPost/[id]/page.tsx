@@ -424,21 +424,7 @@ export default function MyPostsPage() {
                                 <div className={styles.contentMain}>
                                     {postsData && postsData.data && postsData.data.length > 0 ? (
                                         <>
-                                            {/* Load All Button */}
-                                            {hasMore && postsData.data.length === 10 && (
-                                                <div className={styles.initialLoadInfo}>
-                                                    <p className={styles.initialLoadText}>
-                                                        Showing first 10 of {postsData.total} posts
-                                                    </p>
-                                                    <button 
-                                                        onClick={handleLoadAll}
-                                                        className={styles.loadAllButton}
-                                                        disabled={loadingMore}
-                                                    >
-                                                        {loadingMore ? 'Loading...' : 'Load All Posts'}
-                                                    </button>
-                                                </div>
-                                            )}
+                                            
 
                                             {/* User Posts Feed */}
                                             <UserPostsFeed
@@ -462,28 +448,7 @@ export default function MyPostsPage() {
                                                 loadingExternal={loadingMore}
                                             />
                                             
-                                            {/* Manual Load More Button */}
-                                            {hasMore && (
-                                                <div className={styles.manualLoadMore}>
-                                                    <button
-                                                        onClick={handleLoadMore}
-                                                        disabled={loadingMore}
-                                                        className={styles.manualLoadButton}
-                                                    >
-                                                        {loadingMore ? (
-                                                            <>
-                                                                <div className={styles.smallSpinner}></div>
-                                                                Loading...
-                                                            </>
-                                                        ) : (
-                                                            `Load More (${postsData.total - postsData.data.length} remaining)`
-                                                        )}
-                                                    </button>
-                                                    <p className={styles.scrollHint}>
-                                                        ⬇️ Or scroll down for automatic loading
-                                                    </p>
-                                                </div>
-                                            )}
+                                            
                                         </>
                                     ) : (
                                         <div className={styles.noPosts}>
@@ -544,56 +509,14 @@ export default function MyPostsPage() {
                                         </div>
                                     </div>
                                     
-                                    {/* Loading Info */}
-                                    {postsData && (
-                                        <div className={styles.sidebarCard}>
-                                            <div className={styles.sidebarHeader}>
-                                                <FaEye className={styles.sidebarIcon} />
-                                                <h4 className={styles.sidebarTitle}>Loading Info</h4>
-                                            </div>
-                                            <div className={styles.loadingInfo}>
-                                                <div className={styles.infoRow}>
-                                                    <span className={styles.infoLabel}>Initial Load:</span>
-                                                    <span className={styles.infoValue}>10 posts</span>
-                                                </div>
-                                                <div className={styles.infoRow}>
-                                                    <span className={styles.infoLabel}>Currently Showing:</span>
-                                                    <span className={styles.infoValue}>
-                                                        {postsData.data.length} posts
-                                                    </span>
-                                                </div>
-                                                <div className={styles.infoRow}>
-                                                    <span className={styles.infoLabel}>Remaining:</span>
-                                                    <span className={styles.infoValue}>
-                                                        {postsData.total - postsData.data.length} posts
-                                                    </span>
-                                                </div>
-                                                <div className={styles.infoRow}>
-                                                    <span className={styles.infoLabel}>Auto Load:</span>
-                                                    <span className={styles.infoValue}>
-                                                        {hasMore ? 'Active (scroll)' : 'Complete'}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Floating Stats */}
-                {postsData && hasMore && (
-                    <div className={styles.floatingStats}>
-                        <div className={styles.floatingContent}>
-                            <FaFire className={styles.floatingIcon} />
-                            <span className={styles.floatingText}>
-                                <strong>{postsData.data.length}</strong> of <strong>{postsData.total}</strong> posts loaded
-                            </span>
-                        </div>
-                    </div>
-                )}
+                
             </main>
         </div>
     );
