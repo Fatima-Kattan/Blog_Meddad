@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PostItem from '@/components/posts/post-item/PostItem';
 import axios from 'axios';
 
-// تعريف الأنواع (Interfaces)
+// تعريف الأنواع
 export interface ApiPost {
     id: number;
     user_id: number;
@@ -25,66 +25,63 @@ export interface ApiPost {
     tags: any[];
 }
 
-export interface UserPostsResponse {
-    success: boolean;
-    data: {
-        user: {
-            id: number;
-            full_name: string;
-            image: string;
-            bio: string;
-            created_at: string;
-        };
-        posts: {
-            current_page: number;
-            data: ApiPost[];
-            total: number;
-            last_page: number;
-        };
-        stats: {
-            total_posts: number;
-            total_likes: number;
-            total_comments: number;
-        };
-    };
-    message: string;
-}
-
 interface UserPostsFeedProps {
     userId: string | number;
     isOwnProfile?: boolean;
+    posts?: ApiPost[]; // ⭐ البيانات الخارجية الأولية
+    externalPagination?: {
+        current_page: number;
+        last_page: number;
+        total: number;
+        per_page: number;
+    };
+    useExternalData?: boolean;
+    filter?: string;
+    sort?: string;
     onPostDeleted?: (deletedPostId: number) => void;
     onImagesUpdated?: () => void;
     onPostUpdated?: () => void;
+    onRefreshNeeded?: () => void;
+    onLoadMore?: () => Promise<void>; // ⭐ دالة جديدة لتحميل المزيد من البيانات الخارجية
+    hasMoreExternal?: boolean; // ⭐ معرفة إذا كان هناك المزيد في البيانات الخارجية
+    loadingExternal?: boolean; // ⭐ حالة التحميل للبيانات الخارجية
 }
 
 const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
     userId,
     isOwnProfile = false,
+    posts = [],
+    externalPagination,
+    useExternalData = false,
+    filter = 'all',
+    sort = 'newest',
     onPostDeleted,
     onImagesUpdated,
-    onPostUpdated
+    onPostUpdated,
+    onRefreshNeeded,
+    onLoadMore, // ⭐ Prop جديد
+    hasMoreExternal = false, // ⭐ قيمة افتراضية
+    loadingExternal = false // ⭐ قيمة افتراضية
 }) => {
     // States
-    const [userPosts, setUserPosts] = useState<ApiPost[]>([]);
-    const [postsLoading, setPostsLoading] = useState(true);
+    const [userPosts, setUserPosts] = useState<ApiPost[]>(useExternalData ? posts : []);
+    const [postsLoading, setPostsLoading] = useState(!useExternalData);
     const [postsError, setPostsError] = useState<string | null>(null);
     const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [hasMore, setHasMore] = useState(!useExternalData);
+    const [loadingMore, setLoadingMore] = useState(false);
     const observerRef = useRef<HTMLDivElement>(null);
 
-    // Fetch posts function
+    // ⭐ دالة الجلب للبروفايل العادي
     const fetchUserPosts = useCallback(async (pageNum: number = 1, isRefresh: boolean = false) => {
-        if (!userId) {
-            setPostsError('No user ID provided');
-            setPostsLoading(false);
-            return;
-        }
+        if (!userId || useExternalData) return;
 
         try {
-            setPostsLoading(true);
-            const response = await axios.get<UserPostsResponse>(
-                `http://localhost:8000/api/v1/user/${userId}/posts`,
+            setPostsLoading(pageNum === 1);
+            setLoadingMore(pageNum > 1);
+            
+            const response = await axios.get(
+                `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/user/${userId}/posts`,
                 {
                     params: { page: pageNum },
                     headers: {
@@ -98,7 +95,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
             if (response.data.success) {
                 const newPosts = response.data.data.posts.data;
                 
-                if (isRefresh) {
+                if (isRefresh || pageNum === 1) {
                     setUserPosts(newPosts);
                 } else {
                     setUserPosts(prev => [...prev, ...newPosts]);
@@ -115,22 +112,20 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
             console.error('Error fetching user posts:', err);
         } finally {
             setPostsLoading(false);
+            setLoadingMore(false);
         }
-    }, [userId]);
+    }, [userId, useExternalData]);
 
-    // Load more function
-    const loadMore = () => {
-        if (!postsLoading && hasMore) {
-            fetchUserPosts(page, false);
+    // ⭐ تحديث البوستات عندما تتغير props الخارجية
+    useEffect(() => {
+        if (useExternalData) {
+            console.log('External posts updated:', posts);
+            setUserPosts(posts);
+            setPostsLoading(false);
+            setPostsError(null);
+            // ⭐ لا نغير hasMore هنا، نستخدم hasMoreExternal
         }
-    };
-
-    // Refresh function
-    const refreshUserPosts = useCallback(() => {
-        setPage(1);
-        setHasMore(true);
-        fetchUserPosts(1, true);
-    }, [fetchUserPosts]);
+    }, [posts, useExternalData]);
 
     // Event handlers
     const handlePostDeleted = (deletedPostId: number) => {
@@ -138,35 +133,79 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
         if (onPostDeleted) {
             onPostDeleted(deletedPostId);
         }
+        if (onRefreshNeeded) {
+            onRefreshNeeded();
+        }
     };
 
     const handleImagesUpdated = () => {
-        refreshUserPosts();
+        if (!useExternalData) {
+            fetchUserPosts(1, true);
+        } else if (onRefreshNeeded) {
+            onRefreshNeeded();
+        }
+        
         if (onImagesUpdated) {
             onImagesUpdated();
         }
     };
 
     const handlePostUpdated = () => {
-        refreshUserPosts();
+        if (!useExternalData) {
+            fetchUserPosts(1, true);
+        } else if (onRefreshNeeded) {
+            onRefreshNeeded();
+        }
+        
         if (onPostUpdated) {
             onPostUpdated();
         }
     };
 
-    // Initial fetch
+    // ⭐ دالة تحميل المزيد للبيانات الخارجية
+    const loadMoreExternal = async () => {
+        if (!onLoadMore || loadingExternal || !hasMoreExternal) return;
+        
+        try {
+            await onLoadMore();
+        } catch (error) {
+            console.error('Error loading more external posts:', error);
+        }
+    };
+
+    // ⭐ دالة تحميل المزيد العامة
+    const loadMore = async () => {
+        if (useExternalData) {
+            await loadMoreExternal();
+        } else if (!postsLoading && hasMore) {
+            fetchUserPosts(page, false);
+        }
+    };
+
+    // Initial fetch - للبروفايل فقط
     useEffect(() => {
-        if (userId) {
+        if (userId && !useExternalData) {
             fetchUserPosts(1, true);
         }
-    }, [userId, fetchUserPosts]);
+    }, [userId, useExternalData]);
 
-    // Infinite scroll observer
+    // Infinite scroll observer - يعمل لكلا الحالتين
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && hasMore && !postsLoading) {
-                    loadMore();
+                if (entries[0].isIntersecting) {
+                    // ⭐ تحقق من الحالة المناسبة
+                    if (useExternalData) {
+                        if (hasMoreExternal && !loadingExternal && !loadingMore) {
+                            console.log('⬇️ Loading more external posts...');
+                            loadMore();
+                        }
+                    } else {
+                        if (hasMore && !postsLoading && !loadingMore) {
+                            console.log('⬇️ Loading more internal posts...');
+                            loadMore();
+                        }
+                    }
                 }
             },
             { threshold: 0.5 }
@@ -177,9 +216,31 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
         }
 
         return () => observer.disconnect();
-    }, [hasMore, postsLoading]);
+    }, [hasMore, postsLoading, loadingMore, useExternalData, hasMoreExternal, loadingExternal]);
 
+    const refreshUserPosts = useCallback(() => {
+        if (!useExternalData) {
+            setPage(1);
+            setHasMore(true);
+            fetchUserPosts(1, true);
+        } else if (onRefreshNeeded) {
+            onRefreshNeeded();
+        }
+    }, [fetchUserPosts, useExternalData, onRefreshNeeded]);
+
+    // ⭐ تحديد حالة التحميل النشطة
+    const isLoading = useExternalData ? loadingExternal : postsLoading || loadingMore;
+    const canLoadMore = useExternalData ? hasMoreExternal : hasMore;
+    const showLoadMoreButton = canLoadMore && !isLoading;
+    const showEndMessage = !canLoadMore && userPosts.length > 0;
+
+    // Styles
     const styles = {
+        feedContainer: {
+            width: '100%',
+            maxWidth: '800px',
+            margin: '0 auto'
+        },
         errorContainer: {
             textAlign: 'center' as const,
             padding: '2rem',
@@ -198,7 +259,8 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
             border: 'none',
             padding: '0.75rem 1.5rem',
             borderRadius: '6px',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            fontWeight: '600' as const
         },
         emptyState: {
             textAlign: 'center' as const,
@@ -223,25 +285,43 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
             margin: '0 auto 1rem'
         },
         loadMoreButton: {
-            background: '#edf2f7',
-            color: '#2d3748',
-            border: '1px solid #cbd5e0',
+            background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)',
+            color: 'white',
+            border: 'none',
             padding: '0.75rem 1.5rem',
-            borderRadius: '6px',
+            borderRadius: '8px',
             cursor: 'pointer',
-            fontWeight: '200' as const,
-            transition: 'all 0.2s'
+            fontWeight: '600' as const,
+            transition: 'all 0.2s',
+            boxShadow: '0 4px 12px rgba(124, 58, 237, 0.3)',
+            margin: '1rem auto',
+            display: 'block'
+        },
+        loadMoreTrigger: {
+            textAlign: 'center' as const,
+            padding: '2rem'
         },
         endMessage: {
             textAlign: 'center' as const,
             padding: '2rem',
             color: '#718096',
-            fontStyle: 'italic' as const
+            fontStyle: 'italic' as const,
+            borderTop: '1px solid #e2e8f0',
+            marginTop: '1rem'
+        },
+        paginationInfo: {
+            textAlign: 'center' as const,
+            padding: '1rem',
+            color: '#666',
+            fontSize: '0.9rem',
+            background: '#f7fafc',
+            borderRadius: '8px',
+            marginBottom: '1rem'
         }
     };
 
     return (
-        <div className="recent-activity">
+        <div style={styles.feedContainer}>
             {postsError ? (
                 <div style={styles.errorContainer}>
                     <p style={styles.errorText}>{postsError}</p>
@@ -254,7 +334,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                 </div>
             ) : (
                 <>
-                    {userPosts.length === 0 && !postsLoading ? (
+                    {userPosts.length === 0 && !isLoading ? (
                         <div style={styles.emptyState}>
                             <p style={styles.emptyText}>
                                 There are no posts yet.
@@ -262,6 +342,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                         </div>
                     ) : (
                         <>
+                            {/* قائمة البوستات */}
                             {userPosts.map((post) => (
                                 <PostItem 
                                     key={post.id} 
@@ -272,38 +353,46 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                                 />
                             ))}
 
-                            {postsLoading && (
+                            {/* حالة التحميل */}
+                            {isLoading && (
                                 <div style={{ textAlign: 'center', padding: '2rem' }}>
                                     <div style={styles.loadingSpinner}></div>
-                                    <p>Loading user's posts...</p>
+                                    <p>
+                                        {useExternalData 
+                                            ? "Loading more posts..." 
+                                            : "Loading user's posts..."
+                                        }
+                                    </p>
                                 </div>
                             )}
 
-                            {hasMore && !postsLoading && (
-                                <div ref={observerRef} style={{ textAlign: 'center', padding: '1rem' }}>
+                            {/* زر Load More للـ Intersection Observer */}
+                            {showLoadMoreButton && (
+                                <div ref={observerRef} style={styles.loadMoreTrigger}>
                                     <button
                                         onClick={loadMore}
                                         style={styles.loadMoreButton}
                                         onMouseOver={(e) => {
-                                            e.currentTarget.style.background = '#e2e8f0';
-                                            e.currentTarget.style.borderColor = '#a0aec0';
+                                            e.currentTarget.style.transform = 'translateY(-2px)';
+                                            e.currentTarget.style.boxShadow = '0 8px 20px rgba(124, 58, 237, 0.4)';
                                         }}
                                         onMouseOut={(e) => {
-                                            e.currentTarget.style.background = '#edf2f7';
-                                            e.currentTarget.style.borderColor = '#cbd5e0';
+                                            e.currentTarget.style.transform = 'translateY(0)';
+                                            e.currentTarget.style.boxShadow = '0 4px 12px rgba(124, 58, 237, 0.3)';
                                         }}
                                     >
-                                        Load More
+                                        Load More Posts
                                     </button>
                                 </div>
                             )}
 
-                            {!hasMore && userPosts.length > 0 && (
+                            {/* رسالة النهاية */}
+                            {showEndMessage && (
                                 <div style={styles.endMessage}>
                                     <p>
                                         {isOwnProfile 
-                                            ? "You've seen all your posts" 
-                                            : "You've seen all of this user's posts"
+                                            ? "✨ You've reached the end of your posts" 
+                                            : "✨ You've seen all of this user's posts"
                                         }
                                     </p>
                                 </div>
