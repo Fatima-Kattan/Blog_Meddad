@@ -1,42 +1,40 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import styles from './myNotifications.module.css';
-import { notificationsService, Notification } from '@/services/api/notification/notifications';
 import NotificationItem from '@/components/notification/notificationItem/NotificationItem';
-import { markAllAsRead } from '@/services/api/notification/allNotificationsRead';
+import { useNotifications } from '@/context/NotificationContext'; // ✅ أضيفي
 
 function MyNotifications() {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [filteredNotifications, setFilteredNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [filterType, setFilterType] = useState('all');
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
-    // إزالة المتغيرات الخاصة بالـ Pagination
-    // const [currentPage, setCurrentPage] = useState(1); ❌ حذف
-    // const itemsPerPage = 5; ❌ حذف
+    
+    // ✅ أضيفي:
+    const { 
+        notifications, 
+        unreadCount, 
+        fetchNotifications, 
+        markAllAsRead 
+    } = useNotifications();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const token = localStorage.getItem("token") || "";
-                const response = await notificationsService.getNotifications(token);
-                setNotifications(response.data);
-                setFilteredNotifications(response.data);
+                await fetchNotifications(); // ✅ غيري
             } catch (err: any) {
                 setError("You can't view notifications without signing in. Please sign in.");
             } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, []);
 
-    useEffect(() => {
+    const filteredNotifications = useMemo(() => {
         let filtered = [...notifications];
 
         if (filterType !== 'all') {
@@ -61,105 +59,37 @@ function MyNotifications() {
             );
         }
 
-        setFilteredNotifications(filtered);
-        // إزالة هذا السطر لأنه مرتبط بالـ Pagination
-        // setCurrentPage(1); ❌ حذف
-    }, [filterType, dateFrom, dateTo, notifications]);
+        return filtered;
+    }, [notifications, filterType, dateFrom, dateTo]);
 
     const handleMarkAllAsRead = async () => {
         try {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                setError("No token found");
-                return;
-            }
-
-            const updatedNotifications = notifications.map(n => ({
-                ...n,
-                is_read: true,
-                status: "read"
-            }));
-
-            setNotifications(updatedNotifications);
-
-            let updatedFiltered = [...updatedNotifications];
-
-            if (filterType !== 'all') {
-                const shouldBeRead = filterType === 'read';
-                updatedFiltered = updatedFiltered.filter(notification =>
-                    notification.is_read === shouldBeRead
-                );
-            }
-
-            if (dateFrom) {
-                const fromDate = new Date(dateFrom);
-                updatedFiltered = updatedFiltered.filter(notification =>
-                    new Date(notification.created_at) >= fromDate
-                );
-            }
-
-            if (dateTo) {
-                const toDate = new Date(dateTo);
-                toDate.setHours(23, 59, 59, 999);
-                updatedFiltered = updatedFiltered.filter(notification =>
-                    new Date(notification.created_at) <= toDate
-                );
-            }
-
-            setFilteredNotifications(updatedFiltered);
-
-            await markAllAsRead(token);
-
-            setTimeout(async () => {
-                try {
-                    const updatedResponse = await notificationsService.getNotifications(token);
-                    if (updatedResponse?.data) {
-                        setNotifications(updatedResponse.data);
-                    }
-                } catch (e) {
-                    console.log("Background refresh skipped");
-                }
-            }, 1000);
-
-        } catch (err: any) {
-            console.error("Error:", err);
-            setError(err.response?.data?.message || "Failed to mark notifications as read");
+            await markAllAsRead(); // ✅ غيري
+        } catch (err) {
+            setError("Failed to mark all as read");
+            setTimeout(() => setError(null), 3000);
         }
-    };
-
-    const handleNotificationRead = (id: string) => {
-        setNotifications(prev => prev.map(n =>
-            n.id === id ? { ...n, is_read: true, status: "read" } : n
-        ));
     };
 
     const resetFilters = () => {
         setFilterType('all');
         setDateFrom('');
         setDateTo('');
-        console.log('All filters have been reset');
     };
 
-    // إزالة حسابات الـ Pagination
-    // const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage); ❌ حذف
-    // const startIndex = (currentPage - 1) * itemsPerPage; ❌ حذف
-    // const endIndex = startIndex + itemsPerPage; ❌ حذف
-    // const currentNotifications = filteredNotifications.slice(startIndex, endIndex); ❌ حذف
-
-    // استخدام filteredNotifications مباشرة بدلاً من currentNotifications
-    const currentNotifications = filteredNotifications; // ✅ بسيط!
-
-    const unreadCount = notifications.filter(n => !n.is_read).length;
-    const todayCount = notifications.filter(n => {
-        const today = new Date();
-        const notificationDate = new Date(n.created_at);
-        return notificationDate.toDateString() === today.toDateString();
-    }).length;
+    const { todayCount } = useMemo(() => {
+        const today = notifications.filter(n => {
+            const todayDate = new Date();
+            const notificationDate = new Date(n.created_at);
+            return notificationDate.toDateString() === todayDate.toDateString();
+        }).length;
+        
+        return { todayCount: today };
+    }, [notifications]);
 
     return (
         <div className={styles.pageContainer}>
             <div className={styles.mainContainer}>
-
                 <div className={styles.sectionsContainer}>
                     {/* Left Section - Filters */}
                     <div className={styles.leftSection}>
@@ -227,6 +157,7 @@ function MyNotifications() {
                                 <div className={styles.statLabel}>Today</div>
                             </div>
                             <div className={styles.statItem}>
+                                {/* ⭐ استخدمي filteredNotifications مباشرة */}
                                 <div className={styles.statValue}>{filteredNotifications.length}</div>
                                 <div className={styles.statLabel}>Filtered</div>
                             </div>
@@ -262,14 +193,13 @@ function MyNotifications() {
                                 </div>
                             )}
 
-                            {/* التغيير هنا: استخدام filteredNotifications مباشرة */}
                             {!loading && !error && filteredNotifications.length > 0 && (
                                 <div className={styles.notificationsList}>
-                                    {filteredNotifications.map((notification) => ( // ✅ بدون slice
+                                    {/* ⭐ استخدمي filteredNotifications مباشرة */}
+                                    {filteredNotifications.map((notification) => (
                                         <NotificationItem
                                             key={notification.id}
                                             notification={notification}
-                                            onMarkAsRead={() => handleNotificationRead(notification.id)}
                                         />
                                     ))}
                                 </div>
