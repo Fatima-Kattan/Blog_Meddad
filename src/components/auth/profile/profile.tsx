@@ -1,7 +1,7 @@
 'use client'
 // components/Profile.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import './profile.css';
+import styles from './profile.module.css'; // تغيير الاستيراد هنا
 import ProfileService, {
     UserProfile,
     ProfileStats,
@@ -10,7 +10,6 @@ import ProfileService, {
     ProfileResponse,
     UserProfileResponse
 } from '@/services/api/auth/profileService';
-import { FaRegLightbulb } from "react-icons/fa6";
 import MyFollowing from '../../follow/myFollowing/MyFollowing'
 import { HiArrowNarrowRight, HiOutlineLightBulb } from 'react-icons/hi';
 import MyFollowers from '@/components/follow/myFollowers/MyFollowers';
@@ -20,8 +19,6 @@ import DatePickerField from '@/components/shared/DatePickerField';
 import { MdEdit, MdOutlineEmail, MdDelete, MdLock } from 'react-icons/md';
 import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import PostItem from '@/components/posts/post-item/PostItem';
 import axios from 'axios';
 import UserPostsFeed from '@/components/auth/profile/UserPostsFeed';
 
@@ -180,18 +177,18 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2 className="modal-title">Change Password</h2>
-                    <button className="modal-close_delete" onClick={onClose}>
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                    <h2 className={styles.modalTitle}>Change Password</h2>
+                    <button className={styles.modalCloseDelete} onClick={onClose}>
                         ✕
                     </button>
                 </div>
 
-                <div className="modal-body">
-                    <form onSubmit={handleSubmit} className="password-form">
-                        <div className="form-group">
+                <div className={styles.modalBody}>
+                    <form onSubmit={handleSubmit} className={styles.passwordForm}>
+                        <div className={styles.formGroup}>
                             <InputField
                                 label="Current Password"
                                 name="current_password"
@@ -205,7 +202,7 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
                             />
                         </div>
 
-                        <div className="form-group">
+                        <div className={styles.formGroup}>
                             <InputField
                                 label="New Password"
                                 name="new_password"
@@ -217,12 +214,12 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
                                 error={fieldErrors.new_password}
                                 disabled={isUpdating}
                             />
-                            <div className="warning-message-password">
+                            <div className={styles.warningMessagePassword}>
                                 Password must be at least 8 characters
                             </div>
                         </div>
 
-                        <div className="form-group">
+                        <div className={styles.formGroup}>
                             <InputField
                                 label="Confirm New Password"
                                 name="new_password_confirmation"
@@ -236,29 +233,18 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
                             />
                         </div>
 
-
                         {error && (
-                            <div className="error-message">{error}</div>
+                            <div className={styles.errorMessage}>{error}</div>
                         )}
 
                         {success && (
-                            <div className="success-message">{success}</div>
+                            <div className={styles.successMessage}>{success}</div>
                         )}
 
-                        {/*   <div className="password-tips">
-                            <h4>Password Tips:</h4>
-                            <ul>
-                                <li>✓ Use at least 8 characters</li>
-                                <li>✓ Mix letters, numbers, and symbols</li>
-                                <li>✓ Avoid common words or patterns</li>
-                                <li>✓ Don't reuse old passwords</li>
-                            </ul>
-                        </div> */}
-
-                        <div className="form-actions">
+                        <div className={styles.formActions}>
                             <button
                                 type="button"
-                                className="btn btn-secondary"
+                                className={`${styles.btn} ${styles.btnSecondary}`}
                                 onClick={onClose}
                                 disabled={isUpdating}
                             >
@@ -266,12 +252,12 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
                             </button>
                             <button
                                 type="submit"
-                                className="btn btn-primary"
+                                className={`${styles.btn} ${styles.btnPrimary}`}
                                 disabled={isUpdating}
                             >
                                 {isUpdating ? (
                                     <>
-                                        <div className="loading-spinner"></div>
+                                        <div className={styles.loadingSpinner}></div>
                                         Updating...
                                     </>
                                 ) : (
@@ -324,18 +310,18 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                    <h2 className="modal-title">Delete Account</h2>
-                    <button className="modal-close_delete" onClick={onClose}>
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                    <h2 className={styles.modalTitle}>Delete Account</h2>
+                    <button className={styles.modalCloseDelete} onClick={onClose}>
                         ✕
                     </button>
                 </div>
 
-                <div className="modal-body">
-                    <div className="warning-message">
-                        <div className="warning-icon">⚠️</div>
+                <div className={styles.modalBody}>
+                    <div className={styles.warningMessage}>
+                        <div className={styles.warningIcon}>⚠️</div>
                         <h3>Important Warning!</h3>
                         <p>
                             By deleting your account, you will:
@@ -349,23 +335,9 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                         </ul>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="delete-form">
-                        <div className="form-group">
-                            {/*  <label className="form-label">
-                                Enter your password to confirm
-                            </label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    setError('');
-                                }}
-                                className="form-input"
-                                placeholder="Current password"
-                                disabled={isDeleting}
-                            /> */}
-                            <div className="form-group">
+                    <form onSubmit={handleSubmit} className={styles.deleteForm}>
+                        <div className={styles.formGroup}>
+                            <div className={styles.formGroup}>
                                 <InputField
                                     label="Enter your password to confirm"
                                     name="password"
@@ -383,13 +355,13 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                         </div>
 
                         {error && (
-                            <div className="error-message">{error}</div>
+                            <div className={styles.errorMessage}>{error}</div>
                         )}
 
-                        <div className="form-actions">
+                        <div className={styles.formActions}>
                             <button
                                 type="button"
-                                className="btn btn-secondary"
+                                className={`${styles.btn} ${styles.btnSecondary}`}
                                 onClick={onClose}
                                 disabled={isDeleting}
                             >
@@ -397,12 +369,12 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                             </button>
                             <button
                                 type="submit"
-                                className="btn btn-delete"
+                                className={`${styles.btn} ${styles.btnDelete}`}
                                 disabled={isDeleting}
                             >
                                 {isDeleting ? (
                                     <>
-                                        <div className="loading-spinner"></div>
+                                        <div className={styles.loadingSpinner}></div>
                                         Deleting...
                                     </>
                                 ) : (
@@ -893,8 +865,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
     if (loading) {
         return (
-            <div className="loading">
-                <div className="loading-spinner"></div>
+            <div className={styles.loading}>
+                <div className={styles.loadingSpinner}></div>
                 <p style={{
                     color: '#cbd5e1',
                     fontSize: '1.2rem',
@@ -909,8 +881,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
     if (error || !user || !stats) {
         return (
-            <div className="error-state">
-                <div className="error-icon">⚠️</div>
+            <div className={styles.errorState}>
+                <div className={styles.errorIcon}>⚠️</div>
                 <h2 style={{
                     color: 'white',
                     marginBottom: '16px',
@@ -979,32 +951,31 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     }
 
     return (
-        <div className="profile-container">
-            <div className="profile-content">
-                <div className="profile-sidebar">
+        <div className={styles.profileContainer}>
+            <div className={styles.profileContent}>
+                <div className={styles.profileSidebar}>
                     <div>
                         {isOwnProfile && (
-                            <div className='display'>
-                                <button className="edit-avatar-btn" onClick={handleEditClick}>
+                            <div className={styles.display}>
+                                <button className={styles.editAvatarBtn} onClick={handleEditClick}>
                                     <MdEdit style={{ width: 20, height: 20 }} />
                                 </button>
                                  {/* زر تحديث كلمة السر */}
                                 <button
-                                    className="edit-avatar-btn"
+                                    className={styles.editAvatarBtn}
                                     onClick={() => setShowUpdatePasswordModal(true)}
                                     disabled={isUpdatingPassword}
                                 >
                                     <MdLock style={{ width: 20, height: 20 }} />
-                                    {/* {isUpdatingPassword ? 'Updating...' : 'Change Password'} */}
                                 </button>
                             </div>
                         )}
 
                         {!isOwnProfile && (
-                            <div className="display-not-owner">
+                            <div className={styles.displayNotOwner}>
                                 <button
                                     onClick={loadOwnProfile}
-                                    className="edit-avatar-btn-not-owner"
+                                    className={styles.editAvatarBtnNotOwner}
                                 >
                                     <HiArrowNarrowRight style={{ width: 20, height: 20 }} />
                                     back to my profile
@@ -1012,54 +983,54 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             </div>
                         )}
 
-                        <div className="profile-avatar-section">
+                        <div className={styles.profileAvatarSection}>
                             <img
                                 src={user.image || 'https://via.placeholder.com/150'}
                                 alt={user.full_name}
-                                className="profile-avatar"
+                                className={styles.profileAvatar}
                             />
                         </div>
 
-                        <div className="user-info">
-                            <h2 className="user-name">{user.full_name}</h2>
-                            <div className="user-email">
-                                <MdOutlineEmail className='email_icon' />
+                        <div className={styles.userInfo}>
+                            <h2 className={styles.userName}>{user.full_name}</h2>
+                            <div className={styles.userEmail}>
+                                <MdOutlineEmail className={styles.emailIcon} />
                                 <span>{user.email}</span>
                             </div>
-                            <div className="member-since">
+                            <div className={styles.memberSince}>
                                 Member since {formatDate(user.created_at)}
                             </div>
                         </div>
 
-                        <div className="profile-stats">
-                            <div className="stat-card">
-                                <div className="stat-number">{stats.followers_count}</div>
-                                <div className="stat-label">FOLLOWERS</div>
+                        <div className={styles.profileStats}>
+                            <div className={styles.statCard}>
+                                <div className={styles.statNumber}>{stats.followers_count}</div>
+                                <div className={styles.statLabel}>FOLLOWERS</div>
                             </div>
-                            <div className="stat-card">
-                                <div className="stat-number">{stats.following_count}</div>
-                                <div className="stat-label">FOLLOWING</div>
+                            <div className={styles.statCard}>
+                                <div className={styles.statNumber}>{stats.following_count}</div>
+                                <div className={styles.statLabel}>FOLLOWING</div>
                             </div>
                         </div>
 
-                        <div className="profile-info-section">
-                            <h3 className="section-title">About me</h3>
-                            <p className="bio-text">{user.bio || 'No bio provided'}</p>
+                        <div className={styles.profileInfoSection}>
+                            <h3 className={styles.sectionTitle}>About me</h3>
+                            <p className={styles.bioText}>{user.bio || 'No bio provided'}</p>
 
-                            <div className="info-grid">
-                                <div className="info-item">
-                                    <span className="info-label">PHONE</span>
-                                    <span className="info-value">{user.phone_number || 'Not provided'}</span>
+                            <div className={styles.infoGrid}>
+                                <div className={styles.infoItem}>
+                                    <span className={styles.infoLabel}>PHONE</span>
+                                    <span className={styles.infoValue}>{user.phone_number || 'Not provided'}</span>
                                 </div>
 
-                                <div className="info-item">
-                                    <span className="info-label">GENDER</span>
-                                    <span className="info-value">{user.gender || 'Not specified'}</span>
+                                <div className={styles.infoItem}>
+                                    <span className={styles.infoLabel}>GENDER</span>
+                                    <span className={styles.infoValue}>{user.gender || 'Not specified'}</span>
                                 </div>
 
-                                <div className="info-item">
-                                    <span className="info-label">BIRTH DATE</span>
-                                    <span className="info-value">
+                                <div className={styles.infoItem}>
+                                    <span className={styles.infoLabel}>BIRTH DATE</span>
+                                    <span className={styles.infoValue}>
                                         {user.birth_date ? (
                                             <>
                                                 {formatDate(user.birth_date)}
@@ -1077,10 +1048,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
                         {/* Simple delete account button - only shows for owner */}
                         {isOwnProfile && (
-                            <div className="account-actions-section">
+                            <div className={styles.accountActionsSection}>
                                 {/* زر حذف الحساب */}
                                 <button
-                                    className="btn-delete-account-simple"
+                                    className={styles.btnDeleteAccountSimple}
                                     onClick={() => setShowDeleteModal(true)}
                                     disabled={isDeletingAccount}
                                 >
@@ -1092,47 +1063,47 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     </div>
                 </div>
 
-                <div className="profile-main">
-                    <div className="profile-tabs">
+                <div className={styles.profileMain}>
+                    <div className={styles.profileTabs}>
                         {isOwnProfile ? (
                             <>
                                 <button
-                                    className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
+                                    className={`${styles.tabButton} ${activeTab === 'posts' ? styles.active : ''}`}
                                     onClick={() => setActiveTab('posts')}
                                 >
                                     Posts
-                                    <span className="tab-count">{stats.posts_count}</span>
+                                    <span className={styles.tabCount}>{stats.posts_count}</span>
                                 </button>
 
                                 <button
-                                    className={`tab-button ${activeTab === 'followers' ? 'active' : ''}`}
+                                    className={`${styles.tabButton} ${activeTab === 'followers' ? styles.active : ''}`}
                                     onClick={() => setActiveTab('followers')}
                                 >
                                     Followers
-                                    <span className="tab-count">{stats.followers_count}</span>
+                                    <span className={styles.tabCount}>{stats.followers_count}</span>
                                 </button>
 
                                 <button
-                                    className={`tab-button ${activeTab === 'following' ? 'active' : ''}`}
+                                    className={`${styles.tabButton} ${activeTab === 'following' ? styles.active : ''}`}
                                     onClick={() => setActiveTab('following')}
                                 >
                                     Following
-                                    <span className="tab-count">{stats.following_count}</span>
+                                    <span className={styles.tabCount}>{stats.following_count}</span>
                                 </button>
                             </>
                         ) : (
                             <button
-                                className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
+                                className={`${styles.tabButton} ${activeTab === 'posts' ? styles.active : ''}`}
                                 onClick={() => setActiveTab('posts')}
                             >
                                 Posts
-                                <span className="tab-count">{stats.posts_count}</span>
+                                <span className={styles.tabCount}>{stats.posts_count}</span>
                             </button>
                         )}
                     </div>
 
                     {activeTab === 'posts' && (
-                        <div className="recent-activity">
+                        <div className={styles.recentActivity}>
                             <UserPostsFeed
                                 userId={targetUserId || ''}
                                 isOwnProfile={isOwnProfile}
@@ -1144,11 +1115,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     )}
 
                     {activeTab === 'followers' && (
-                        <div className="recent-activity">
-                            <h3 className="activity-title">Followers ({stats.followers_count})</h3>
-                            <div className="">
-                                <p className='activity_follow'>
-                                    <HiOutlineLightBulb className='icon-follow' />
+                        <div className={styles.recentActivity}>
+                            <h3 className={styles.activityTitle}>Followers ({stats.followers_count})</h3>
+                            <div className={styles.borderDev}>
+                                <p className={styles.activityFollow}>
+                                    <HiOutlineLightBulb className={styles.iconFollow} />
                                     {isOwnProfile ? 'Your followers will appear here' : 'Followers will appear here'}
                                 </p>
                                 {isOwnProfile ? (
@@ -1168,11 +1139,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     )}
 
                     {activeTab === 'following' && (
-                        <div className="recent-activity">
-                            <h3 className="activity-title">Following ({stats.following_count})</h3>
-                            <div className="border-dev">
-                                <p className='activity_follow'>
-                                    <HiOutlineLightBulb className='icon-follow' />
+                        <div className={styles.recentActivity}>
+                            <h3 className={styles.activityTitle}>Following ({stats.following_count})</h3>
+                            <div className={styles.borderDev}>
+                                <p className={styles.activityFollow}>
+                                    <HiOutlineLightBulb className={styles.iconFollow} />
                                     {isOwnProfile ? 'People you follow will appear here' : 'Following will appear here'}
                                 </p>
                                 {isOwnProfile ? (
@@ -1195,17 +1166,17 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
             {/* Edit Profile Modal */}
             {showEditModal && isOwnProfile && (
-                <div className="edit-modal-overlay" onClick={() => setShowEditModal(false)}>
-                    <div className="edit-modal" onClick={(e) => e.stopPropagation()}>
-                        <button className="modal-close" onClick={() => setShowEditModal(false)}>
+                <div className={styles.editModalOverlay} onClick={() => setShowEditModal(false)}>
+                    <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
+                        <button className={styles.modalClose} onClick={() => setShowEditModal(false)}>
                             ✕
                         </button>
 
-                        <div className="modal-header">
-                            <h2 className="modal-title">Edit Profile</h2>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.modalTitle}>Edit Profile</h2>
                         </div>
 
-                        <div className="modal-body">
+                        <div className={styles.modalBody}>
                             {saveError && (
                                 <div style={{
                                     background: 'rgba(239, 68, 68, 0.1)',
@@ -1220,15 +1191,15 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 </div>
                             )}
 
-                            <div className="image-preview-container">
+                            <div className={styles.imagePreviewContainer}>
                                 <img
                                     src={editForm.image || user.image || 'https://via.placeholder.com/150'}
                                     alt="Profile Preview"
-                                    className="image-preview"
+                                    className={styles.imagePreview}
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <InputField
                                     label="Profile Image URL"
                                     name="image"
@@ -1238,7 +1209,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <InputField
                                     label="Full Name"
                                     name="full_name"
@@ -1250,7 +1221,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <InputField
                                     label="Email"
                                     name="email"
@@ -1263,19 +1234,19 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 />
                             </div>
 
-                            <div className="form-group">
-                                <label className="form-label">Bio</label>
+                            <div className={styles.formGroup}>
+                                <label className={styles.formLabel}>Bio</label>
                                 <textarea
                                     name="bio"
                                     value={editForm.bio || ''}
                                     onChange={handleInputChange}
-                                    className="form-input form-textarea"
+                                    className={`${styles.formInput} ${styles.formTextarea}`}
                                     placeholder="Tell us about yourself..."
                                     rows={4}
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <InputField
                                     label="Phone Number"
                                     name="phone_number"
@@ -1286,7 +1257,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <SelectField
                                     label="Gender"
                                     name="gender"
@@ -1297,7 +1268,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className={styles.formGroup}>
                                 <DatePickerField
                                     label="Birth Date"
                                     name="birth_date"
@@ -1308,9 +1279,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 />
                             </div>
 
-                            <div className="form-actions">
+                            <div className={styles.formActions}>
                                 <button
-                                    className="btn btn-secondary"
+                                    className={`${styles.btn} ${styles.btnSecondary}`}
                                     onClick={() => setShowEditModal(false)}
                                     disabled={isSaving}
                                 >
@@ -1318,13 +1289,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 </button>
 
                                 <button
-                                    className="btn btn-primary"
+                                    className={`${styles.btn} ${styles.btnPrimary}`}
                                     onClick={handleSaveProfile}
                                     disabled={isSaving}
                                 >
                                     {isSaving ? (
                                         <>
-                                            <div className="loading-spinner" style={{
+                                            <div className={styles.loadingSpinner} style={{
                                                 width: '20px',
                                                 height: '20px',
                                                 borderWidth: '2px'

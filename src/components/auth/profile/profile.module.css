@@ -1,5 +1,7 @@
+/* profile.module.css */
+
 /* styles/Profile.css */
-.profile-container {
+.profileContainer {
     width: 100%;
     min-height: 100vh;
     background: #0a0518;
@@ -9,14 +11,14 @@
 }
 
 /* هيدر البروفايل */
-.profile-header {
+.profileHeader {
     background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
     padding: 60px 40px 40px;
     position: relative;
     overflow: hidden;
 }
 
-.profile-header::before {
+.profileHeader::before {
     content: '';
     position: absolute;
     top: 0;
@@ -28,14 +30,14 @@
     opacity: 0.1;
 }
 
-.header-content {
+.headerContent {
     max-width: 1400px;
     margin: 0 auto;
     position: relative;
     z-index: 2;
 }
 
-.profile-title {
+.profileTitle {
     font-size: 2.8rem;
     font-weight: 800;
     margin-bottom: 12px;
@@ -43,7 +45,7 @@
     letter-spacing: -0.5px;
 }
 
-.profile-subtitle {
+.profileSubtitle {
     font-size: 1.2rem;
     color: rgba(255, 255, 255, 0.9);
     margin-bottom: 0;
@@ -52,7 +54,7 @@
 }
 
 /* المحتوى الرئيسي */
-.profile-content {
+.profileContent {
     max-width: 1500px;
     margin: 0 auto;
     padding: 40px;
@@ -62,7 +64,7 @@
 }
 
 /* الشريط الجانبي - تصميم مظلم */
-.profile-sidebar {
+.profileSidebar {
     background: #160722;
     border-radius: 24px;
     padding: 32px;
@@ -73,12 +75,12 @@
     top: 40px;
 }
 
-.profile-avatar-section {
+.profileAvatarSection {
     text-align: center;
     position: relative;
 }
 
-.profile-avatar {
+.profileAvatar {
     width: 180px;
     height: 180px;
     border-radius: 50%;
@@ -89,11 +91,11 @@
     transition: transform 0.3s ease;
 }
 
-.profile-avatar:hover {
+.profileAvatar:hover {
     transform: scale(1.05);
 }
 
-.avatar-status {
+.avatarStatus {
     position: absolute;
     bottom: 30px;
     right: calc(50% - 80px);
@@ -104,7 +106,7 @@
     border-radius: 50%;
 }
 
-.edit-avatar-btn {
+.editAvatarBtn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -120,7 +122,7 @@
     box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
 }
 
-.edit-avatar-btn-not-owner {
+.editAvatarBtnNotOwner {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -136,42 +138,42 @@
     box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
 }
 
-.edit-avatar-btn-not-owner:hover {
+.editAvatarBtnNotOwner:hover {
     transform: translateY(-2px);
     box-shadow: 0 15px 30px rgba(124, 58, 237, 0.5);
     background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
 }
 
-.edit-avatar-btn:hover {
+.editAvatarBtn:hover {
     transform: translateY(-2px);
     box-shadow: 0 15px 30px rgba(124, 58, 237, 0.5);
     background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
 }
 
-.edit-avatar-btn-not-owner:active {
+.editAvatarBtnNotOwner:active {
     transform: translateY(0);
 }
 
-.edit-avatar-btn {
+.editAvatarBtn {
     transform: translateY(0);
 }
 
 /* معلومات المستخدم */
-.user-info {
+.userInfo {
     text-align: center;
     margin-bottom: 32px;
     padding-bottom: 32px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.user-name {
+.userName {
     font-size: 1.8rem;
     font-weight: 700;
     color: white;
     margin-bottom: 12px;
 }
 
-.user-email {
+.userEmail {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -181,12 +183,12 @@
     margin-bottom: 16px;
 }
 
-.email_icon {
+.emailIcon {
     width: 20px;
     height: 20px;
 }
 
-.member-since {
+.memberSince {
     color: #64748b;
     font-size: 0.9rem;
     background: rgba(255, 255, 255, 0.05);
@@ -196,14 +198,14 @@
 }
 
 /* إحصائيات البروفايل */
-.profile-stats {
+.profileStats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
     margin-bottom: 32px;
 }
 
-.stat-card {
+.statCard {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 24px;
@@ -214,7 +216,7 @@
     overflow: hidden;
 }
 
-.stat-card::before {
+.statCard::before {
     content: '';
     position: absolute;
     top: 0;
@@ -224,14 +226,14 @@
     background: linear-gradient(90deg, #7c3aed, #4f46e5);
 }
 
-.stat-card:hover {
+.statCard:hover {
     background: rgba(124, 58, 237, 0.1);
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(124, 58, 237, 0.2);
     border-color: rgba(124, 58, 237, 0.5);
 }
 
-.stat-number {
+.statNumber {
     font-size: 2.4rem;
     font-weight: 800;
     color: white;
@@ -240,7 +242,7 @@
     text-shadow: 0 2px 10px rgba(124, 58, 237, 0.5);
 }
 
-.stat-label {
+.statLabel {
     font-size: 0.9rem;
     color: #94a3b8;
     text-transform: uppercase;
@@ -249,7 +251,7 @@
 }
 
 /* معلومات البروفايل */
-.profile-info-section {
+.profileInfoSection {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     padding: 28px;
@@ -257,14 +259,14 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.profile-info-section:hover {
+.profileInfoSection:hover {
     background: rgba(124, 58, 237, 0.1);
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(124, 58, 237, 0.2);
     border-color: rgba(124, 58, 237, 0.5);
 }
 
-.section-title {
+.sectionTitle {
     font-size: 1.2rem;
     font-weight: 700;
     color: white;
@@ -275,7 +277,7 @@
     color: #a78bfa;
 }
 
-.section-title::before {
+.sectionTitle::before {
     content: '';
     width: 4px;
     height: 24px;
@@ -283,7 +285,7 @@
     border-radius: 2px;
 }
 
-.bio-text {
+.bioText {
     color: #cbd5e1;
     font-size: 1.05rem;
     line-height: 1.7;
@@ -292,19 +294,19 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.info-grid {
+.infoGrid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 40px;
 }
 
-.info-item {
+.infoItem {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.info-label {
+.infoLabel {
     font-size: 0.85rem;
     color: #94a3b8;
     font-weight: 500;
@@ -312,12 +314,12 @@
     letter-spacing: 1px;
 }
 
-.info-value {
+.infoValue {
     color: white;
     font-weight: 400;
 }
 
-.account-created {
+.accountCreated {
     background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(79, 70, 229, 0.2));
     border-radius: 16px;
     padding: 24px;
@@ -327,7 +329,7 @@
     overflow: hidden;
 }
 
-.account-created::before {
+.accountCreated::before {
     content: '';
     position: absolute;
     top: 0;
@@ -338,7 +340,7 @@
     transform: translateX(-100%);
 }
 
-.account-created:hover::before {
+.accountCreated:hover::before {
     animation: shimmer 2s infinite;
 }
 
@@ -348,21 +350,21 @@
     }
 }
 
-.created-label {
+.createdLabel {
     font-size: 0.9rem;
     color: #a78bfa;
     margin-bottom: 8px;
     font-weight: 600;
 }
 
-.created-date {
+.createdDate {
     font-size: 1.2rem;
     color: white;
     font-weight: 700;
 }
 
 /* المحتوى الرئيسي */
-.profile-main {
+.profileMain {
     background: #1e293b;
     border-radius: 24px;
     padding: 32px;
@@ -371,7 +373,7 @@
 }
 
 /* التبويبات */
-.profile-tabs {
+.profileTabs {
     display: flex;
     gap: 4px;
     margin-bottom: 40px;
@@ -381,7 +383,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.tab-button {
+.tabButton {
     flex: 1;
     background: transparent;
     border: none;
@@ -399,14 +401,14 @@
     position: relative;
 }
 
-.tab-button.active {
+.tabButton.active {
     background: rgba(124, 58, 237, 0.2);
     color: white;
     box-shadow: 0 8px 20px rgba(124, 58, 237, 0.2);
     border: 1px solid #7c3aed;
 }
 
-.tab-button.active::before {
+.tabButton.active::before {
     content: '';
     position: absolute;
     top: -2px;
@@ -418,12 +420,12 @@
     z-index: -1;
 }
 
-.tab-button:hover:not(.active) {
+.tabButton:hover:not(.active) {
     background: rgba(255, 255, 255, 0.1);
     color: #cbd5e1;
 }
 
-.tab-count {
+.tabCount {
     background: rgba(255, 255, 255, 0.1);
     color: #94a3b8;
     padding: 4px 12px;
@@ -434,24 +436,24 @@
     font-weight: 700;
 }
 
-.tab-button.active .tab-count {
+.tabButton.active .tabCount {
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
 }
 
 /* قسم النشاط الأخير */
-.recent-activity {
+.recentActivity {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 20px;
     padding: 40px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.border-dev {
+.borderDev {
     border-radius: 12px;
 }
 
-.activity-title {
+.activityTitle {
     font-size: 1.5rem;
     font-weight: 700;
     color: white;
@@ -461,7 +463,7 @@
     gap: 16px;
 }
 
-.activity-title::before {
+.activityTitle::before {
     content: '';
     width: 6px;
     height: 30px;
@@ -470,13 +472,13 @@
 }
 
 /* قائمة المنشورات */
-.posts-list {
+.postsList {
     display: flex;
     flex-direction: column;
     gap: 24px;
 }
 
-.post-item {
+.postItem {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     padding: 32px;
@@ -486,14 +488,14 @@
     overflow: hidden;
 }
 
-.post-item:hover {
+.postItem:hover {
     transform: translateY(-6px);
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
     border-color: rgba(124, 58, 237, 0.5);
     background: rgba(124, 58, 237, 0.1);
 }
 
-.post-item::before {
+.postItem::before {
     content: '';
     position: absolute;
     top: 0;
@@ -505,11 +507,11 @@
     transition: opacity 0.3s ease;
 }
 
-.post-item:hover::before {
+.postItem:hover::before {
     opacity: 1;
 }
 
-.post-header {
+.postHeader {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -517,7 +519,7 @@
     margin-top: 10px;
 }
 
-.post-title {
+.postTitle {
     font-size: 1.6rem;
     font-weight: 700;
     color: white;
@@ -526,7 +528,7 @@
     line-height: 1.4;
 }
 
-.post-date {
+.postDate {
     font-size: 0.95rem;
     color: #94a3b8;
     background: rgba(255, 255, 255, 0.05);
@@ -537,7 +539,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.post-content {
+.postContent {
     color: #cbd5e1;
     font-size: 1.1rem;
     line-height: 1.7;
@@ -546,7 +548,7 @@
 }
 
 /* إحصائيات المنشور */
-.post-stats {
+.postStats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
@@ -554,7 +556,7 @@
     margin-top: 10px;
 }
 
-.post-stat {
+.postStat {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     padding: 24px;
@@ -567,13 +569,13 @@
     overflow: hidden;
 }
 
-.post-stat:hover {
+.postStat:hover {
     background: rgba(124, 58, 237, 0.1);
     transform: translateY(-3px);
     border-color: rgba(124, 58, 237, 0.3);
 }
 
-.post-stat-icon {
+.postStatIcon {
     width: 56px;
     height: 56px;
     border-radius: 14px;
@@ -584,21 +586,21 @@
     position: relative;
 }
 
-.likes-stat .post-stat-icon {
+.likesStat .postStatIcon {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
     color: #f87171;
 }
 
-.comments-stat .post-stat-icon {
+.commentsStat .postStatIcon {
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
     color: #60a5fa;
 }
 
-.post-stat-info {
+.postStatInfo {
     flex: 1;
 }
 
-.post-stat-number {
+.postStatNumber {
     font-size: 2.2rem;
     font-weight: 800;
     color: white;
@@ -607,7 +609,7 @@
     text-shadow: 0 2px 10px rgba(124, 58, 237, 0.3);
 }
 
-.post-stat-label {
+.postStatLabel {
     font-size: 1rem;
     color: #94a3b8;
     font-weight: 600;
@@ -616,12 +618,12 @@
 }
 
 /* المعجبين */
-.post-likers {
+.postLikers {
     padding-top: 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.likers-title {
+.likersTitle {
     font-size: 1.2rem;
     font-weight: 600;
     color: #cbd5e1;
@@ -631,13 +633,13 @@
     gap: 12px;
 }
 
-.likers-list {
+.likersList {
     display: flex;
     flex-wrap: wrap;
     gap: 16px;
 }
 
-.liker-item {
+.likerItem {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -650,13 +652,13 @@
     overflow: hidden;
 }
 
-.liker-item:hover {
+.likerItem:hover {
     background: rgba(124, 58, 237, 0.1);
     transform: translateY(-2px);
     border-color: rgba(124, 58, 237, 0.3);
 }
 
-.liker-avatar {
+.likerAvatar {
     width: 44px;
     height: 44px;
     border-radius: 50%;
@@ -665,14 +667,14 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.liker-name {
+.likerName {
     font-size: 1rem;
     color: white;
     font-weight: 600;
 }
 
 /* نافذة تعديل البروفايل */
-.edit-modal-overlay {
+.editModalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -687,7 +689,7 @@
     backdrop-filter: blur(10px)
 }
 
-.edit-modal {
+.editModal {
     background: #160722;
     border-radius: 28px;
     max-width: 540px;
@@ -704,31 +706,31 @@
 }
 
 /* For Chrome, Safari and Edge */
-.edit-modal::-webkit-scrollbar {
+.editModal::-webkit-scrollbar {
     width: 10px !important;
 }
 
-.edit-modal::-webkit-scrollbar-track {
+.editModal::-webkit-scrollbar-track {
     background: #2a0a50 !important;
     border-radius: 10px !important;
 }
 
-.edit-modal::-webkit-scrollbar-thumb {
+.editModal::-webkit-scrollbar-thumb {
     background: #743decbe !important;
     border-radius: 10px !important;
     border: 2px solid #2a0a50 !important;
 }
 
-.edit-modal::-webkit-scrollbar-thumb:hover {
+.editModal::-webkit-scrollbar-thumb:hover {
     background: #8b5cf6 !important;
 }
 
-.modal-header {
+.modalHeader {
     padding: 36px 40px 0;
     /* margin-bottom: 28px; */
 }
 
-.modal-title {
+.modalTitle {
     font-size: 2rem;
     font-weight: 800;
     color: white;
@@ -739,7 +741,7 @@
     background-clip: text;
 }
 
-.modal-close {
+.modalClose {
     top: 15px;
     right: 28px;
     background: rgba(255, 255, 255, 0.1);
@@ -757,7 +759,7 @@
     position: absolute;
 }
 
-.modal-close_delete {
+.modalCloseDelete {
     top: 15px;
     right: 28px;
     background: rgba(255, 255, 255, 0.1);
@@ -774,27 +776,27 @@
     transition: all 0.3s ease;
 }
 
-.modal-close:hover {
+.modalClose:hover {
     background: rgba(239, 68, 68, 0.2);
     color: #f87171;
     transform: rotate(90deg);
 }
 
-.modal-close_delete:hover {
+.modalCloseDelete:hover {
     background: rgba(239, 68, 68, 0.2);
     color: #f87171;
     transform: rotate(90deg);
 }
 
-.modal-body {
+.modalBody {
     padding: 0 40px 40px;
 }
 
-.form-group {
+.formGroup {
     margin-bottom: 28px;
 }
 
-.form-label {
+.formLabel {
     display: block;
     font-size: 1rem;
     font-weight: 600;
@@ -805,13 +807,13 @@
     gap: 8px;
 }
 
-.form-label::after {
+.formLabel::after {
     content: '*';
     color: #f87171;
     opacity: 0.7;
 }
 
-.form-input {
+.formInput {
     width: 100%;
     padding: 18px 20px;
     border: 2px solid #491f73;
@@ -822,29 +824,29 @@
     transition: all 0.3s ease;
 }
 
-.form-input:focus {
+.formInput:focus {
     outline: none;
     color: white;
     border-color: #b721ff;
     box-shadow: 0 0 0 3px rgba(183, 33, 255, 0.1);
 }
 
-.form-input::placeholder {
+.formInput::placeholder {
     color: #64748b;
 }
 
-.form-textarea {
+.formTextarea {
     min-height: 120px;
     resize: vertical;
 }
 
-.image-preview-container {
+.imagePreviewContainer {
     text-align: center;
     margin-bottom: 32px;
     position: relative;
 }
 
-.image-preview {
+.imagePreview {
     width: 160px;
     height: 160px;
     border-radius: 50%;
@@ -854,11 +856,11 @@
     transition: transform 0.3s ease;
 }
 
-.image-preview:hover {
+.imagePreview:hover {
     transform: scale(1.05);
 }
 
-.form-actions {
+.formActions {
     display: flex;
     gap: 20px;
     /* margin-top: 40px; */
@@ -896,29 +898,29 @@
     animation: shimmer 1.5s infinite;
 }
 
-.btn-primary {
+.btnPrimary {
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
     box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
 }
 
-.btn-primary:hover {
+.btnPrimary:hover {
     transform: translateY(-3px);
     box-shadow: 0 20px 40px rgba(124, 58, 237, 0.5);
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
 }
 
-.btn-primary:active {
+.btnPrimary:active {
     transform: translateY(-1px);
 }
 
-.btn-secondary {
+.btnSecondary {
     background: rgba(159, 60, 216, 0.1);
     color: #cbd5e1;
     border: 1px solid #7c3aed71;
 }
 
-.btn-secondary:hover {
+.btnSecondary:hover {
     background: rgba(159, 60, 216, 0.25);
     transform: translateY(-3px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -934,7 +936,7 @@
     gap: 32px;
 }
 
-.loading-spinner {
+.loadingSpinner {
     width: 70px;
     height: 70px;
     border: 5px solid rgba(255, 255, 255, 0.1);
@@ -954,7 +956,7 @@
 }
 
 /* حالة الخطأ */
-.error-state {
+.errorState {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -964,7 +966,7 @@
     text-align: center;
 }
 
-.error-icon {
+.errorIcon {
     font-size: 5rem;
     color: #f87171;
     margin-bottom: 24px;
@@ -972,12 +974,12 @@
 }
 
 /* رسالة عدم وجود منشورات */
-.no-posts {
+.noPosts {
     text-align: center;
     padding: 80px 40px;
 }
 
-.no-posts-icon {
+.noPostsIcon {
     font-size: 5rem;
     color: #7c3aed;
     margin-bottom: 24px;
@@ -987,77 +989,77 @@
 
 /* التصميم المتجاوب */
 @media (max-width: 1200px) {
-    .profile-content {
+    .profileContent {
         grid-template-columns: 1fr;
         max-width: 800px;
         padding: 40px 20px;
     }
 
-    .profile-sidebar {
+    .profileSidebar {
         position: static;
     }
 }
 
 @media (max-width: 768px) {
-    .profile-header {
+    .profileHeader {
         padding: 40px 20px 30px;
     }
 
-    .profile-title {
+    .profileTitle {
         font-size: 2.2rem;
     }
 
-    .profile-subtitle {
+    .profileSubtitle {
         font-size: 1.1rem;
     }
 
-    .profile-stats,
-    .info-grid,
-    .post-stats {
+    .profileStats,
+    .infoGrid,
+    .postStats {
         grid-template-columns: 1fr;
     }
 
-    .profile-tabs {
+    .profileTabs {
         flex-direction: column;
     }
 
-    .tab-button {
+    .tabButton {
         justify-content: flex-start;
         padding: 18px 24px;
     }
 
-    .post-header {
+    .postHeader {
         flex-direction: column;
         gap: 16px;
     }
 
-    .post-date {
+    .postDate {
         margin-left: 0;
         align-self: flex-start;
     }
 
-    .edit-modal {
+    .editModal {
         max-width: 95%;
         padding: 0;
     }
 
-    .modal-header,
-    .modal-body {
+    .modalHeader,
+    .modalBody {
         padding: 24px;
     }
 }
 
 @media (max-width: 480px) {
-    .profile-content {
+    .profileContent {
         padding: 20px 16px;
     }
 
-    .profile-sidebar,
-    .profile-main {
+    .profileSidebar,
+    .profileMain {
         padding: 24px;
     }
 
-    .form-actions {
+    .formActions {
         flex-direction: column;
     }
 
@@ -1065,7 +1067,7 @@
         width: 100%;
     }
 
-    .profile-avatar {
+    .profileAvatar {
         width: 120px;
         height: 120px;
     }
@@ -1078,13 +1080,13 @@
     gap:5px
 }
 
-.display-not-owner {
+.displayNotOwner {
     display: flex;
     align-items: center;
     justify-self: flex-start;
 }
 
-.post-image-container {
+.postImageContainer {
     height: 280px;
     overflow: hidden;
     position: relative;
@@ -1092,19 +1094,19 @@
     flex-shrink: 0;
 }
 
-.post-image {
+.postImage {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
 }
 
-.post-image-container:hover .post-image {
+.postImageContainer:hover .postImage {
     transform: scale(1.05);
 }
 
 /* شارة عدد الصور */
-.image-badge {
+.imageBadge {
     position: absolute;
     top: 20px;
     right: 20px;
@@ -1123,7 +1125,7 @@
 }
 
 /* قسم النشاط الأخير */
-.recent-activity {
+.recentActivity {
     flex: 1;
     background: rgba(255, 255, 255, 0.03);
     border-radius: 20px;
@@ -1134,21 +1136,21 @@
     flex-direction: column;
 }
 
-.recent-activity::-webkit-scrollbar {
+.recentActivity::-webkit-scrollbar {
     width: 8px;
 }
 
-.recent-activity::-webkit-scrollbar-track {
+.recentActivity::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 4px;
 }
 
-.recent-activity::-webkit-scrollbar-thumb {
+.recentActivity::-webkit-scrollbar-thumb {
     background: rgba(124, 58, 237, 0.5);
     border-radius: 4px;
 }
 
-.profile-main {
+.profileMain {
     background: #160722;
     border-radius: 24px;
     padding: 32px;
@@ -1160,7 +1162,7 @@
 }
 
 /* التبويبات */
-.profile-tabs {
+.profileTabs {
     display: flex;
     gap: 4px;
     margin-bottom: 32px;
@@ -1175,7 +1177,7 @@
 /* إضافة إلى Profile.css */
 
 /* تنسيق صور البوست المتعددة */
-.post-images-grid {
+.postImagesGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px;
@@ -1191,18 +1193,18 @@
 }
 
 /* تصميم كل صورة في الشبكة */
-.post-image-item {
+.postImageItem {
     position: relative;
     overflow: hidden;
     border-radius: 10px;
 }
 
-.post-image-item:hover {
+.postImageItem:hover {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     z-index: 2;
 }
 
-.post-grid-image {
+.postGridImage {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -1210,12 +1212,12 @@
     transition: transform 0.5s ease;
 }
 
-/* .post-grid-image:hover {
+/* .postGridImage:hover {
     transform: scale(1.1);
 } */
 
 /* عدادات الصور */
-.images-count-badge {
+.imagesCountBadge {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -1235,28 +1237,28 @@
 
 /* تأثيرات للصور المتعددة */
 /* صورة واحدة - تحتل المساحة كاملة */
-.single-image {
+.singleImage {
     grid-column: span 2;
     aspect-ratio: 16 / 9;
 }
 
 /* صورتين - توزيع 50% لكل منهما */
-.two-images {
+.twoImages {
     grid-column: span 1;
 }
 
 /* 3 صور - الصورة الأولى أكبر */
-.three-images .post-image-item:first-child {
+.threeImages .postImageItem:first-child {
     grid-column: span 2;
     grid-row: span 2;
 }
 
 /* 4 صور أو أكثر - شبكة مربعة */
-.four-or-more {
+.fourOrMore {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 }
 
-.activity_follow {
+.activityFollow {
     background:
         radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(198, 36, 227, 0.1) 0%, transparent 50%),
@@ -1276,7 +1278,7 @@
     gap: 6px;
 }
 
-.icon-follow {
+.iconFollow {
     width: 20px;
     height: 20px;
 }
@@ -1323,12 +1325,12 @@
 }
 
 /* Simple delete account button styles */
-.account-actions-section {
+.accountActionsSection {
     margin-top: 2rem;
     padding: 0;
 }
 
-.btn-delete-account-simple {
+.btnDeleteAccountSimple {
     width: 100%;
     padding: 14px 20px;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
@@ -1345,19 +1347,19 @@
     gap: 8px;
 }
 
-.btn-delete-account-simple:hover:not(:disabled) {
+.btnDeleteAccountSimple:hover:not(:disabled) {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
 }
 
-.btn-delete-account-simple:disabled {
+.btnDeleteAccountSimple:disabled {
     opacity: 0.7;
     cursor: not-allowed;
 }
 
 /* Modal styles with black and purple theme */
-.modal-overlay {
+.modalOverlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -1371,7 +1373,7 @@
     backdrop-filter: blur(8px);
 }
 
-.delete-account-modal {
+.deleteAccountModal {
     background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
     border-radius: 20px;
     width: 90%;
@@ -1395,7 +1397,7 @@
     }
 }
 
-.modal-header {
+.modalHeader {
     padding: 1.5rem 1.5rem 1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
@@ -1403,17 +1405,17 @@
     justify-content: space-between;
 }
 
-.modal-title {
+.modalTitle {
     font-size: 1.5rem;
     font-weight: 700;
     color: white;
 }
 
-.modal-body {
+.modalBody {
     padding: 1.5rem;
 }
 
-.warning-message {
+.warningMessage {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 12px;
@@ -1421,47 +1423,47 @@
     margin-bottom: 1.5rem;
 }
 
-.warning-icon {
+.warningIcon {
     font-size: 2rem;
     margin-bottom: 1rem;
     color: #ef4444;
 }
 
-.warning-message h3 {
+.warningMessage h3 {
     color: #ef4444;
     margin-bottom: 0.5rem;
     font-size: 1.2rem;
 }
 
-.warning-message p {
+.warningMessage p {
     color: #d1d5db;
     line-height: 1.6;
     font-size: 0.95rem;
 }
 
-.warning-message ul {
+.warningMessage ul {
     margin: 0.75rem 0;
     padding-left: 1.5rem;
 }
 
-.warning-message li {
+.warningMessage li {
     margin-bottom: 0.25rem;
     color: #d1d5db;
 }
 
-.warning-message strong {
+.warningMessage strong {
     color: white;
 }
 
-.delete-form {
+.deleteForm {
     margin-top: 1.5rem;
 }
 
-.form-group {
+.formGroup {
     margin-bottom: 1.5rem;
 }
 
-.form-label {
+.formLabel {
     display: block;
     color: white;
     font-weight: 600;
@@ -1469,7 +1471,7 @@
     font-size: 0.95rem;
 }
 
-.form-input {
+.formInput {
     width: 100%;
     padding: 14px 16px;
     background: rgba(255, 255, 255, 0.05);
@@ -1480,24 +1482,24 @@
     color: white;
 }
 
-.form-input::placeholder {
+.formInput::placeholder {
     color: #9ca3af;
 }
 
-.form-input:focus {
+.formInput:focus {
     outline: none;
     border-color: #8c5af2;
     box-shadow: 0 0 0 3px rgba(140, 90, 242, 0.2);
     background: rgba(255, 255, 255, 0.08);
 }
 
-.form-input:disabled {
+.formInput:disabled {
     background: rgba(255, 255, 255, 0.03);
     cursor: not-allowed;
     opacity: 0.7;
 }
 
-.error-message {
+.errorMessage {
     background: rgba(239, 68, 68, 0.1);
     color: #fca5a5;
     padding: 12px 16px;
@@ -1507,30 +1509,30 @@
     border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.form-actions {
+.formActions {
     display: flex;
     gap: 12px;
     justify-content: flex-end;
 }
 
-.btn-cancel {
+.btnCancel {
     background: rgba(255, 255, 255, 0.1);
     color: #d1d5db;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.btn-cancel:hover:not(:disabled) {
+.btnCancel:hover:not(:disabled) {
     background: rgba(255, 255, 255, 0.15);
     color: white;
 }
 
-.btn-delete {
+.btnDelete {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     border: none;
 }
 
-.btn-delete:hover:not(:disabled) {
+.btnDelete:hover:not(:disabled) {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
@@ -1542,7 +1544,7 @@
     transform: none !important;
 }
 
-.warning-message-password{
+.warningMessagePassword {
     color: rgb(216, 99, 99);
     font-size: small;
     margin: 0px;
