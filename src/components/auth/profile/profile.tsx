@@ -299,9 +299,9 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
                                     type="password"
                                     value={password}
                                     onChange={(e) => {
-                                    setPassword(e.target.value);
-                                    setError('');
-                                }}
+                                        setPassword(e.target.value);
+                                        setError('');
+                                    }}
                                     placeholder="Current password"
                                     required
                                     disabled={isDeleting}
@@ -915,7 +915,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 <button className={styles.editAvatarBtn} onClick={handleEditClick}>
                                     <MdEdit style={{ width: 20, height: 20 }} />
                                 </button>
-                                 {/* زر تحديث كلمة السر */}
+                                {/* زر تحديث كلمة السر */}
                                 <button
                                     className={styles.editAvatarBtn}
                                     onClick={() => setShowUpdatePasswordModal(true)}
@@ -1065,6 +1065,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 onPostDeleted={handlePostDeleted}
                                 onImagesUpdated={handleImagesUpdated}
                                 onPostUpdated={handlePostUpdated}
+                            // ⭐ بدون useExternalData => سيجلب البيانات بنفسه
                             />
                         </div>
                     )}

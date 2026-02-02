@@ -7,7 +7,7 @@ export interface NotificationResponse {
   message?: string;
 }
 
-export const notificationsService = {
+export const notificationReadService = {
   async markAsRead(id: number, token: string): Promise<NotificationResponse> {
     const response = await axios.put<NotificationResponse>(
       `http://localhost:8000/api/v1/notifications/${id}/read`,
