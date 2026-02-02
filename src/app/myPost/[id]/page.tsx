@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import UserPostsFeed from '@/components/auth/profile/UserPostsFeed';
-import { 
-    FaFeatherAlt, 
+import {
+    FaFeatherAlt,
     FaQuoteLeft,
     FaHeart,
     FaPenAlt,
@@ -15,19 +15,19 @@ import {
     FaComments,
     FaEye
 } from 'react-icons/fa';
-import { 
+import {
     HiOutlineDocumentText,
     HiOutlineLightningBolt,
     HiOutlineSparkles,
     HiOutlinePencilAlt
 } from 'react-icons/hi';
-import { 
+import {
     FiZap,
     FiTrendingUp,
     FiAward,
     FiClock
 } from 'react-icons/fi';
-import { 
+import {
     GiMagicPortal,
     GiStaryu
 } from 'react-icons/gi';
@@ -47,31 +47,31 @@ const INSPIRING_QUOTES = [
 
 // Updated stats cards
 const STATS_CARDS = [
-    { 
-        label: "Total Posts", 
-        key: "total_posts", 
-        icon: HiOutlineDocumentText, 
+    {
+        label: "Total Posts",
+        key: "total_posts",
+        icon: HiOutlineDocumentText,
         color: "#8B5CF6",
         description: "All published posts"
     },
-    { 
-        label: "Most Liked", 
-        key: "most_liked", 
-        icon: FaHeart, 
+    {
+        label: "Most Liked",
+        key: "most_liked",
+        icon: FaHeart,
         color: "#EC4899",
         description: "Highest liked post"
     },
-    { 
-        label: "Latest Post", 
-        key: "latest_post", 
-        icon: FiClock, 
+    {
+        label: "Latest Post",
+        key: "latest_post",
+        icon: FiClock,
         color: "#10B981",
         description: "Most recent creation"
     },
-    { 
-        label: "Total Comments", 
-        key: "total_comments", 
-        icon: FaComments, 
+    {
+        label: "Total Comments",
+        key: "total_comments",
+        icon: FaComments,
         color: "#3B82F6",
         description: "All post comments"
     }
@@ -87,8 +87,9 @@ export default function MyPostsPage() {
         latest_post: 0,
         total_comments: 0
     });
-    
+
     const [loading, setLoading] = useState(true);
+    const [filterLoading, setFilterLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [randomQuote, setRandomQuote] = useState('');
@@ -96,6 +97,7 @@ export default function MyPostsPage() {
     const [activeSort, setActiveSort] = useState('newest');
     const [postsData, setPostsData] = useState<any>(null);
     const [hasMore, setHasMore] = useState(false);
+    const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
     // Select random quote on load
     useEffect(() => {
@@ -106,11 +108,8 @@ export default function MyPostsPage() {
     // Function to fetch user statistics
     const fetchUserStats = async () => {
         try {
-            setLoading(true);
-            setError(null);
-            
             const response = await getUserStats(userId);
-            
+
             if (response.success) {
                 setStats(response.data.stats);
             } else {
@@ -119,32 +118,29 @@ export default function MyPostsPage() {
         } catch (error: any) {
             console.error('Error fetching user stats:', error);
             setError('Unable to load data. Please try again.');
-        } finally {
-            setLoading(false);
         }
     };
 
-    // Function to fetch filtered posts - أول 10 فقط
+    // Function to fetch filtered posts
     const fetchFilteredPosts = async (page: number = 1, loadMore: boolean = false) => {
         try {
             if (loadMore) {
                 setLoadingMore(true);
             } else {
-                setLoading(true);
+                setFilterLoading(true);
             }
-            
-            console.log('📡 Fetching posts:', { 
-                userId, 
-                filter: activeFilter, 
-                sort: activeSort, 
+
+            console.log('📡 Fetching posts:', {
+                userId,
+                filter: activeFilter,
+                sort: activeSort,
                 page,
                 loadMore
             });
-            
-            // أول مرة: 10، بعدين: 10
+
             const limit = 10;
             const response = await getFilteredUserPosts(userId, activeFilter, activeSort, page, limit);
-            
+
             console.log('✅ API Response:', {
                 success: response.success,
                 hasData: !!response.data,
@@ -154,24 +150,21 @@ export default function MyPostsPage() {
                 last_page: response.last_page,
                 has_more: response.has_more
             });
-            
+
             if (response.success) {
                 if (loadMore && postsData?.data) {
-                    // في حالة load more، دمج البيانات
                     setPostsData({
                         ...response,
                         data: [...postsData.data, ...response.data]
                     });
                 } else {
-                    // في حالة جديدة
                     setPostsData(response);
                 }
-                
-                // تحقق إذا كان هناك المزيد للتحميل
-                const totalLoaded = loadMore 
+
+                const totalLoaded = loadMore
                     ? (postsData?.data?.length || 0) + response.data.length
                     : response.data.length;
-                
+
                 setHasMore(totalLoaded < response.total && response.has_more);
             }
         } catch (error: any) {
@@ -183,14 +176,14 @@ export default function MyPostsPage() {
             if (loadMore) {
                 setLoadingMore(false);
             } else {
-                setLoading(false);
+                setFilterLoading(false);
             }
         }
     };
 
-    // دالة لتحميل المزيد - 10 بوستات إضافية
+    // دالة لتحميل المزيد
     const handleLoadMore = async () => {
-        if (postsData && hasMore && !loadingMore && !loading) {
+        if (postsData && hasMore && !loadingMore && !filterLoading) {
             const nextPage = postsData.current_page + 1;
             await fetchFilteredPosts(nextPage, true);
         }
@@ -198,15 +191,15 @@ export default function MyPostsPage() {
 
     // دالة لتحميل كل البوستات مرة واحدة
     const handleLoadAll = async () => {
-        if (postsData && hasMore && !loadingMore && !loading) {
+        if (postsData && hasMore && !loadingMore && !filterLoading) {
             const remainingPosts = postsData.total - postsData.data.length;
             const pagesNeeded = Math.ceil(remainingPosts / 10);
-            
+
             console.log(`🔄 Loading all remaining posts: ${remainingPosts} posts, ${pagesNeeded} pages`);
-            
+
             for (let i = 1; i <= pagesNeeded; i++) {
                 if (!hasMore) break;
-                
+
                 const pageNum = postsData.current_page + i;
                 await fetchFilteredPosts(pageNum, true);
             }
@@ -215,26 +208,49 @@ export default function MyPostsPage() {
 
     // Initialize - fetch both stats and posts
     useEffect(() => {
-        fetchUserStats();
-        fetchFilteredPosts(1, false);
+        const initializeData = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                
+                // Fetch statistics first
+                await fetchUserStats();
+                
+                // Then fetch initial posts
+                await fetchFilteredPosts(1, false);
+                
+                setInitialLoadComplete(true);
+            } catch (error: any) {
+                console.error('❌ Error initializing data:', error);
+                setError('Failed to load page. Please try again.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (userId) {
+            initializeData();
+        }
     }, [userId]);
 
-    // Update posts when filter or sort changes
-    useEffect(() => {
-        if (userId) {
-            fetchFilteredPosts(1, false);
-        }
-    }, [activeFilter, activeSort]);
-
     // Handle filter change
-    const handleFilterChange = (filterId: string) => {
+    const handleFilterChange = async (filterId: string) => {
         setActiveFilter(filterId);
+        // Loading will be handled by the useEffect below
     };
 
     // Handle sort change
     const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setActiveSort(e.target.value);
+        // Loading will be handled by the useEffect below
     };
+
+    // Update posts when filter or sort changes - بعد الانتهاء من التحميل الأولي
+    useEffect(() => {
+        if (initialLoadComplete && userId) {
+            fetchFilteredPosts(1, false);
+        }
+    }, [activeFilter, activeSort, initialLoadComplete]);
 
     // Handle post deletion
     const handlePostDeleted = () => {
@@ -293,16 +309,16 @@ export default function MyPostsPage() {
                     {STATS_CARDS.map((stat, index) => {
                         const Icon = stat.icon;
                         const value = stats[stat.key as keyof typeof stats];
-                        
+
                         return (
-                            <div 
-                                key={stat.key} 
+                            <div
+                                key={stat.key}
                                 className={styles.statCard}
                                 style={{ animationDelay: `${index * 0.1}s` }}
                             >
                                 <div className={styles.statIconContainer}>
-                                    <Icon 
-                                        className={styles.statIcon} 
+                                    <Icon
+                                        className={styles.statIcon}
                                         style={{ color: stat.color }}
                                     />
                                 </div>
@@ -313,7 +329,7 @@ export default function MyPostsPage() {
                                     <span className={styles.statLabel}>{stat.label}</span>
                                     <span className={styles.statDescription}>{stat.description}</span>
                                 </div>
-                                <div 
+                                <div
                                     className={styles.statGlow}
                                     style={{ background: `radial-gradient(circle, ${stat.color}40 0%, transparent 70%)` }}
                                 ></div>
@@ -333,11 +349,10 @@ export default function MyPostsPage() {
                             return (
                                 <button
                                     key={filter.id}
-                                    className={`${styles.filterButton} ${
-                                        activeFilter === filter.id ? styles.filterButtonActive : ''
-                                    }`}
+                                    className={`${styles.filterButton} ${activeFilter === filter.id ? styles.filterButtonActive : ''
+                                        }`}
                                     onClick={() => handleFilterChange(filter.id)}
-                                    disabled={loading}
+                                    disabled={filterLoading || loading}
                                 >
                                     <Icon className={styles.filterIcon} />
                                     {filter.label}
@@ -345,14 +360,14 @@ export default function MyPostsPage() {
                             );
                         })}
                     </div>
-                    
+
                     <div className={styles.sortContainer}>
                         <span className={styles.sortLabel}>Sort by:</span>
-                        <select 
+                        <select
                             className={styles.sortSelect}
                             value={activeSort}
                             onChange={handleSortChange}
-                            disabled={loading}
+                            disabled={filterLoading || loading}
                         >
                             {sortOptions.map(option => (
                                 <option key={option.value} value={option.value}>
@@ -370,7 +385,7 @@ export default function MyPostsPage() {
                         <h2 className={styles.headerTitle}>
                             Writing Journey
                             <span className={styles.headerSubtitle}>
-                                {loading ? 'Loading...' : `${stats.total_posts} creative posts`}
+                                {loading || filterLoading ? 'Loading...' : `${stats.total_posts} creative posts`}
                             </span>
                         </h2>
                     </div>
@@ -380,8 +395,8 @@ export default function MyPostsPage() {
                     </div>
                 </div>
 
-                {/* Loading State */}
-                {loading && !postsData && (
+                {/* Loading State للتحميل الأولي */}
+                {loading && (
                     <div className={styles.loadingContainer}>
                         <div className={styles.loadingAnimation}>
                             <GiStaryu className={styles.loadingStar} />
@@ -392,8 +407,20 @@ export default function MyPostsPage() {
                     </div>
                 )}
 
+                {/* Loading State للفلتر فقط */}
+                {!loading && filterLoading && (
+                    <div className={styles.loadingContainer}>
+                        <div className={styles.loadingAnimation}>
+                            <GiStaryu className={styles.loadingStar} />
+                            <GiStaryu className={styles.loadingStar} style={{ animationDelay: '0.2s' }} />
+                            <GiStaryu className={styles.loadingStar} style={{ animationDelay: '0.4s' }} />
+                        </div>
+                        <p className={styles.loadingText}>Loading posts...</p>
+                    </div>
+                )}
+
                 {/* Error State */}
-                {error && !loading && (
+                {error && !loading && !filterLoading && (
                     <div className={styles.errorContainer}>
                         <div className={styles.errorIconContainer}>
                             <HiOutlinePencilAlt className={styles.errorIcon} />
@@ -402,7 +429,7 @@ export default function MyPostsPage() {
                         <p className={styles.errorMessage}>
                             {error}
                         </p>
-                        <button 
+                        <button
                             className={styles.retryButton}
                             onClick={() => {
                                 setError(null);
@@ -417,15 +444,13 @@ export default function MyPostsPage() {
                 )}
 
                 {/* Posts Content */}
-                {!loading && !error && (
+                {!loading && !filterLoading && !error && postsData && (
                     <div className={styles.postsContent}>
                         <div className={styles.contentBackground}>
                             <div className={styles.contentGrid}>
                                 <div className={styles.contentMain}>
-                                    {postsData && postsData.data && postsData.data.length > 0 ? (
+                                    {postsData.data && postsData.data.length > 0 ? (
                                         <>
-                                            
-
                                             {/* User Posts Feed */}
                                             <UserPostsFeed
                                                 userId={userId}
@@ -447,8 +472,6 @@ export default function MyPostsPage() {
                                                 hasMoreExternal={hasMore}
                                                 loadingExternal={loadingMore}
                                             />
-                                            
-                                            
                                         </>
                                     ) : (
                                         <div className={styles.noPosts}>
@@ -457,7 +480,7 @@ export default function MyPostsPage() {
                                             </div>
                                             <h3>No posts found</h3>
                                             <p>Try changing your filter or create a new post!</p>
-                                            <button 
+                                            <button
                                                 onClick={() => fetchFilteredPosts(1, false)}
                                                 className={styles.retryButton}
                                             >
@@ -466,7 +489,7 @@ export default function MyPostsPage() {
                                         </div>
                                     )}
                                 </div>
-                                
+
                                 {/* Sidebar */}
                                 <div className={styles.contentSidebar}>
                                     <div className={styles.sidebarCard}>
@@ -475,13 +498,13 @@ export default function MyPostsPage() {
                                             <h4 className={styles.sidebarTitle}>Creative Tips</h4>
                                         </div>
                                         <ul className={styles.sidebarTips}>
-                                            <li>✍️ Write regularly to develop your skills</li>
-                                            <li>💡 Get inspired by personal experiences</li>
-                                            <li>🌟 Share your unique ideas</li>
-                                            <li>📈 Track your readers' engagement</li>
+                                            <li>✍️ Write regularly to improve</li>
+                                            <li>💡 Use personal experiences</li>
+                                            <li>🌟 Share unique ideas</li>
+                                            <li>📈 Track reader engagement</li>
                                         </ul>
                                     </div>
-                                    
+
                                     <div className={styles.sidebarCard}>
                                         <div className={styles.sidebarHeader}>
                                             <FaStar className={styles.sidebarIcon} />
@@ -508,15 +531,11 @@ export default function MyPostsPage() {
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
-
-                
             </main>
         </div>
     );
