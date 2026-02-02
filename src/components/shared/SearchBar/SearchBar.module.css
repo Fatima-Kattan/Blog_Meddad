@@ -39,7 +39,7 @@
     color: #ffffff;
     /* background: linear-gradient(145deg, rgba(26, 11, 46, 0.95), rgba(40, 20, 70, 0.95)); */
     border: 2px solid rgba(139, 92, 246, 0.3);
-    border-radius: 16px;
+    border-radius: 13px;
     outline: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(10px);

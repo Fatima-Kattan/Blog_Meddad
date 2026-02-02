@@ -1,7 +1,7 @@
 'use client'
 // components/Profile.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import styles from './profile.module.css'; // تغيير الاستيراد هنا
+import styles from './profile.module.css';
 import ProfileService, {
     UserProfile,
     ProfileStats,
@@ -28,51 +28,6 @@ interface ProfileProps {
     userId?: string | number;
     isOwnProfile?: boolean;
 }
-
-interface ApiPost {
-    id: number;
-    user_id: number;
-    title: string;
-    caption: string;
-    images: string[];
-    created_at: string;
-    likes_count: number;
-    comments_count: number;
-    user: {
-        id: number;
-        full_name: string;
-        image: string;
-    };
-    likes: any[];
-    comments: any[];
-    tags: any[];
-}
-
-interface UserPostsResponse {
-    success: boolean;
-    data: {
-        user: {
-            id: number;
-            full_name: string;
-            image: string;
-            bio: string;
-            created_at: string;
-        };
-        posts: {
-            current_page: number;
-            data: ApiPost[];
-            total: number;
-            last_page: number;
-        };
-        stats: {
-            total_posts: number;
-            total_likes: number;
-            total_comments: number;
-        };
-    };
-    message: string;
-}
-
 // مكون المودال لتعديل كلمة السر
 interface UpdatePasswordModalProps {
     isOpen: boolean;
