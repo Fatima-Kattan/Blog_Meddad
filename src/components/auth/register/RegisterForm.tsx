@@ -6,7 +6,7 @@ import InputField from '../../shared/InputField';
 import SelectField from '../../shared/SelectField';
 import DatePickerField from '../../shared/DatePickerField';
 import FileUploadField from '../../shared/FileUploadField';
-import './RegisterForm.css';
+import styles from './RegisterForm.module.css'; // تغيير هنا
 import { IoPersonAdd } from "react-icons/io5";
 
 const RegisterForm: React.FC = () => {
@@ -146,9 +146,9 @@ const RegisterForm: React.FC = () => {
 
     if (!isClient) {
         return (
-            <div className="register-container">
-                <div className="register-card">
-                    <h1 className="register-title"><IoPersonAdd className='icon_color' /> Create New Account</h1>
+            <div className={styles.container}>
+                <div className={styles.card}>
+                    <h1 className={styles.title}><IoPersonAdd className={styles.iconColor} /> Create New Account</h1>
                     <div style={{ textAlign: 'center', padding: '2rem' }}>
                         Loading form...
                     </div>
@@ -158,27 +158,27 @@ const RegisterForm: React.FC = () => {
     }
 
     return (
-        <div className="register-container" suppressHydrationWarning>
-            <div className="register-card">
-                <div className='register-icon'>
-                    <IoPersonAdd className='icon_color' />
-                    <h1 className="register-title">Create New Account</h1>
+        <div className={styles.container} suppressHydrationWarning>
+            <div className={styles.card}>
+                <div className={styles.registerIcon}>
+                    <IoPersonAdd className={styles.iconColor} />
+                    <h1 className={styles.title}>Create New Account</h1>
                 </div>
 
                 {successMessage && (
-                    <div className="success-message">
+                    <div className={styles.successMessage}>
                         {successMessage}
                     </div>
                 )}
 
                 {errorMessage && (
-                    <div className="error-message-global">
+                    <div className={styles.errorMessageGlobal}>
                         {errorMessage}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="register-form">
-                    <div className="form-grid">
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    <div className={styles.formGrid}>
                         <InputField
                             label="Full Name"
                             name="full_name"
@@ -255,13 +255,13 @@ const RegisterForm: React.FC = () => {
                         <InputField
                             label="Profile Picture (Optional)"
                             name="image"
-                            value={formData.image || ''}  // أضف هذا لتجنب مشاكل undefined/null
+                            value={formData.image || ''}
                             onChange={handleChange}
                             placeholder="enter image url ..."
-                            error={errors.image}  // غير من errors.phone_number إلى errors.image
+                            error={errors.image}
                         />
-                        <div className="textarea-group">
-                            <label htmlFor="bio" className="textarea-label">
+                        <div className={styles.textareaGroup}>
+                            <label htmlFor="bio" className={styles.textareaLabel}>
                                 About You (Optional)
                             </label>
                             <textarea
@@ -270,7 +270,7 @@ const RegisterForm: React.FC = () => {
                                 value={formData.bio}
                                 onChange={handleChange}
                                 placeholder="Tell us about yourself..."
-                                className="textarea-field"
+                                className={styles.textareaField}
                                 rows={4}
                             />
                         </div>
@@ -287,14 +287,14 @@ const RegisterForm: React.FC = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="register-button"
+                        className={styles.button}
                     >
                         {isLoading ? 'Registering...' : 'Register'}
                     </button>
 
-                    <p className="login-link">
+                    <p className={styles.loginLink}>
                         Already have an account?{' '}
-                        <a href="/login" className="login-link-text">
+                        <a href="/login" className={styles.loginLinkText}>
                             Login
                         </a>
                     </p>

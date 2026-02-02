@@ -1,5 +1,5 @@
-/* LoginForm.css */
-.login-container {
+/* LoginForm.module.css */
+.container {
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -11,20 +11,18 @@
 }
 
 /* الدائرة المتحركة */
-.login-container::before {
+.container::before {
     content: '';
     position: absolute;
     width: 500px;
     height: 500px;
     border-radius: 50%;
-    background: conic-gradient(
-        from 0deg,
-        #8b5cf6,
-        #6d28d9,
-        #c624e3,
-        #6d28d9,
-        #360d96
-    );
+    background: conic-gradient(from 0deg,
+            #8b5cf6,
+            #6d28d9,
+            #c624e3,
+            #6d28d9,
+            #360d96);
     animation: rotate 8s linear infinite;
     filter: blur(80px);
     opacity: 0.3;
@@ -33,20 +31,18 @@
     top: -100px;
 }
 
-.login-container::after {
+.container::after {
     content: '';
     position: absolute;
     width: 400px;
     height: 400px;
     border-radius: 50%;
-    background: conic-gradient(
-        from 180deg,
-        #a78bfa,
-        #7c3aed,
-        #a78bfa,
-        #7c3aed,
-        #a78bfa
-    );
+    background: conic-gradient(from 180deg,
+            #a78bfa,
+            #7c3aed,
+            #a78bfa,
+            #7c3aed,
+            #a78bfa);
     animation: rotate 10s linear infinite reverse;
     filter: blur(60px);
     opacity: 0.2;
@@ -59,18 +55,19 @@
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
 }
 
-.login-card {
+.card {
     background: rgba(22, 7, 40, 0.7);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(139, 92, 246, 0.3);
     border-radius: 1.5rem;
-    box-shadow: 
+    box-shadow:
         0 20px 60px rgba(139, 92, 246, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 3rem;
@@ -80,7 +77,8 @@
     z-index: 1;
     transition: all 0.3s ease;
 }
-.login-card::before {
+
+.card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -89,16 +87,14 @@
     bottom: 0;
     border-radius: 1.5rem;
     padding: 2px;
-    background: conic-gradient(
-        from var(--angle, 0deg),
-        #8b5cf6,
-        #1d1523,
-        #231332,
-        #0e081b,
-        #ce70dd
-    );
-    -webkit-mask: 
-        linear-gradient(#fff 0 0) content-box, 
+    background: conic-gradient(from var(--angle, 0deg),
+            #8b5cf6,
+            #1d1523,
+            #231332,
+            #0e081b,
+            #ce70dd);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -116,18 +112,20 @@
     0% {
         --angle: 0deg;
     }
+
     100% {
         --angle: 360deg;
     }
 }
-.login-card:hover {
+
+.card:hover {
     border-color: rgba(139, 92, 246, 0.5);
-    box-shadow: 
+    box-shadow:
         0 25px 80px rgba(139, 92, 246, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.login-title-container {
+.titleContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -135,7 +133,7 @@
     margin-bottom: 2.5rem;
 }
 
-.login-icon {
+.icon {
     font-size: 3rem;
     background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
     -webkit-background-clip: text;
@@ -145,11 +143,11 @@
     margin-bottom: 0.5rem;
 }
 
-.login-title {
+.title {
     text-align: center;
 }
 
-.login-title-text {
+.titleText {
     font-size: 2.2rem;
     font-weight: 700;
     background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 100%);
@@ -160,7 +158,7 @@
     line-height: 1.2;
 }
 
-.login-subtitle {
+.subtitle {
     font-size: 1rem;
     color: #c4b5fd;
     font-weight: 400;
@@ -168,17 +166,17 @@
     display: block;
 }
 
-.login-form {
+.form {
     width: 100%;
 }
 
 /* تحسين حقول الإدخال */
-.form-group {
+.formGroup {
     margin-bottom: 1.5rem;
     width: 100%;
 }
 
-.form-label {
+.formLabel {
     display: block;
     margin-bottom: 0.75rem;
     font-weight: 500;
@@ -187,7 +185,7 @@
     letter-spacing: 0.5px;
 }
 
-.form-input {
+.formInput {
     width: 100%;
     padding: 0.875rem 1.25rem;
     border: 2px solid rgba(139, 92, 246, 0.2);
@@ -199,28 +197,28 @@
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.form-input::placeholder {
+.formInput::placeholder {
     color: rgba(200, 200, 255, 0.4);
 }
 
-.form-input:focus {
+.formInput:focus {
     outline: none;
     border-color: #8b5cf6;
     background: rgba(40, 20, 70, 0.8);
-    box-shadow: 
+    box-shadow:
         0 0 0 4px rgba(139, 92, 246, 0.15),
         inset 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.form-input:hover {
+.formInput:hover {
     border-color: rgba(139, 92, 246, 0.4);
 }
 
-.password-container {
+.passwordContainer {
     position: relative;
 }
 
-.password-toggle {
+.passwordToggle {
     position: absolute;
     right: 1.25rem;
     top: 63%;
@@ -235,25 +233,25 @@
     z-index: 2;
 }
 
-.password-toggle:hover {
+.passwordToggle:hover {
     color: #8b5cf6;
     transform: translateY(-50%) scale(1.1);
 }
 
-.remember-forgot {
+.rememberForgot {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
 }
 
-.remember-me {
+.rememberMe {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.remember-checkbox {
+.rememberCheckbox {
     width: 1.2rem;
     height: 1.2rem;
     border: 2px solid rgba(139, 92, 246, 0.4);
@@ -265,12 +263,12 @@
     position: relative;
 }
 
-.remember-checkbox:checked {
+.rememberCheckbox:checked {
     background-color: #8b5cf6;
     border-color: #8b5cf6;
 }
 
-.remember-checkbox:checked::after {
+.rememberCheckbox:checked::after {
     content: '✓';
     position: absolute;
     color: white;
@@ -280,14 +278,14 @@
     transform: translate(-50%, -50%);
 }
 
-.remember-label {
+.rememberLabel {
     color: #c4b5fd;
     font-size: 0.95rem;
     cursor: pointer;
     font-weight: 500;
 }
 
-.forgot-password {
+.forgotPassword {
     color: #a78bfa;
     font-size: 0.95rem;
     text-decoration: none;
@@ -296,7 +294,7 @@
     position: relative;
 }
 
-.forgot-password::after {
+.forgotPassword::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -307,15 +305,15 @@
     transition: width 0.3s ease;
 }
 
-.forgot-password:hover {
+.forgotPassword:hover {
     color: #8b5cf6;
 }
 
-.forgot-password:hover::after {
+.forgotPassword:hover::after {
     width: 100%;
 }
 
-.login-button {
+.button {
     width: 100%;
     padding: 1rem;
     background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
@@ -327,7 +325,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 0.5rem;
-    box-shadow: 
+    box-shadow:
         0 4px 20px rgba(139, 92, 246, 0.4),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
@@ -335,7 +333,7 @@
     letter-spacing: 0.5px;
 }
 
-.login-button::before {
+.button::before {
     content: '';
     position: absolute;
     top: 0;
@@ -346,22 +344,22 @@
     transition: 0.5s;
 }
 
-.login-button:hover::before {
+.button:hover::before {
     left: 100%;
 }
 
-.login-button:hover:not(:disabled) {
+.button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 
+    box-shadow:
         0 8px 30px rgba(139, 92, 246, 0.6),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.login-button:active:not(:disabled) {
+.button:active:not(:disabled) {
     transform: translateY(0);
 }
 
-.login-button:disabled {
+.button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
@@ -388,14 +386,14 @@
     background: rgba(22, 7, 40, 0.7);
 }
 
-.register-link {
+.registerLink {
     text-align: center;
     margin-top: 2rem;
     color: #c4b5fd;
     font-size: 1rem;
 }
 
-.register-link-text {
+.registerLinkText {
     color: #a78bfa;
     font-weight: 600;
     text-decoration: none;
@@ -403,7 +401,7 @@
     position: relative;
 }
 
-.register-link-text::after {
+.registerLinkText::after {
     content: '';
     position: absolute;
     bottom: -2px;
@@ -414,15 +412,15 @@
     transition: width 0.3s ease;
 }
 
-.register-link-text:hover {
+.registerLinkText:hover {
     color: #8b5cf6;
 }
 
-.register-link-text:hover::after {
+.registerLinkText:hover::after {
     width: 100%;
 }
 
-.success-message {
+.successMessage {
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%);
     color: white;
     padding: 1rem 1.5rem;
@@ -434,7 +432,7 @@
     backdrop-filter: blur(10px);
 }
 
-.error-message-global {
+.errorMessageGlobal {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.9) 0%, rgba(220, 38, 38, 0.9) 100%);
     color: white;
     padding: 1rem 1.5rem;
@@ -446,7 +444,7 @@
     backdrop-filter: blur(10px);
 }
 
-.error-message {
+.errorMessage {
     color: #f87171;
     font-size: 0.875rem;
     margin-top: 0.5rem;
@@ -454,7 +452,7 @@
     padding-left: 0.25rem;
 }
 
-.loading-text {
+.loadingText {
     text-align: center;
     padding: 2rem;
     color: #a78bfa;
@@ -463,72 +461,75 @@
 
 /* تأثيرات إضافية للدائرة عند التحميل */
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.3;
     }
+
     50% {
         opacity: 0.5;
     }
 }
 
-.login-container.loading::before,
-.login-container.loading::after {
+.container.loading::before,
+.container.loading::after {
     animation: pulse 2s ease-in-out infinite;
 }
 
+/* تأثيرات للدائرة عند التحويم */
+.card:hover~.container::before {
+    opacity: 0.4;
+    filter: blur(60px);
+}
+
+.card:hover~.container::after {
+    opacity: 0.3;
+    filter: blur(40px);
+}
+
 @media (max-width: 640px) {
-    .login-container {
+    .container {
         padding: 1rem;
     }
-    
-    .login-card {
+
+    .card {
         padding: 2rem 1.5rem;
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
     }
-    
-    .login-container::before {
+
+    .container::before {
         width: 300px;
         height: 300px;
         left: -50px;
         top: -50px;
     }
-    
-    .login-container::after {
+
+    .container::after {
         width: 250px;
         height: 250px;
         right: -30px;
         bottom: -30px;
     }
-    
-    .login-title-container {
+
+    .titleContainer {
         gap: 1rem;
         margin-bottom: 2rem;
     }
-    
-    .login-icon {
+
+    .icon {
         font-size: 2.5rem;
     }
-    
-    .login-title-text {
+
+    .titleText {
         font-size: 1.8rem;
     }
-    
-    .remember-forgot {
+
+    .rememberForgot {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
         margin-bottom: 1.5rem;
     }
-}
-
-/* تأثيرات للدائرة عند التحويم */
-.login-card:hover ~ .login-container::before {
-    opacity: 0.4;
-    filter: blur(60px);
-}
-
-.login-card:hover ~ .login-container::after {
-    opacity: 0.3;
-    filter: blur(40px);
 }

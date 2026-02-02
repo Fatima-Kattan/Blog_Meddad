@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import InputField from '../../shared/InputField';
 import { loginService, LoginData } from '@/services/api/auth/loginService';
-import './LoginForm.css';
+import styles from './LoginForm.module.css'; // تغيير هنا
 
 const LoginForm: React.FC = () => {
     const [isClient, setIsClient] = useState(false);
@@ -128,16 +128,16 @@ const LoginForm: React.FC = () => {
 
     if (!isClient) {
         return (
-            <div className="login-container">
-                <div className="login-card">
-                    <div className="login-title-container">
-                        <div className="login-icon">🔐</div>
-                        <div className="login-title">
-                            <span className="login-title-text">Welcome Back</span>
-                            <span className="login-subtitle">Sign in to your account</span>
+            <div className={styles.container}>
+                <div className={styles.card}>
+                    <div className={styles.titleContainer}>
+                        <div className={styles.icon}>🔐</div>
+                        <div className={styles.title}>
+                            <span className={styles.titleText}>Welcome Back</span>
+                            <span className={styles.subtitle}>Sign in to your account</span>
                         </div>
                     </div>
-                    <div className="loading-text">
+                    <div className={styles.loadingText}>
                         Loading login form...
                     </div>
                 </div>
@@ -146,29 +146,29 @@ const LoginForm: React.FC = () => {
     }
 
     return (
-        <div className="login-container" suppressHydrationWarning>
-            <div className="login-card">
-                <div className="login-title-container">
-                    <div className="login-icon">🔐</div>
-                    <div className="login-title">
-                        <span className="login-title-text">Welcome Back</span>
-                        <span className="login-subtitle">Sign in to your account</span>
+        <div className={styles.container} suppressHydrationWarning>
+            <div className={styles.card}>
+                <div className={styles.titleContainer}>
+                    <div className={styles.icon}>🔐</div>
+                    <div className={styles.title}>
+                        <span className={styles.titleText}>Welcome Back</span>
+                        <span className={styles.subtitle}>Sign in to your account</span>
                     </div>
                 </div>
 
                 {successMessage && (
-                    <div className="success-message">
+                    <div className={styles.successMessage}>
                         {successMessage}
                     </div>
                 )}
 
                 {errorMessage && (
-                    <div className="error-message-global">
+                    <div className={styles.errorMessageGlobal}>
                         {errorMessage}
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="login-form">
+                <form onSubmit={handleSubmit} className={styles.form}>
                     {/* استخدام InputField بدلاً من input مباشرة */}
                     <InputField
                         label="Email Address"
@@ -182,8 +182,8 @@ const LoginForm: React.FC = () => {
                     />
 
                     {/* للحقل password سنضيف container خاص لإضافة زر show/hide */}
-                    <div className="form-group">
-                        <div className="password-container">
+                    <div className={styles.formGroup}>
+                        <div className={styles.passwordContainer}>
                             <InputField
                                 name="password"
                                 type={showPassword ? "text" : "password"}
@@ -197,29 +197,29 @@ const LoginForm: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={togglePasswordVisibility}
-                                className="password-toggle"
+                                className={styles.passwordToggle}
                                 aria-label={showPassword ? "Hide password" : "Show password"}
                             >
                                 {showPassword ? "👁️" : "👁️‍🗨️"}
                             </button>
                         </div>
-                        {errors.password && <span className="error-message">{errors.password}</span>}
+                        {errors.password && <span className={styles.errorMessage}>{errors.password}</span>}
                     </div>
 
-                    <div className="remember-forgot">
-                        <div className="remember-me">
+                    <div className={styles.rememberForgot}>
+                        <div className={styles.rememberMe}>
                             <input
                                 type="checkbox"
                                 id="rememberMe"
                                 checked={rememberMe}
                                 onChange={handleRememberMeChange}
-                                className="remember-checkbox"
+                                className={styles.rememberCheckbox}
                             />
-                            <label htmlFor="rememberMe" className="remember-label">
+                            <label htmlFor="rememberMe" className={styles.rememberLabel}>
                                 Remember me
                             </label>
                         </div>
-                        <a href="/forgot-password" className="forgot-password">
+                        <a href="/forgot-password" className={styles.forgotPassword}>
                             Forgot password?
                         </a>
                     </div>
@@ -227,18 +227,18 @@ const LoginForm: React.FC = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="login-button"
+                        className={styles.button}
                     >
                         {isLoading ? 'Signing in...' : 'Sign In'}
                     </button>
 
-                    <div className="divider">
+                    <div className={styles.divider}>
                         <span>Or</span>
                     </div>
 
-                    <p className="register-link">
+                    <p className={styles.registerLink}>
                         Don't have an account?{' '}
-                        <a href="/register" className="register-link-text">
+                        <a href="/register" className={styles.registerLinkText}>
                             Create account
                         </a>
                     </p>
