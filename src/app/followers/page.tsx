@@ -1,14 +1,9 @@
+// ⭐ أضيفي هذا السطر المهم!
+export const dynamic = 'force-dynamic';
 
-import MyFollowers from '@/components/follow/myFollowers/MyFollowers'
-import React from 'react'
-// import LoginForm from '../../components/auth/login/LoginForm'
+import FollowersClient from './FollowersClient';
 
-function page() {
-    return (
-        <div>
-            <MyFollowers/>
-        </div>
-    )
+export default async function FollowersPage() {
+    // ⭐ الصفحة الآن Dynamic!
+    return <FollowersClient />;
 }
-
-export default page
