@@ -64,6 +64,13 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     transform: translateY(-1px);
 }
+/* ===== Search Icon Animation ===== */
+.inputWrapper:focus-within .searchIcon {
+    
+    transform: translateY(-12px);
+}
+
+
 
 .searchInput::placeholder {
     color: rgba(196, 181, 253, 0.6);
