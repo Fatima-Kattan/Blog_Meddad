@@ -28,7 +28,7 @@ function NotificationMenu() {
           />
         ) : null
       ))}
-      {notifications.length > 3 && (
+      {notifications.length > 0 && (
         <button
           onClick={() => router.push('/notifications')}
           className={styles.moreBtn} // ✅ زر منسق من الملف الخارجي

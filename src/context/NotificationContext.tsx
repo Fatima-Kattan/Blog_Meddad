@@ -22,41 +22,91 @@ export interface Notification {
 interface NotificationsContextType {
   notifications: Notification[];
   unreadCount: number;
-  fetchNotifications: () => Promise<void>;
+  isLoading: boolean;
+  fetchNotifications: (force?: boolean) => Promise<void>;
   markAsRead: (id: number) => Promise<void>;
   markAllAsRead: () => Promise<void>;
+  handleManualRefresh: () => void;
 }
 
 const NotificationsContext = createContext<NotificationsContextType | null>(null);
 
-export const NotificationsProvider = ({ children }: { children: React.ReactNode }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [isPolling, setIsPolling] = useState(true); // ✅ للتحكم في الـ Polling
+interface NotificationsProviderProps {
+  children: React.ReactNode;
+  initialNotifications?: Notification[];    // ⭐ أضيفي هذا
+  initialUnreadCount?: number;             // ⭐ أضيفي هذا
+}
 
-  // ✅ جلب الإشعارات
-  const fetchNotifications = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+export const NotificationsProvider = ({ 
+  children,
+  initialNotifications = [],  // ⭐ قيمة افتراضية
+  initialUnreadCount = 0      // ⭐ قيمة افتراضية
+}: NotificationsProviderProps) => {
+  // ⭐ استخدمي البيانات الأولية من السيرفر
+  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const [unreadCount, setUnreadCount] = useState<number>(initialUnreadCount);
+  const [isLoading, setIsLoading] = useState(false); // ⭐ false لأن البيانات جاهزة أولياً
+  const [isPolling, setIsPolling] = useState(true);
+  const [token, setToken] = useState<string | null>(null);
+  const [lastFetched, setLastFetched] = useState<number>(0);
+  const [hasInitialData, setHasInitialData] = useState<boolean>(initialNotifications.length > 0);
+  
+  const CACHE_DURATION = 5000; // 5 ثواني
 
-    try {
-      const res = await notificationsService.getNotifications(token);
-      setNotifications(res.data);
-      
-      // ✅ حساب عدد غير المقروء
-      const unread = res.data.filter((n: Notification) => !n.is_read).length;
-      setUnreadCount(unread);
-    } catch (err) {
-      console.error('خطأ في جلب الإشعارات:', err);
+  // ✅ جلب التوكن من localStorage بعد التأكد من العميل
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedToken = localStorage.getItem('token');
+      if (savedToken) {
+        setToken(savedToken);
+      }
     }
   }, []);
 
-  // ✅ تحديث إشعار واحد - Optimistic Update
-  const markAsRead = useCallback(async (id: number) => {
-    const token = localStorage.getItem('token');
+  // ✅ جلب الإشعارات مع cache و retry
+  const fetchNotifications = useCallback(async (force = false, retryCount = 0) => {
     if (!token) return;
 
-    // 1. ✅ تحديث فوري في الواجهة (Optimistic Update)
+    // ✅ التحقق من الكاش
+    const now = Date.now();
+    if (!force && now - lastFetched < CACHE_DURATION) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await notificationsService.getNotifications(token);
+      
+      setNotifications(res.data);
+      const unread = res.data.filter((n: Notification) => !n.is_read).length;
+      setUnreadCount(unread);
+      setHasInitialData(true);
+      
+      setLastFetched(now);
+      
+      if (retryCount > 0) {
+        console.log('✅ تمت إعادة المحاولة بنجاح');
+      }
+    } catch (err) {
+      console.error('خطأ في جلب الإشعارات:', err);
+      
+      // ✅ Retry logic (3 محاولات)
+      if (retryCount < 3) {
+        const delay = Math.min(1000 * 2 ** retryCount, 10000);
+        setTimeout(() => {
+          fetchNotifications(true, retryCount + 1);
+        }, delay);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [token, lastFetched]);
+
+  // ✅ تحديث إشعار واحد
+  const markAsRead = useCallback(async (id: number) => {
+    if (!token) return;
+
+    // 1. ✅ تحديث فوري في الواجهة
     setNotifications(prev => 
       prev.map(n => 
         n.id === id ? { ...n, is_read: true } : n
@@ -66,14 +116,14 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
     // 2. ✅ تحديث unreadCount فورياً
     setUnreadCount(prev => Math.max(0, prev - 1));
 
-    // 3. ✅ إرسال الطلب للسيرفر (في الخلفية)
+    // 3. ✅ إرسال الطلب للسيرفر
     try {
       await notificationReadService.markAsRead(id, token);
       console.log('✅ تم تحديث السيرفر بنجاح');
     } catch (err) {
       console.error('❌ فشل تحديث السيرفر:', err);
       
-      // 4. ✅ التراجع عن التحديث إذا فشل السيرفر
+      // 4. ✅ التراجع عن التحديث
       setNotifications(prev => 
         prev.map(n => 
           n.id === id ? { ...n, is_read: false } : n
@@ -81,14 +131,11 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
       );
       setUnreadCount(prev => prev + 1);
     }
-  }, []);
+  }, [token]);
 
   // ✅ تحديث الكل
   const markAllAsRead = useCallback(async () => {
-    if (unreadCount === 0) return;
-    
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    if (unreadCount === 0 || !token) return;
 
     // 1. ✅ تحديث فوري
     setNotifications(prev => 
@@ -98,34 +145,57 @@ export const NotificationsProvider = ({ children }: { children: React.ReactNode 
 
     // 2. ✅ إرسال للسيرفر
     try {
-      // تأكدي من وجود هذه الخدمة
+      // إذا كان لديك خدمة markAllAsRead
       // await markAllAsReadService(token);
     } catch (err) {
       console.error('❌ فشل تحديث الكل:', err);
     }
-  }, [unreadCount]);
+  }, [unreadCount, token]);
 
-  // ✅ Polling كل 30 ثانية
+  // ✅ تحديث يدوي
+  const handleManualRefresh = useCallback(() => {
+    fetchNotifications(true);
+  }, [fetchNotifications]);
+
+  // ✅ Polling ذكي (فقط عند رؤية الصفحة)
   useEffect(() => {
-    if (!isPolling) return;
+    if (!isPolling || !token) return;
 
-    fetchNotifications(); // جلب أولي
-    
-    const interval = setInterval(() => {
+    // ⭐ إذا لم يكن لدينا بيانات أولية، جلب البيانات
+    if (!hasInitialData) {
       fetchNotifications();
-    }, 30000); // 30 ثانية
+    }
 
-    return () => clearInterval(interval);
-  }, [fetchNotifications, isPolling]);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchNotifications();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchNotifications();
+      }
+    }, 15000); // 15 ثانية
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [fetchNotifications, isPolling, token, hasInitialData]);
 
   return (
     <NotificationsContext.Provider 
       value={{ 
         notifications, 
         unreadCount, 
+        isLoading,
         fetchNotifications, 
         markAsRead,
-        markAllAsRead 
+        markAllAsRead,
+        handleManualRefresh
       }}
     >
       {children}

@@ -1,13 +1,9 @@
-import MyFollowing from '@/components/follow/myFollowing/MyFollowing'
-import React from 'react'
-// import LoginForm from '../../components/auth/login/LoginForm'
+// ⭐ أضيفي هذا السطر!
+export const dynamic = 'force-dynamic';
 
-function page() {
-    return (
-        <div>
-            <MyFollowing/>
-        </div>
-    )
+import FollowingClient from './FollowingClient';
+
+export default async function FollowingPage() {
+    // ⭐ الصفحة الآن Dynamic!
+    return <FollowingClient />;
 }
-
-export default page
