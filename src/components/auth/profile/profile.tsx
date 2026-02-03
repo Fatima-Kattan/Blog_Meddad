@@ -1,6 +1,6 @@
 'use client'
 // components/Profile.tsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import styles from './profile.module.css';
 import ProfileService, {
     UserProfile,
@@ -10,17 +10,29 @@ import ProfileService, {
     ProfileResponse,
     UserProfileResponse
 } from '@/services/api/auth/profileService';
-import MyFollowing from '../../follow/myFollowing/MyFollowing'
 import { HiArrowNarrowRight, HiOutlineLightBulb } from 'react-icons/hi';
-import MyFollowers from '@/components/follow/myFollowers/MyFollowers';
 import InputField from '@/components/shared/InputField';
 import SelectField from '@/components/shared/SelectField';
 import DatePickerField from '@/components/shared/DatePickerField';
 import { MdEdit, MdOutlineEmail, MdDelete, MdLock } from 'react-icons/md';
 import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import UserPostsFeed from '@/components/auth/profile/UserPostsFeed';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports للتحسين
+const UserPostsFeed = dynamic(() => import('@/components/auth/profile/UserPostsFeed'), {
+    loading: () => <div className={styles.loadingSmall}>Loading posts...</div>
+});
+
+const MyFollowers = dynamic(() => import('@/components/follow/myFollowers/MyFollowers'), {
+    loading: () => <div className={styles.loadingSmall}>Loading followers...</div>,
+    ssr: false
+});
+
+const MyFollowing = dynamic(() => import('@/components/follow/myFollowing/MyFollowing'), {
+    loading: () => <div className={styles.loadingSmall}>Loading following...</div>,
+    ssr: false
+});
 
 type TabType = 'overview' | 'posts' | 'followers' | 'following';
 
@@ -28,8 +40,9 @@ interface ProfileProps {
     userId?: string | number;
     isOwnProfile?: boolean;
 }
+
 // مكون المودال لتعديل كلمة السر
-interface UpdatePasswordModalProps {
+const UpdatePasswordModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
     onUpdate: (data: {
@@ -37,13 +50,7 @@ interface UpdatePasswordModalProps {
         new_password: string;
         new_password_confirmation: string;
     }) => Promise<void>;
-}
-
-const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
-    isOpen,
-    onClose,
-    onUpdate
-}) => {
+}> = ({ isOpen, onClose, onUpdate }) => {
     const [formData, setFormData] = useState({
         current_password: '',
         new_password: '',
@@ -56,7 +63,6 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
         setError('');
         setFieldErrors({});
 
@@ -93,8 +99,6 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
         try {
             await onUpdate(formData);
             setSuccess('Password updated successfully!');
-
-            // إعادة تعيين النموذج بعد النجاح
             setTimeout(() => {
                 setFormData({
                     current_password: '',
@@ -136,9 +140,7 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
             <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <h2 className={styles.modalTitle}>Change Password</h2>
-                    <button className={styles.modalCloseDelete} onClick={onClose}>
-                        ✕
-                    </button>
+                    <button className={styles.modalCloseDelete} onClick={onClose}>✕</button>
                 </div>
 
                 <div className={styles.modalBody}>
@@ -169,9 +171,7 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
                                 error={fieldErrors.new_password}
                                 disabled={isUpdating}
                             />
-                            <div className={styles.warningMessagePassword}>
-                                Password must be at least 8 characters
-                            </div>
+                            <div className={styles.warningMessagePassword}>Password must be at least 8 characters</div>
                         </div>
 
                         <div className={styles.formGroup}>
@@ -188,36 +188,15 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
                             />
                         </div>
 
-                        {error && (
-                            <div className={styles.errorMessage}>{error}</div>
-                        )}
-
-                        {success && (
-                            <div className={styles.successMessage}>{success}</div>
-                        )}
+                        {error && <div className={styles.errorMessage}>{error}</div>}
+                        {success && <div className={styles.successMessage}>{success}</div>}
 
                         <div className={styles.formActions}>
-                            <button
-                                type="button"
-                                className={`${styles.btn} ${styles.btnSecondary}`}
-                                onClick={onClose}
-                                disabled={isUpdating}
-                            >
+                            <button type="button" className={`${styles.btn} ${styles.btnSecondary}`} onClick={onClose} disabled={isUpdating}>
                                 Cancel
                             </button>
-                            <button
-                                type="submit"
-                                className={`${styles.btn} ${styles.btnPrimary}`}
-                                disabled={isUpdating}
-                            >
-                                {isUpdating ? (
-                                    <>
-                                        <div className={styles.loadingSpinner}></div>
-                                        Updating...
-                                    </>
-                                ) : (
-                                    'Update Password'
-                                )}
+                            <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={isUpdating}>
+                                {isUpdating ? (<><div className={styles.loadingSpinner}></div>Updating...</>) : 'Update Password'}
                             </button>
                         </div>
                     </form>
@@ -228,17 +207,11 @@ const UpdatePasswordModal: React.FC<UpdatePasswordModalProps> = ({
 };
 
 // مكون المودال لحذف الحساب باللغة الإنجليزية
-interface DeleteAccountModalProps {
+const DeleteAccountModal: React.FC<{
     isOpen: boolean;
     onClose: () => void;
     onDelete: (password: string) => Promise<void>;
-}
-
-const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
-    isOpen,
-    onClose,
-    onDelete
-}) => {
+}> = ({ isOpen, onClose, onDelete }) => {
     const [password, setPassword] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
     const [error, setError] = useState('');
@@ -269,19 +242,14 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
             <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <h2 className={styles.modalTitle}>Delete Account</h2>
-                    <button className={styles.modalCloseDelete} onClick={onClose}>
-                        ✕
-                    </button>
+                    <button className={styles.modalCloseDelete} onClick={onClose}>✕</button>
                 </div>
 
                 <div className={styles.modalBody}>
                     <div className={styles.warningMessage}>
                         <div className={styles.warningIcon}>⚠️</div>
                         <h3>Important Warning!</h3>
-                        <p>
-                            By deleting your account, you will:
-                            <strong>This action cannot be undone.</strong>
-                        </p>
+                        <p>By deleting your account, you will:<strong>This action cannot be undone.</strong></p>
                         <ul>
                             <li>❌ Permanently delete all your posts</li>
                             <li>❌ Delete all your comments and likes</li>
@@ -292,49 +260,29 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
 
                     <form onSubmit={handleSubmit} className={styles.deleteForm}>
                         <div className={styles.formGroup}>
-                            <div className={styles.formGroup}>
-                                <InputField
-                                    label="Enter your password to confirm"
-                                    name="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => {
-                                        setPassword(e.target.value);
-                                        setError('');
-                                    }}
-                                    placeholder="Current password"
-                                    required
-                                    disabled={isDeleting}
-                                />
-                            </div>
+                            <InputField
+                                label="Enter your password to confirm"
+                                name="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => {
+                                    setPassword(e.target.value);
+                                    setError('');
+                                }}
+                                placeholder="Current password"
+                                required
+                                disabled={isDeleting}
+                            />
                         </div>
 
-                        {error && (
-                            <div className={styles.errorMessage}>{error}</div>
-                        )}
+                        {error && <div className={styles.errorMessage}>{error}</div>}
 
                         <div className={styles.formActions}>
-                            <button
-                                type="button"
-                                className={`${styles.btn} ${styles.btnSecondary}`}
-                                onClick={onClose}
-                                disabled={isDeleting}
-                            >
+                            <button type="button" className={`${styles.btn} ${styles.btnSecondary}`} onClick={onClose} disabled={isDeleting}>
                                 Cancel
                             </button>
-                            <button
-                                type="submit"
-                                className={`${styles.btn} ${styles.btnDelete}`}
-                                disabled={isDeleting}
-                            >
-                                {isDeleting ? (
-                                    <>
-                                        <div className={styles.loadingSpinner}></div>
-                                        Deleting...
-                                    </>
-                                ) : (
-                                    'Delete Account'
-                                )}
+                            <button type="submit" className={`${styles.btn} ${styles.btnDelete}`} disabled={isDeleting}>
+                                {isDeleting ? (<><div className={styles.loadingSpinner}></div>Deleting...</>) : 'Delete Account'}
                             </button>
                         </div>
                     </form>
@@ -343,6 +291,10 @@ const DeleteAccountModal: React.FC<DeleteAccountModalProps> = ({
         </div>
     );
 };
+
+// Cache للبيانات
+const profileCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 30000; // 30 ثانية
 
 const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: propIsOwnProfile }) => {
     const router = useRouter();
@@ -357,7 +309,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [isOwnProfile, setIsOwnProfile] = useState(propIsOwnProfile || false);
     const [user, setUser] = useState<UserProfile | null>(null);
     const [stats, setStats] = useState<ProfileStats | null>(null);
-    const [profilePosts, setProfilePosts] = useState<ProfilePost[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<TabType>('posts');
@@ -368,158 +319,64 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [today, setToday] = useState('');
 
-    // States for delete account
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeletingAccount, setIsDeletingAccount] = useState(false);
-
-    // States for password update
     const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
-    // Improved function to extract ID from token
-    const getCurrentUserIdFromToken = (): string | number | null => {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                console.log('❌ No token in localStorage');
-                return null;
-            }
-
-            try {
-                // Check if token is valid and in JWT format
-                if (typeof token !== 'string') {
-                    console.log('⚠️ Token is not a string');
-                    return null;
-                }
-
-                // Check if token contains two dots (JWT format)
-                const parts = token.split('.');
-                if (parts.length !== 3) {
-                    console.log('⚠️ Token is not in valid JWT format');
-                    return null;
-                }
-
-                // Try to decode Base64
-                const payloadBase64 = parts[1];
-
-                // Add padding if necessary
-                const paddedBase64 = payloadBase64.padEnd(payloadBase64.length + (4 - payloadBase64.length % 4) % 4, '=');
-
-                // Decode
-                const payloadJson = atob(paddedBase64);
-
-                // Parse JSON
-                const payload = JSON.parse(payloadJson);
-
-                // Search for ID in possible places
-                const userId = payload.id || payload.user_id || payload.userId || payload.sub || payload.user?.id;
-
-                if (userId) {
-                    return userId;
-                } else {
-                    return null;
-                }
-            } catch (parseError) {
-                console.error('❌ Error parsing JWT token:', parseError);
-                return null;
-            }
-        } catch (error) {
-            console.error('❌ Error in getCurrentUserIdFromToken:', error);
-            return null;
-        }
-    };
-
-    // Alternative safer function to extract ID from token
-    const getCurrentUserIdFromTokenAlternative = (): string | number | null => {
+    // تحسين: استخدام useMemo للحسابات المتكررة
+    const memoizedTargetUserId = useMemo(() => targetUserId, [targetUserId]);
+    
+    // تحسين: دالة واحدة مبسطة لاستخراج الـ ID من التوكن
+    const getCurrentUserIdFromToken = useCallback((): string | number | null => {
         try {
             const token = localStorage.getItem('token');
             if (!token) return null;
-
-            let payload;
+            
+            // محاولة تحليل التوكن كـ JWT
             try {
-                // Check if token is a string and has length
-                if (typeof token !== 'string' || token.length < 10) {
-                    console.warn('Invalid token');
-                    return null;
-                }
-
-                // Try JWT first
                 const parts = token.split('.');
                 if (parts.length === 3) {
-                    try {
-                        const base64Url = parts[1];
-                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
-                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                        }).join(''));
-
-                        payload = JSON.parse(jsonPayload);
-                    } catch (jwtError) {
-                        console.warn('Failed to parse JWT:', jwtError);
-                        payload = null;
-                    }
+                    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                    return payload.id || payload.user_id || payload.userId || payload.sub || payload.user?.id || null;
                 }
-
-                // Extract ID from payload
-                if (payload) {
-                    return payload.id || payload.user_id || payload.userId || payload.sub ||
-                        payload.user?.id || payload.data?.id;
-                }
-
-                // Last attempt: search for ID in text
-                const idRegex = /"id"\s*:\s*"?(\d+)/;
-                const match = token.match(idRegex);
+            } catch {
+                // Fallback: البحث عن الـ ID في النص
+                const match = token.match(/"id"\s*:\s*"?(\d+)/);
                 if (match) return match[1];
-
-            } catch (innerError) {
-                console.error('Internal error:', innerError);
             }
-
+            
             return null;
-        } catch (error) {
-            console.error('External error:', error);
+        } catch {
             return null;
         }
-    };
+    }, []);
 
-    // Get current user ID from API directly
-    const getCurrentUserIdFromAPI = async (): Promise<string | number | null> => {
+    // تحسين: استخدام useCallback للدوال
+    const getCurrentUserId = useCallback(async (): Promise<string | number | null> => {
+        const fromToken = getCurrentUserIdFromToken();
+        if (fromToken) return fromToken;
+
         try {
             const response = await ProfileService.getUserProfile();
             if (response.success && response.data.user.id) {
                 return response.data.user.id;
             }
             return null;
-        } catch (error) {
-            console.error('❌ Error getting ID from API:', error);
+        } catch {
             return null;
         }
-    };
+    }, [getCurrentUserIdFromToken]);
 
-    // Unified function to get current ID
-    const getCurrentUserId = async (): Promise<string | number | null> => {
-        const fromToken = getCurrentUserIdFromTokenAlternative();
-        if (fromToken) return fromToken;
-
-        const fromAPI = await getCurrentUserIdFromAPI();
-        return fromAPI;
-    };
-
-    // Delete account function
-    const handleDeleteAccount = async (password: string) => {
+    const handleDeleteAccount = useCallback(async (password: string) => {
         setIsDeletingAccount(true);
         try {
             const response = await ProfileService.deleteAccount(password);
-
             if (response.success) {
-                // Clear all local data
                 localStorage.clear();
                 sessionStorage.clear();
-
-                // Redirect to register page
+                profileCache.clear();
                 router.push('/register');
-
-                // Show success message
                 alert('Your account has been successfully deleted. We\'re sorry to see you go!');
             }
         } catch (error: any) {
@@ -527,10 +384,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         } finally {
             setIsDeletingAccount(false);
         }
-    };
+    }, [router]);
 
-    // Update password function
-    const handleUpdatePassword = async (data: {
+    const handleUpdatePassword = useCallback(async (data: {
         current_password: string;
         new_password: string;
         new_password_confirmation: string;
@@ -544,14 +400,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             });
 
             if (response.success) {
-                // تحديث التوكن في localStorage
                 if (response.data?.token) {
                     localStorage.setItem('token', response.data.token);
                 }
-
                 alert('Password updated successfully! You have been logged in with your new password.');
-
-                // إعادة تحميل الصفحة لتطبيق التغييرات
                 window.location.reload();
             }
         } catch (error: any) {
@@ -559,87 +411,44 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         } finally {
             setIsUpdatingPassword(false);
         }
-    };
+    }, []);
 
-    // Reset state when user changes
-    useEffect(() => {
-        const resetState = () => {
-            setUser(null);
-            setStats(null);
-            setProfilePosts([]);
-            setLoading(true);
-            setError(null);
-            setActiveTab('posts');
-        };
-
-        resetState();
-
-        const todayDate = new Date().toISOString().split('T')[0];
-        setToday(todayDate);
-
-        if (targetUserId) {
-            fetchProfileData();
+    // تحسين: استخدام useCallback لـ fetchProfileData
+    const fetchProfileData = useCallback(async () => {
+        if (!memoizedTargetUserId) return;
+        
+        // التحقق من الـ cache أولاً
+        const cacheKey = `profile_${memoizedTargetUserId}`;
+        const cached = profileCache.get(cacheKey);
+        
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+            setUser(cached.data.user);
+            setStats(cached.data.stats);
+            setLoading(false);
+            return;
         }
-    }, [targetUserId]);
 
-    // Update isOwnProfile status when path or user changes
-    useEffect(() => {
-        const updateOwnProfileStatus = async () => {
-            if (!targetUserId) {
-                setIsOwnProfile(true);
-                return;
-            }
-
-            try {
-                const currentUserId = await getCurrentUserId();
-
-                if (currentUserId) {
-                    const isOwn = targetUserId.toString() === currentUserId.toString();
-                    setIsOwnProfile(isOwn);
-                } else {
-                    setIsOwnProfile(false);
-                }
-            } catch (error) {
-                console.error('❌ Error in updateOwnProfileStatus:', error);
-                setIsOwnProfile(false);
-            }
-        };
-
-        updateOwnProfileStatus();
-    }, [targetUserId, pathname]);
-
-    const fetchProfileData = async () => {
         try {
             setLoading(true);
             setError(null);
 
             let profileResponse: ProfileResponse | UserProfileResponse;
 
-            if (targetUserId) {
-                try {
-                    profileResponse = await ProfileService.getUserProfileById(targetUserId);
-
-                    const currentUserId = await getCurrentUserId();
-
-                    if (currentUserId && currentUserId.toString() === targetUserId.toString()) {
-                        setIsOwnProfile(true);
-                        localStorage.setItem('user_id', currentUserId.toString());
-                    } else {
-                        setIsOwnProfile(false);
-                    }
-
-                } catch (fetchError) {
-                    console.error('❌ Error fetching user profile:', fetchError);
-                    throw new Error('Failed to fetch user profile');
+            if (memoizedTargetUserId) {
+                profileResponse = await ProfileService.getUserProfileById(memoizedTargetUserId);
+                const currentUserId = await getCurrentUserId();
+                if (currentUserId && currentUserId.toString() === memoizedTargetUserId.toString()) {
+                    setIsOwnProfile(true);
+                    localStorage.setItem('user_id', currentUserId.toString());
+                } else {
+                    setIsOwnProfile(false);
                 }
             } else {
                 profileResponse = await ProfileService.getUserProfile();
-
                 const currentUserId = profileResponse.data.user.id;
                 if (currentUserId) {
                     localStorage.setItem('user_id', currentUserId.toString());
                 }
-
                 setIsOwnProfile(true);
             }
 
@@ -676,32 +485,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(formattedUser);
             setStats(formattedStats);
 
-            const userOldPosts = userData.posts || [];
-            if (userOldPosts.length > 0) {
-                const postsWithLikes = await Promise.all(
-                    userOldPosts.map(async (post) => {
-                        try {
-                            const likes = await ProfileService.getPostLikes(post.id);
-                            return {
-                                ...post,
-                                likes: likes,
-                                likes_count: likes.length,
-                                comments_count: post.comments_count || 0
-                            };
-                        } catch {
-                            return {
-                                ...post,
-                                likes: [],
-                                likes_count: post.likes_count || 0,
-                                comments_count: post.comments_count || 0
-                            };
-                        }
-                    })
-                );
-                setProfilePosts(postsWithLikes);
-            } else {
-                setProfilePosts([]);
-            }
+            // تخزين في الـ cache
+            profileCache.set(cacheKey, {
+                data: { user: formattedUser, stats: formattedStats },
+                timestamp: Date.now()
+            });
 
         } catch (err) {
             console.error('🔥 Error fetching data:', err);
@@ -710,9 +498,15 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         } finally {
             setLoading(false);
         }
-    };
+    }, [memoizedTargetUserId, getCurrentUserId]);
 
-    const formatDate = (dateString: string) => {
+    // تحسين: استخدام useMemo للحسابات
+    const genderOptions = useMemo(() => [
+        { value: 'male', label: 'Male' },
+        { value: 'female', label: 'Female' },
+    ], []);
+
+    const formatDate = useCallback((dateString: string) => {
         try {
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', {
@@ -723,9 +517,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         } catch {
             return 'Invalid date';
         }
-    };
+    }, []);
 
-    const calculateAge = (birthDate: string) => {
+    const calculateAge = useCallback((birthDate: string) => {
         if (!birthDate) return '';
         try {
             const birth = new Date(birthDate);
@@ -741,14 +535,43 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         } catch {
             return '';
         }
-    };
+    }, []);
 
-    const genderOptions = [
-        { value: 'male', label: 'Male' },
-        { value: 'female', label: 'Female' },
-    ];
+    // تحسين: useEffect مبسطة
+    useEffect(() => {
+        const todayDate = new Date().toISOString().split('T')[0];
+        setToday(todayDate);
 
-    const handleEditClick = () => {
+        const updateOwnProfileStatus = async () => {
+            if (!memoizedTargetUserId) {
+                setIsOwnProfile(true);
+                return;
+            }
+
+            try {
+                const currentUserId = await getCurrentUserId();
+                if (currentUserId) {
+                    const isOwn = memoizedTargetUserId.toString() === currentUserId.toString();
+                    setIsOwnProfile(isOwn);
+                } else {
+                    setIsOwnProfile(false);
+                }
+            } catch (error) {
+                console.error('❌ Error in updateOwnProfileStatus:', error);
+                setIsOwnProfile(false);
+            }
+        };
+
+        updateOwnProfileStatus();
+    }, [memoizedTargetUserId, pathname, getCurrentUserId]);
+
+    useEffect(() => {
+        if (memoizedTargetUserId) {
+            fetchProfileData();
+        }
+    }, [memoizedTargetUserId, fetchProfileData]);
+
+    const handleEditClick = useCallback(() => {
         if (user && isOwnProfile) {
             setEditForm({
                 full_name: user.full_name,
@@ -762,9 +585,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setShowEditModal(true);
             setSaveError(null);
         }
-    };
+    }, [user, isOwnProfile]);
 
-    const handleSaveProfile = async () => {
+    const handleSaveProfile = useCallback(async () => {
         if (!user || !isOwnProfile) return;
 
         try {
@@ -775,6 +598,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(response.data);
             setShowEditModal(false);
 
+            // إلغاء الـ cache بعد التحديث
+            const cacheKey = `profile_${user.id}`;
+            profileCache.delete(cacheKey);
+            
             await fetchProfileData();
 
         } catch (err) {
@@ -782,17 +609,17 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         } finally {
             setIsSaving(false);
         }
-    };
+    }, [user, isOwnProfile, editForm, fetchProfileData]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setEditForm(prev => ({
             ...prev,
             [name]: value
         }));
-    };
+    }, []);
 
-    const loadOwnProfile = async () => {
+    const loadOwnProfile = useCallback(async () => {
         try {
             const currentId = await getCurrentUserId();
             if (currentId) {
@@ -804,19 +631,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             console.error('❌ Failed to load own profile:', error);
             router.push('/login');
         }
-    };
+    }, [router, getCurrentUserId]);
 
-    const handlePostDeleted = (deletedPostId: number) => {
-        setProfilePosts(prev => prev.filter(post => post.id !== deletedPostId));
-    };
-
-    const handleImagesUpdated = () => {
-        // No action needed
-    };
-
-    const handlePostUpdated = () => {
-        // No action needed
-    };
+    const handlePostDeleted = useCallback((deletedPostId: number) => {
+        // إلغاء الـ cache عند حذف منشور
+        const cacheKey = `profile_${memoizedTargetUserId}`;
+        profileCache.delete(cacheKey);
+    }, [memoizedTargetUserId]);
 
     if (loading) {
         return (
@@ -828,7 +649,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     fontWeight: '600',
                     letterSpacing: '0.5px'
                 }}>
-                    {targetUserId ? `Loading Profile...` : 'Loading Your Profile...'}
+                    {memoizedTargetUserId ? `Loading Profile...` : 'Loading Your Profile...'}
                 </p>
             </div>
         );
@@ -838,67 +659,48 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         return (
             <div className={styles.errorState}>
                 <div className={styles.errorIcon}>⚠️</div>
-                <h2 style={{
-                    color: 'white',
-                    marginBottom: '16px',
-                    fontSize: '2rem'
-                }}>
-                    Error Loading Profile
-                </h2>
-                <p style={{
-                    color: '#94a3b8',
-                    marginBottom: '32px',
-                    fontSize: '1.1rem',
-                    maxWidth: '400px'
-                }}>
+                <h2 style={{ color: 'white', marginBottom: '16px', fontSize: '2rem' }}>Error Loading Profile</h2>
+                <p style={{ color: '#94a3b8', marginBottom: '32px', fontSize: '1.1rem', maxWidth: '400px' }}>
                     {error || 'Failed to load profile data'}
                 </p>
 
-                {targetUserId && (
+                {memoizedTargetUserId && (
                     <div style={{ marginBottom: '16px' }}>
-                        <button
-                            onClick={loadOwnProfile}
-                            style={{
-                                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                color: 'white',
-                                border: 'none',
-                                padding: '12px 24px',
-                                borderRadius: '12px',
-                                fontSize: '0.95rem',
-                                fontWeight: '600',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                marginRight: '12px'
-                            }}
-                        >
+                        <button onClick={loadOwnProfile} style={{
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            color: 'white',
+                            border: 'none',
+                            padding: '12px 24px',
+                            borderRadius: '12px',
+                            fontSize: '0.95rem',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            marginRight: '12px'
+                        }}>
                             View My Profile
                         </button>
                     </div>
                 )}
 
-                <button
-                    onClick={fetchProfileData}
-                    style={{
-                        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                        color: 'white',
-                        border: 'none',
-                        padding: '16px 32px',
-                        borderRadius: '12px',
-                        fontSize: '1rem',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        boxShadow: '0 8px 20px rgba(124, 58, 237, 0.4)'
-                    }}
-                    onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 15px 30px rgba(124, 58, 237, 0.5)';
-                    }}
-                    onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 8px 20px rgba(124, 58, 237, 0.4)';
-                    }}
-                >
+                <button onClick={fetchProfileData} style={{
+                    background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                    color: 'white',
+                    border: 'none',
+                    padding: '16px 32px',
+                    borderRadius: '12px',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    boxShadow: '0 8px 20px rgba(124, 58, 237, 0.4)'
+                }} onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                    e.currentTarget.style.boxShadow = '0 15px 30px rgba(124, 58, 237, 0.5)';
+                }} onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 8px 20px rgba(124, 58, 237, 0.4)';
+                }}>
                     Try Again
                 </button>
             </div>
@@ -915,12 +717,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 <button className={styles.editAvatarBtn} onClick={handleEditClick}>
                                     <MdEdit style={{ width: 20, height: 20 }} />
                                 </button>
-                                {/* زر تحديث كلمة السر */}
-                                <button
-                                    className={styles.editAvatarBtn}
-                                    onClick={() => setShowUpdatePasswordModal(true)}
-                                    disabled={isUpdatingPassword}
-                                >
+                                <button className={styles.editAvatarBtn} onClick={() => setShowUpdatePasswordModal(true)} disabled={isUpdatingPassword}>
                                     <MdLock style={{ width: 20, height: 20 }} />
                                 </button>
                             </div>
@@ -928,10 +725,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
                         {!isOwnProfile && (
                             <div className={styles.displayNotOwner}>
-                                <button
-                                    onClick={loadOwnProfile}
-                                    className={styles.editAvatarBtnNotOwner}
-                                >
+                                <button onClick={loadOwnProfile} className={styles.editAvatarBtnNotOwner}>
                                     <HiArrowNarrowRight style={{ width: 20, height: 20 }} />
                                     back to my profile
                                 </button>
@@ -943,6 +737,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 src={user.image || 'https://via.placeholder.com/150'}
                                 alt={user.full_name}
                                 className={styles.profileAvatar}
+                                loading="lazy"
                             />
                         </div>
 
@@ -1001,15 +796,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             </div>
                         </div>
 
-                        {/* Simple delete account button - only shows for owner */}
                         {isOwnProfile && (
                             <div className={styles.accountActionsSection}>
-                                {/* زر حذف الحساب */}
-                                <button
-                                    className={styles.btnDeleteAccountSimple}
-                                    onClick={() => setShowDeleteModal(true)}
-                                    disabled={isDeletingAccount}
-                                >
+                                <button className={styles.btnDeleteAccountSimple} onClick={() => setShowDeleteModal(true)} disabled={isDeletingAccount}>
                                     <MdDelete style={{ width: 18, height: 18, marginRight: 8 }} />
                                     {isDeletingAccount ? 'Processing...' : 'Delete Account'}
                                 </button>
@@ -1022,37 +811,19 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     <div className={styles.profileTabs}>
                         {isOwnProfile ? (
                             <>
-                                <button
-                                    className={`${styles.tabButton} ${activeTab === 'posts' ? styles.active : ''}`}
-                                    onClick={() => setActiveTab('posts')}
-                                >
-                                    Posts
-                                    <span className={styles.tabCount}>{stats.posts_count}</span>
+                                <button className={`${styles.tabButton} ${activeTab === 'posts' ? styles.active : ''}`} onClick={() => setActiveTab('posts')}>
+                                    Posts<span className={styles.tabCount}>{stats.posts_count}</span>
                                 </button>
-
-                                <button
-                                    className={`${styles.tabButton} ${activeTab === 'followers' ? styles.active : ''}`}
-                                    onClick={() => setActiveTab('followers')}
-                                >
-                                    Followers
-                                    <span className={styles.tabCount}>{stats.followers_count}</span>
+                                <button className={`${styles.tabButton} ${activeTab === 'followers' ? styles.active : ''}`} onClick={() => setActiveTab('followers')}>
+                                    Followers<span className={styles.tabCount}>{stats.followers_count}</span>
                                 </button>
-
-                                <button
-                                    className={`${styles.tabButton} ${activeTab === 'following' ? styles.active : ''}`}
-                                    onClick={() => setActiveTab('following')}
-                                >
-                                    Following
-                                    <span className={styles.tabCount}>{stats.following_count}</span>
+                                <button className={`${styles.tabButton} ${activeTab === 'following' ? styles.active : ''}`} onClick={() => setActiveTab('following')}>
+                                    Following<span className={styles.tabCount}>{stats.following_count}</span>
                                 </button>
                             </>
                         ) : (
-                            <button
-                                className={`${styles.tabButton} ${activeTab === 'posts' ? styles.active : ''}`}
-                                onClick={() => setActiveTab('posts')}
-                            >
-                                Posts
-                                <span className={styles.tabCount}>{stats.posts_count}</span>
+                            <button className={`${styles.tabButton} ${activeTab === 'posts' ? styles.active : ''}`} onClick={() => setActiveTab('posts')}>
+                                Posts<span className={styles.tabCount}>{stats.posts_count}</span>
                             </button>
                         )}
                     </div>
@@ -1060,12 +831,9 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     {activeTab === 'posts' && (
                         <div className={styles.recentActivity}>
                             <UserPostsFeed
-                                userId={targetUserId || ''}
+                                userId={memoizedTargetUserId || ''}
                                 isOwnProfile={isOwnProfile}
                                 onPostDeleted={handlePostDeleted}
-                                onImagesUpdated={handleImagesUpdated}
-                                onPostUpdated={handlePostUpdated}
-                            // ⭐ بدون useExternalData => سيجلب البيانات بنفسه
                             />
                         </div>
                     )}
@@ -1078,15 +846,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                     <HiOutlineLightBulb className={styles.iconFollow} />
                                     {isOwnProfile ? 'Your followers will appear here' : 'Followers will appear here'}
                                 </p>
-                                {isOwnProfile ? (
-                                    <MyFollowers />
-                                ) : (
-                                    <div style={{
-                                        color: '#94a3b8',
-                                        textAlign: 'center',
-                                        padding: '40px',
-                                        fontSize: '1.1rem'
-                                    }}>
+                                {isOwnProfile ? <MyFollowers /> : (
+                                    <div style={{ color: '#94a3b8', textAlign: 'center', padding: '40px', fontSize: '1.1rem' }}>
                                         Followers list is only visible to profile owner
                                     </div>
                                 )}
@@ -1102,15 +863,8 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                     <HiOutlineLightBulb className={styles.iconFollow} />
                                     {isOwnProfile ? 'People you follow will appear here' : 'Following will appear here'}
                                 </p>
-                                {isOwnProfile ? (
-                                    <MyFollowing />
-                                ) : (
-                                    <div style={{
-                                        color: '#94a3b8',
-                                        textAlign: 'center',
-                                        padding: '40px',
-                                        fontSize: '1.1rem'
-                                    }}>
+                                {isOwnProfile ? <MyFollowing /> : (
+                                    <div style={{ color: '#94a3b8', textAlign: 'center', padding: '40px', fontSize: '1.1rem' }}>
                                         Following list is only visible to profile owner
                                     </div>
                                 )}
@@ -1120,18 +874,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 </div>
             </div>
 
-            {/* Edit Profile Modal */}
             {showEditModal && isOwnProfile && (
                 <div className={styles.editModalOverlay} onClick={() => setShowEditModal(false)}>
                     <div className={styles.editModal} onClick={(e) => e.stopPropagation()}>
-                        <button className={styles.modalClose} onClick={() => setShowEditModal(false)}>
-                            ✕
-                        </button>
-
+                        <button className={styles.modalClose} onClick={() => setShowEditModal(false)}>✕</button>
                         <div className={styles.modalHeader}>
                             <h2 className={styles.modalTitle}>Edit Profile</h2>
                         </div>
-
                         <div className={styles.modalBody}>
                             {saveError && (
                                 <div style={{
@@ -1142,9 +891,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                     marginBottom: '24px',
                                     fontSize: '0.95rem',
                                     border: '1px solid rgba(239, 68, 68, 0.2)'
-                                }}>
-                                    {saveError}
-                                </div>
+                                }}>{saveError}</div>
                             )}
 
                             <div className={styles.imagePreviewContainer}>
@@ -1152,6 +899,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                     src={editForm.image || user.image || 'https://via.placeholder.com/150'}
                                     alt="Profile Preview"
                                     className={styles.imagePreview}
+                                    loading="lazy"
                                 />
                             </div>
 
@@ -1236,29 +984,11 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                             </div>
 
                             <div className={styles.formActions}>
-                                <button
-                                    className={`${styles.btn} ${styles.btnSecondary}`}
-                                    onClick={() => setShowEditModal(false)}
-                                    disabled={isSaving}
-                                >
+                                <button className={`${styles.btn} ${styles.btnSecondary}`} onClick={() => setShowEditModal(false)} disabled={isSaving}>
                                     Cancel
                                 </button>
-
-                                <button
-                                    className={`${styles.btn} ${styles.btnPrimary}`}
-                                    onClick={handleSaveProfile}
-                                    disabled={isSaving}
-                                >
-                                    {isSaving ? (
-                                        <>
-                                            <div className={styles.loadingSpinner} style={{
-                                                width: '20px',
-                                                height: '20px',
-                                                borderWidth: '2px'
-                                            }}></div>
-                                            Saving...
-                                        </>
-                                    ) : 'Save Changes'}
+                                <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleSaveProfile} disabled={isSaving}>
+                                    {isSaving ? (<><div className={styles.loadingSpinner} style={{ width: '20px', height: '20px', borderWidth: '2px' }}></div>Saving...</>) : 'Save Changes'}
                                 </button>
                             </div>
                         </div>
@@ -1266,14 +996,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                 </div>
             )}
 
-            {/* Update Password Modal */}
             <UpdatePasswordModal
                 isOpen={showUpdatePasswordModal}
                 onClose={() => setShowUpdatePasswordModal(false)}
                 onUpdate={handleUpdatePassword}
             />
 
-            {/* Delete Account Modal */}
             <DeleteAccountModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
