@@ -72,7 +72,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
                     
                     <button
                         type="button"
-                        className={styles.createButton}
+                        className={`${styles.btn} ${styles.createButton}`}
                         onClick={handleCreateClick}
                         title="Create Post"
                         disabled

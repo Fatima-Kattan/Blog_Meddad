@@ -11,7 +11,7 @@
     overflow: hidden;
 }
 
-.pageContainer::before {
+/* .pageContainer::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -24,7 +24,7 @@
         radial-gradient(circle at 40% 80%, rgba(74, 0, 130, 0.08) 0%, transparent 50%);
     z-index: 0;
     animation: float 15s ease-in-out infinite alternate;
-}
+} */
 
 @keyframes float {
     0% { transform: translate(0, 0) rotate(0deg); }
@@ -41,9 +41,9 @@
     display: flex;
     flex-direction: column;
     box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.5),
-        0 0 60px rgba(138, 43, 226, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 10px 20px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(137, 43, 226, 0.158),
+        inset 0 1px 0 rgba(255, 255, 255, 0.153);
     max-width: 1400px;
     width: 100%;
     position: relative;
@@ -283,10 +283,7 @@
 .filterButton {
     width: 100%;
     padding: 16px;
-    background: linear-gradient(135deg, 
-        #8a2be2 0%, 
-        #6a1bb2 50%,
-        #8a2be2 100%);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
     border: none;
     border-radius: 14px;
@@ -298,45 +295,46 @@
     position: relative;
     overflow: hidden;
     text-transform: uppercase;
-    box-shadow: 0 8px 25px rgba(138, 43, 226, 0.3);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .filterButton::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.2), 
-        transparent);
-    transition: left 0.7s;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
 }
 
 .filterButton:hover::before {
-    left: 100%;
+    animation: shimmer 1.5s infinite;
 }
 
 .filterButton:hover {
     transform: translateY(-3px);
-    box-shadow: 
-        0 15px 35px rgba(138, 43, 226, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.1);
-    background: linear-gradient(135deg, 
-        #9a3bf2 0%, 
-        #7a2bd2 50%,
-        #9a3bf2 100%);
-        cursor: pointer;
-
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
 }
 
 .filterButton:active {
     transform: translateY(-1px);
-    box-shadow: 0 5px 20px rgba(138, 43, 226, 0.3);
 }
 
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
 /* Notifications Header */
 .notificationsHeader {
     display: flex;

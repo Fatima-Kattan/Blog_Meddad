@@ -135,13 +135,43 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+    position: relative;
+    overflow: hidden;
+}
+
+.editAvatarBtnNotOwner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+}
+
+.editAvatarBtnNotOwner:hover::before {
+    animation: shimmer 1.5s infinite;
 }
 
 .editAvatarBtnNotOwner:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(124, 58, 237, 0.5);
-    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+
+.editAvatarBtnNotOwner:active {
+    transform: translateY(-1px);
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .editAvatarBtn:hover {
@@ -150,9 +180,7 @@
     background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
 }
 
-.editAvatarBtnNotOwner:active {
-    transform: translateY(0);
-}
+
 
 .editAvatarBtn {
     transform: translateY(0);

@@ -403,26 +403,68 @@
 
 .urlSubmitButton {
     padding: 0.75rem 1.5rem;
-    background: var(--color-primary);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
     border: none;
-    border-radius: 0.5rem;
-    color: var(--color-text);
+    border-radius: 12px;
+    color: white;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     white-space: nowrap;
     height: fit-content;
+    margin-top: 10px;
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.urlSubmitButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
 }
 
 .urlSubmitButton:hover:not(:disabled) {
-    background: var(--color-primary-dark);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
 }
 
+.urlSubmitButton:hover:not(:disabled)::before {
+    animation: shimmer 1.5s infinite;
+}
+
+.urlSubmitButton:active:not(:disabled) {
+    transform: translateY(-1px);
+}
 .urlSubmitButton:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.urlSubmitButton:disabled::before {
+    animation: none !important;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .urlHint {
@@ -498,21 +540,43 @@
 
 .postButton {
     flex: 1;
-    padding: 12px;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    color: var(--color-text);
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
     border: none;
     border-radius: 12px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+.postButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+}
+.postButton:hover:not(.disabled):not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+.postButton:hover:not(.disabled):not(:disabled)::before {
+    animation: shimmer 1.5s infinite;
 }
 
-.postButton:hover:not(.disabled):not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-    background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+.postButton:active:not(.disabled):not(:disabled) {
+    transform: translateY(-1px);
 }
 
 .postButton.disabled,
@@ -522,6 +586,12 @@
     transform: none !important;
     box-shadow: none !important;
 }
+
+.postButton.disabled::before,
+.postButton:disabled::before {
+    animation: none !important;
+}
+
 
 .loadingSpinner {
     display: inline-block;
