@@ -278,7 +278,7 @@
 /* الأساسيات */
 .sidebar {
   width: 280px;
-  min-height: 561px;
+  min-height: 77%;
   background: #1a0b2e;
   color: white;
   position: sticky;
