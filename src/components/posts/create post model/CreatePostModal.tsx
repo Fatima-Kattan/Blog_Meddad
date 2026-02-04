@@ -280,7 +280,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({
                             name="title"
                             value={postData.title}
                             onChange={handleInputChange}
-                            placeholder="Post Title"
+                            placeholder="post title"
                             className={styles.titleInput}
                             required
                         />
