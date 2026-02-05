@@ -458,6 +458,66 @@
   padding-left: 44px;
   padding-right: 44px;
   border: 1px solid #8b5cf64d;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* أفضل من ease */
+}
+
+/* إطار أرجواني متحرك */
+.navigation::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 1px;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    #a855f7 25%,
+    #7c3aed 50%,
+    #c084fc 75%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  z-index: -1;
+  opacity: 0.4;
+  animation: purpleFlow 3s linear infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes purpleFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* طبقة داخلية */
+.navigation::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: calc(16px - 1px);
+  background: #1a0b2e;
+  z-index: -1;
+}
+
+.navigation:hover::before {
+  opacity: 0.8;
+  animation-duration: 1.5s;
+}
+
+.navigation {
+  transform: translateY(-4px); /* تغيير هنا: -4px بدل -2px */
+}
+.navigation:hover {
+  transform: translateY(-4px); /* تغيير هنا: -4px بدل -2px */
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.2);
 }
 
 .navList {

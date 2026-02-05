@@ -29,7 +29,7 @@ const PostContent = ({ title, caption, onTagClick }: PostContentProps) => {
                         onClick={() => onTagClick && onTagClick(tagName)}
                         style={{ 
                             cursor: 'pointer',
-                            color: '#007bff',
+                            color: 'rgb(222 164 205)',
                             fontWeight: 500 
                         }}
                     >
