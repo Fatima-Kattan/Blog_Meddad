@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import styles from './notificationItem.module.css';
 import { useNotifications } from '@/context/NotificationContext';
 import { FiCheckCircle } from 'react-icons/fi';
+import LoadingIcon from "@/components/shared/LoadingIcon/LoadingIcon";
 
 interface Actor {
     id: number;
@@ -28,13 +29,13 @@ interface NotificationItemProps {
 
 function NotificationItem({ notification }: NotificationItemProps) {
     const [loading, setLoading] = useState(false);
-    const { markAsRead } = useNotifications(); // ✅ ناخد الدالة من الـ context
+    const { markAsRead } = useNotifications();
     const isRead = Boolean(notification.is_read);
 
     const handleMarkAsRead = async () => {
         try {
             setLoading(true);
-            await markAsRead(notification.id); // ✅ استدعاء الدالة من الـ context
+            await markAsRead(notification.id);
         } catch (error: any) {
             alert(error.message);
         } finally {
@@ -76,14 +77,30 @@ function NotificationItem({ notification }: NotificationItemProps) {
             </div>
 
             {!isRead && (
-                <button
-                    className={styles.markReadBtn}
-                    onClick={handleMarkAsRead}
-                    disabled={loading}
-                >
-                    <FiCheckCircle />
-                    {loading ? 'Updating' : 'Marke as read'}
-                </button>
+                <div className={styles.markReadContainer}>
+                    
+                    {loading ? (
+                        <div style={{ 
+                            position: 'relative', 
+                            width: '120px',
+                            height: '40px'
+                        }}>
+                            <LoadingIcon 
+                                size={25}
+                                position="absolute"
+                            />
+                        </div>
+                    ) : (
+                        <button
+                            className={styles.markReadBtn}
+                            onClick={handleMarkAsRead}
+                            disabled={loading}
+                        >
+                            <FiCheckCircle />
+                            Mark as read
+                        </button>
+                    )}
+                </div>
             )}
         </div>
     );

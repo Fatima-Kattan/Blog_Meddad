@@ -8,6 +8,7 @@ import ProfileService from '@/services/api/auth/profileService';
 import { HiHome, HiUsers, HiCalendar } from 'react-icons/hi';
 import styles from './sidebar.module.css';
 import { MdAssistantNavigation } from 'react-icons/md';
+import LoadingIcon from '../shared/LoadingIcon/LoadingIcon';
 
 interface LeftSidebarProps {
   compact?: boolean;
@@ -27,7 +28,6 @@ interface UserData {
   created_at?: string;
 }
 
-// fetcher بسيط
 const fetcher = async () => {
   const response = await ProfileService.getUserProfile();
   if (response.success && response.data.user) {
@@ -52,10 +52,10 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ compact = false }) => {
   const pathname = usePathname();
   const router = useRouter();
 
-  // SWR بيخزن ويعمل revalidate تلقائي
+  // SWR stores and automatically revalidates
   const { data: user, error, isLoading } = useSWR('currentUser', fetcher, {
-    revalidateOnFocus: false,   // ما يعيد التحميل كل ما رجعت للصفحة
-    refreshInterval: 5 * 60 * 1000 // تحديث كل 5 دقائق
+    revalidateOnFocus: false, // Reloads every time you return to the page
+    refreshInterval: 5 * 60 * 1000 // Refreshes every 5 minutes
   });
 
   const formatNumber = (num: number) =>
@@ -81,14 +81,18 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ compact = false }) => {
     return (
       <aside className={`${styles.sidebar} ${compact ? styles.compact : ''}`}>
         <div className={styles.loadingContainer}>
-          <div className={styles.loadingSpinner}></div>
+          <LoadingIcon
+            size={45}
+            message="Loading..."
+            position="absolute"
+          />
         </div>
       </aside>
     );
   }
 
   if (error) {
-    return <div>خطأ بتحميل البيانات</div>;
+    return <div>Data Loading Error</div>;
   }
 
   return (

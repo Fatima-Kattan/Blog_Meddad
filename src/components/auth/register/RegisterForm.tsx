@@ -8,6 +8,7 @@ import DatePickerField from '../../shared/DatePickerField';
 import FileUploadField from '../../shared/FileUploadField';
 import styles from './RegisterForm.module.css'; // تغيير هنا
 import { IoPersonAdd } from "react-icons/io5";
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 const RegisterForm: React.FC = () => {
     const [isClient, setIsClient] = useState(false);
@@ -46,13 +47,6 @@ const RegisterForm: React.FC = () => {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
     };
-
-    /*  const handleImageChange = (file: File | null) => {
-         setFormData(prev => ({
-             ...prev,
-             image: file
-         }));
-     }; */
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
@@ -148,9 +142,16 @@ const RegisterForm: React.FC = () => {
         return (
             <div className={styles.container}>
                 <div className={styles.card}>
-                    <h1 className={styles.title}><IoPersonAdd className={styles.iconColor} /> Create New Account</h1>
+                    <div className={styles.registerIcon}>
+                        <IoPersonAdd className={styles.iconColor} />
+                        <h1 className={styles.title}>Create New Account</h1>
+                    </div>
                     <div style={{ textAlign: 'center', padding: '2rem' }}>
-                        Loading form...
+                        <LoadingIcon 
+                            size={60}
+                            message="Loading form..."
+                            position="absolute"
+                        />
                     </div>
                 </div>
             </div>
@@ -274,13 +275,6 @@ const RegisterForm: React.FC = () => {
                                 rows={4}
                             />
                         </div>
-
-                        {/* <FileUploadField
-                            label="Profile Picture (Optional)"
-                            name="image"
-                            onChange={handleImageChange}
-                            error={errors.image}
-                        /> */}
 
                     </div>
 

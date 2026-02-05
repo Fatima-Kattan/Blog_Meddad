@@ -15,7 +15,6 @@ function NotificationIcon() {
         setIsOpen(prev => !prev);
     };
 
-    // ✅ إغلاق القائمة عند النقر خارجها
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (

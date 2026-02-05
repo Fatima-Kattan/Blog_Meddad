@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import PostItem from '@/components/posts/post-item/PostItem';
 import axios from 'axios';
 
-// تعريف الأنواع
+// Define types
 export interface ApiPost {
     id: number;
     user_id: number;
@@ -28,7 +28,7 @@ export interface ApiPost {
 interface UserPostsFeedProps {
     userId: string | number;
     isOwnProfile?: boolean;
-    posts?: ApiPost[]; // ⭐ البيانات الخارجية الأولية
+    posts?: ApiPost[]; // ⭐ Initial external data
     externalPagination?: {
         current_page: number;
         last_page: number;
@@ -42,9 +42,9 @@ interface UserPostsFeedProps {
     onImagesUpdated?: () => void;
     onPostUpdated?: () => void;
     onRefreshNeeded?: () => void;
-    onLoadMore?: () => Promise<void>; // ⭐ دالة جديدة لتحميل المزيد من البيانات الخارجية
-    hasMoreExternal?: boolean; // ⭐ معرفة إذا كان هناك المزيد في البيانات الخارجية
-    loadingExternal?: boolean; // ⭐ حالة التحميل للبيانات الخارجية
+    onLoadMore?: () => Promise<void>; // ⭐ New function to load more external data
+    hasMoreExternal?: boolean; // ⭐ Know if there is more in external data
+    loadingExternal?: boolean; // ⭐ Loading state for external data
 }
 
 const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
@@ -59,9 +59,9 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
     onImagesUpdated,
     onPostUpdated,
     onRefreshNeeded,
-    onLoadMore, // ⭐ Prop جديد
-    hasMoreExternal = false, // ⭐ قيمة افتراضية
-    loadingExternal = false // ⭐ قيمة افتراضية
+    onLoadMore, // ⭐ New prop
+    hasMoreExternal = false, // ⭐ Default value
+    loadingExternal = false // ⭐ Default value
 }) => {
     // States
     const [userPosts, setUserPosts] = useState<ApiPost[]>(useExternalData ? posts : []);
@@ -72,7 +72,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
     const [loadingMore, setLoadingMore] = useState(false);
     const observerRef = useRef<HTMLDivElement>(null);
 
-    // ⭐ دالة الجلب للبروفايل العادي
+    // ⭐ Fetch function for normal profile
     const fetchUserPosts = useCallback(async (pageNum: number = 1, isRefresh: boolean = false) => {
         if (!userId || useExternalData) return;
 
@@ -116,14 +116,14 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
         }
     }, [userId, useExternalData]);
 
-    // ⭐ تحديث البوستات عندما تتغير props الخارجية
+    // ⭐ Update posts when external props change
     useEffect(() => {
         if (useExternalData) {
             console.log('External posts updated:', posts);
             setUserPosts(posts);
             setPostsLoading(false);
             setPostsError(null);
-            // ⭐ لا نغير hasMore هنا، نستخدم hasMoreExternal
+            // ⭐ Don't change hasMore here, use hasMoreExternal
         }
     }, [posts, useExternalData]);
 
@@ -162,7 +162,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
         }
     };
 
-    // ⭐ دالة تحميل المزيد للبيانات الخارجية
+    // ⭐ Load more function for external data
     const loadMoreExternal = async () => {
         if (!onLoadMore || loadingExternal || !hasMoreExternal) return;
         
@@ -173,7 +173,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
         }
     };
 
-    // ⭐ دالة تحميل المزيد العامة
+    // ⭐ General load more function
     const loadMore = async () => {
         if (useExternalData) {
             await loadMoreExternal();
@@ -182,19 +182,19 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
         }
     };
 
-    // Initial fetch - للبروفايل فقط
+    // Initial fetch - for profile only
     useEffect(() => {
         if (userId && !useExternalData) {
             fetchUserPosts(1, true);
         }
     }, [userId, useExternalData]);
 
-    // Infinite scroll observer - يعمل لكلا الحالتين
+    // Infinite scroll observer - works for both cases
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
                 if (entries[0].isIntersecting) {
-                    // ⭐ تحقق من الحالة المناسبة
+                    // ⭐ Check appropriate state
                     if (useExternalData) {
                         if (hasMoreExternal && !loadingExternal && !loadingMore) {
                             console.log('⬇️ Loading more external posts...');
@@ -228,7 +228,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
         }
     }, [fetchUserPosts, useExternalData, onRefreshNeeded]);
 
-    // ⭐ تحديد حالة التحميل النشطة
+    // ⭐ Determine active loading state
     const isLoading = useExternalData ? loadingExternal : postsLoading || loadingMore;
     const canLoadMore = useExternalData ? hasMoreExternal : hasMore;
     const showLoadMoreButton = canLoadMore && !isLoading;
@@ -342,7 +342,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                         </div>
                     ) : (
                         <>
-                            {/* قائمة البوستات */}
+                            {/* Posts list */}
                             {userPosts.map((post) => (
                                 <PostItem 
                                     key={post.id} 
@@ -353,7 +353,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                                 />
                             ))}
 
-                            {/* حالة التحميل */}
+                            {/* Loading state */}
                             {isLoading && (
                                 <div style={{ textAlign: 'center', padding: '2rem' }}>
                                     <div style={styles.loadingSpinner}></div>
@@ -366,7 +366,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                                 </div>
                             )}
 
-                            {/* زر Load More للـ Intersection Observer */}
+                            {/* Load More button for Intersection Observer */}
                             {showLoadMoreButton && (
                                 <div ref={observerRef} style={styles.loadMoreTrigger}>
                                     <button
@@ -386,7 +386,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                                 </div>
                             )}
 
-                            {/* رسالة النهاية */}
+                            {/* End message */}
                             {showEndMessage && (
                                 <div style={styles.endMessage}>
                                     <p>
@@ -402,7 +402,7 @@ const UserPostsFeed: React.FC<UserPostsFeedProps> = ({
                 </>
             )}
 
-            <style jsx>{`
+            <style >{`
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
                     100% { transform: rotate(360deg); }

@@ -1,6 +1,4 @@
 /* profile.module.css */
-
-/* styles/Profile.css */
 .profileContainer {
     width: 100%;
     min-height: 100vh;
@@ -10,7 +8,6 @@
     padding: 0;
 }
 
-/* هيدر البروفايل */
 .profileHeader {
     background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
     padding: 60px 40px 40px;
@@ -53,7 +50,6 @@
     max-width: 600px;
 }
 
-/* المحتوى الرئيسي */
 .profileContent {
     max-width: 1500px;
     margin: 0 auto;
@@ -63,7 +59,6 @@
     gap: 10px;
 }
 
-/* الشريط الجانبي - تصميم مظلم */
 .profileSidebar {
     background: #160722;
     border-radius: 24px;
@@ -109,35 +104,80 @@
 .editAvatarBtn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 8px;
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
     border: none;
-    padding: 14px 14px;
+    padding: 14px;
     border-radius: 12px;
     font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
-}
-
-.editAvatarBtnNotOwner {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
-    color: white;
-    border: none;
-    padding: 12px 12px;
-    border-radius: 12px;
-    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
     position: relative;
     overflow: hidden;
+    white-space: nowrap;
+}
+
+.editAvatarBtn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.editAvatarBtn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+
+.editAvatarBtn:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite;
+}
+
+.editAvatarBtn:active {
+    transform: translateY(-1px);
+}
+
+.editAvatarBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.editAvatarBtn:disabled::before {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+.editAvatarBtnNotOwner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    border: none;
+    padding: 10px 17px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .editAvatarBtnNotOwner::before {
@@ -149,10 +189,8 @@
     bottom: 0;
     background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transform: translateX(-100%);
-}
-
-.editAvatarBtnNotOwner:hover::before {
-    animation: shimmer 1.5s infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .editAvatarBtnNotOwner:hover {
@@ -161,32 +199,26 @@
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
 }
 
+.editAvatarBtnNotOwner:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite;
+}
+
 .editAvatarBtnNotOwner:active {
     transform: translateY(-1px);
 }
 
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
+.editAvatarBtnNotOwner:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-.editAvatarBtn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(124, 58, 237, 0.5);
-    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+.editAvatarBtnNotOwner:disabled::before {
+    animation: none !important;
+    opacity: 0 !important;
 }
-
-
-
-.editAvatarBtn {
-    transform: translateY(0);
-}
-
-/* معلومات المستخدم */
 .userInfo {
     text-align: center;
     margin-bottom: 32px;
@@ -225,7 +257,6 @@
     display: inline-block;
 }
 
-/* إحصائيات البروفايل */
 .profileStats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -278,7 +309,6 @@
     font-weight: 600;
 }
 
-/* معلومات البروفايل */
 .profileInfoSection {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 20px;
@@ -391,7 +421,6 @@
     font-weight: 700;
 }
 
-/* المحتوى الرئيسي */
 .profileMain {
     background: #1e293b;
     border-radius: 24px;
@@ -400,7 +429,6 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* التبويبات */
 .profileTabs {
     display: flex;
     gap: 4px;
@@ -469,7 +497,6 @@
     color: white;
 }
 
-/* قسم النشاط الأخير */
 .recentActivity {
     background: rgba(255, 255, 255, 0.03);
     border-radius: 20px;
@@ -575,7 +602,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* إحصائيات المنشور */
 .postStats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -645,7 +671,6 @@
     letter-spacing: 1px;
 }
 
-/* المعجبين */
 .postLikers {
     padding-top: 24px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -701,7 +726,6 @@
     font-weight: 600;
 }
 
-/* نافذة تعديل البروفايل */
 .editModalOverlay {
     position: fixed;
     top: 0;
@@ -733,7 +757,6 @@
     scrollbar-width: thin !important;
 }
 
-/* For Chrome, Safari and Edge */
 .editModal::-webkit-scrollbar {
     width: 10px !important;
 }
@@ -755,7 +778,6 @@
 
 .modalHeader {
     padding: 36px 40px 0;
-    /* margin-bottom: 28px; */
 }
 
 .modalTitle {
@@ -891,7 +913,6 @@
 .formActions {
     display: flex;
     gap: 20px;
-    /* margin-top: 40px; */
 }
 
 .btn {
@@ -909,6 +930,7 @@
     gap: 12px;
     position: relative;
     overflow: hidden;
+    background-color: #c31f1f;
 }
 
 .btn::before {
@@ -954,7 +976,6 @@
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* حالة التحميل */
 .loading {
     display: flex;
     flex-direction: column;
@@ -983,7 +1004,6 @@
     }
 }
 
-/* حالة الخطأ */
 .errorState {
     display: flex;
     flex-direction: column;
@@ -1001,7 +1021,6 @@
     filter: drop-shadow(0 10px 20px rgba(239, 68, 68, 0.3));
 }
 
-/* رسالة عدم وجود منشورات */
 .noPosts {
     text-align: center;
     padding: 80px 40px;
@@ -1015,7 +1034,6 @@
     filter: drop-shadow(0 10px 20px rgba(124, 58, 237, 0.3));
 }
 
-/* التصميم المتجاوب */
 @media (max-width: 1200px) {
     .profileContent {
         grid-template-columns: 1fr;
@@ -1133,7 +1151,6 @@
     transform: scale(1.05);
 }
 
-/* شارة عدد الصور */
 .imageBadge {
     position: absolute;
     top: 20px;
@@ -1152,7 +1169,6 @@
     z-index: 2;
 }
 
-/* قسم النشاط الأخير */
 .recentActivity {
     flex: 1;
     background: rgba(255, 255, 255, 0.03);
@@ -1189,7 +1205,6 @@
     flex-direction: column;
 }
 
-/* التبويبات */
 .profileTabs {
     display: flex;
     gap: 4px;
@@ -1200,27 +1215,19 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     flex-shrink: 0;
 }
-
-/* ////////////////////////////// */
-/* إضافة إلى Profile.css */
-
-/* تنسيق صور البوست المتعددة */
 .postImagesGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px;
     margin-bottom: 20px;
     max-height: 400px;
-    /* ارتفاع ثابت */
     overflow-y: auto;
-    /* سكرول داخلي */
     padding: 8px;
     border-radius: 12px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* تصميم كل صورة في الشبكة */
 .postImageItem {
     position: relative;
     overflow: hidden;
@@ -1239,12 +1246,6 @@
     cursor: pointer;
     transition: transform 0.5s ease;
 }
-
-/* .postGridImage:hover {
-    transform: scale(1.1);
-} */
-
-/* عدادات الصور */
 .imagesCountBadge {
     position: absolute;
     top: 10px;
@@ -1263,25 +1264,20 @@
     gap: 6px;
 }
 
-/* تأثيرات للصور المتعددة */
-/* صورة واحدة - تحتل المساحة كاملة */
 .singleImage {
     grid-column: span 2;
     aspect-ratio: 16 / 9;
 }
 
-/* صورتين - توزيع 50% لكل منهما */
 .twoImages {
     grid-column: span 1;
 }
 
-/* 3 صور - الصورة الأولى أكبر */
 .threeImages .postImageItem:first-child {
     grid-column: span 2;
     grid-row: span 2;
 }
 
-/* 4 صور أو أكثر - شبكة مربعة */
 .fourOrMore {
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
 }
@@ -1311,36 +1307,6 @@
     height: 20px;
 }
 
-/* .input-field{
-    color: #fff !important;
-    background: #ffffff0d !important;
-    border: 2px solid #ffffff1a !important;
-    border-radius: 14px !important;
-    width: 100% !important;
-    padding: 18px 20px !important;
-    font-size: 1.05rem !important;
-    transition: all .3s !important;
-} */
-
-/* .select-field{
-    background: #293445 !important;
-    border: 2px solid #ffffff1a !important;
-    border-radius: 14px !important;
-    width: 100% !important;
-    padding: 18px 20px !important;
-    font-size: 1.05rem !important;
-    transition: all .3s !important;
-}
-
-.date-field{
-    background: #293445 !important;
-    border: 2px solid #ffffff1a !important;
-    border-radius: 14px !important;
-    width: 100% !important;
-    padding: 18px 20px !important;
-    font-size: 1.05rem !important;
-    transition: all .3s !important;
-} */
 
 @keyframes spin {
     0% {
@@ -1352,41 +1318,10 @@
     }
 }
 
-/* Simple delete account button styles */
 .accountActionsSection {
-    margin-top: 2rem;
+    margin-top: 0.9rem;
     padding: 0;
 }
-
-.btnDeleteAccountSimple {
-    width: 100%;
-    padding: 14px 20px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btnDeleteAccountSimple:hover:not(:disabled) {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
-}
-
-.btnDeleteAccountSimple:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-}
-
-/* Modal styles with black and purple theme */
 .modalOverlay {
     position: fixed;
     top: 0;
@@ -1553,16 +1488,86 @@
     color: white;
 }
 
-.btnDelete {
+.btnDeleteAccountSimple {
+    width: 100%;
+    flex: 1;
+    padding: 15px 18px;
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
 }
 
-.btnDelete:hover:not(:disabled) {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+.btnDeleteAccountSimple::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.btnDeleteAccountSimple:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); /* لون أحمر داكن عند hover */
+    transform: translateY(-3px); 
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4); 
+}
+
+.btnDeleteAccountSimple:hover:not(:disabled)::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite; 
+}
+
+.btnDeleteAccountSimple:active:not(:disabled) {
+    transform: translateY(-1px);
+    transition-duration: 0.1s;
+}
+
+.btnDeleteAccountSimple:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.btnDeleteAccountSimple:disabled::before {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+.btnDeleteAccountSimple span {
+    position: relative;
+    z-index: 2;
+}
+
+.btnDelete .icon {
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .btn:disabled {

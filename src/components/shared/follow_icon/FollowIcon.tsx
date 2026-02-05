@@ -1,39 +1,39 @@
 import React from "react";
 import { RiUserAddLine } from "react-icons/ri";
 import styles from "./followIcon.module.css";
-import { followService } from "@/services/api/follow_api/createFollow"; // استدعاء الخدمة
+import { followService } from "@/services/api/follow_api/createFollow"; 
 
 interface FollowIconProps {
-  token: string;        // التوكن الخاص بالمستخدم
-  followingId: number;  // الـ id للشخص اللي بدك تعمل له follow
+  token: string;        
+  followingId: number;  
   setFollowings?: React.Dispatch<React.SetStateAction<any>>; 
-  // اختياري: إذا بدك تحدث القائمة بعد الإضافة
+ 
 }
 
 function FollowIcon({ token, followingId, setFollowings }: FollowIconProps) {
 
   const handleFollow = async () => {
     try {
-      // ✅ نافذة تأكيد قبل الإضافة
+    
       const confirmed = window.confirm("You are about to follow this user. Are you sure?");
       if (!confirmed) return;
 
       const response = await followService.createFollow(token, followingId);
       console.log("✅ Success:", response.message);
 
-      // تحديث القائمة بعد الإضافة (اختياري)
+    
       if (setFollowings) {
         setFollowings(prev => {
           if (!prev) return prev;
           return {
             ...prev,
             count: prev.count + 1,
-            data: [...prev.data, response.data], // إضافة العلاقة الجديدة
+            data: [...prev.data, response.data], 
           };
         });
       }
 
-      // ✅ إعادة تحميل الصفحة حتى يختفي الشخص من القائمة
+    
       window.location.reload();
 
     } catch (error: any) {

@@ -36,7 +36,7 @@ export default function UserProfilePage() {
                 const response = await ProfileService.getUserProfileById(userId);
                 setProfile(response.data.user as UserProfile);
             } catch (err: any) {
-                console.error('Error fetching profile:', err);
+                console.error('خطأ في تحميل البروفايل:', err);
                 setError(err.message || 'فشل في تحميل البروفايل');
                 
                 // إذا كان المستخدم غير موجود، ارجع إلى الصفحة الرئيسية
@@ -82,6 +82,5 @@ export default function UserProfilePage() {
         );
     }
     
-    // ⬇️ استخدم المكون Profile مباشرة
     return <Profile userId={userId} />;
 }

@@ -9,7 +9,7 @@ const api = axios.create({
   },
 });
 
-// إضافة interceptor لإضافة التوكن
+// Add interceptor to include token in requests
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -23,12 +23,12 @@ api.interceptors.request.use(
   }
 );
 
-// إضافة interceptor للتعامل مع الأخطاء
+// Add interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // معالجة حالة عدم المصادقة
+      // Handle unauthorized access
       localStorage.removeItem('token');
       window.location.href = '/login';
     }

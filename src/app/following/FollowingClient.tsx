@@ -12,9 +12,8 @@ function MyFollowing() {
     const [token, setToken] = useState<string>("");
     const [lastFetched, setLastFetched] = useState<number>(0);
     
-    const CACHE_DURATION = 10000; // ⭐ 10 ثواني cache
+    const CACHE_DURATION = 10000; 
 
-    // ⭐ تهيئة الـ userId و token
     useEffect(() => {
         if (typeof window !== 'undefined') {
             try {
@@ -33,14 +32,12 @@ function MyFollowing() {
         }
     }, []);
 
-    // ⭐ دالة محسنة لجلب البيانات
     const fetchFollowings = useCallback(async (force = false) => {
         if (!userId || !token) {
             console.log("Waiting for userId or token...");
             return;
         }
 
-        // ⭐ Cache check
         const now = Date.now();
         if (!force && now - lastFetched < CACHE_DURATION) {
             console.log("Using cached data");
@@ -61,7 +58,6 @@ function MyFollowing() {
             console.error("Error fetching followings:", err);
             setError(err.message || "Failed to load followings. Please try again.");
             
-            // ⭐ Retry بعد 5 ثواني
             setTimeout(() => {
                 fetchFollowings(true);
             }, 5000);
@@ -70,12 +66,10 @@ function MyFollowing() {
         }
     }, [userId, token, lastFetched]);
 
-    // ⭐ جلب البيانات مع Polling
     useEffect(() => {
         if (userId && token) {
             fetchFollowings();
             
-            // ⭐ Polling كل 30 ثانية
             const interval = setInterval(() => {
                 if (document.visibilityState === 'visible') {
                     fetchFollowings();
@@ -86,13 +80,11 @@ function MyFollowing() {
         }
     }, [userId, token, fetchFollowings]);
 
-    // ⭐ تحسين handleUnfollow مع Optimistic Update
     const handleUnfollow = async (userIdToUnfollow: number | string) => {
         try {
             const confirmed = window.confirm("Are you sure you want to unfollow this user?");
             if (!confirmed) return;
 
-            // ⭐ Optimistic Update - تحديث فوري
             setFollowings(prev => {
                 if (!prev) return prev;
                 return {
@@ -102,7 +94,6 @@ function MyFollowing() {
                 };
             });
 
-            // ⭐ إرسال الطلب للسيرفر
             await followsService.deleteFollow(Number(userIdToUnfollow), token);
             
             console.log("Successfully unfollowed");
@@ -111,12 +102,10 @@ function MyFollowing() {
             console.error("Failed to unfollow:", error);
             alert("Failed to unfollow. Please try again.");
             
-            // ⭐ التراجع عن التحديث
             fetchFollowings(true);
         }
     };
 
-    // ⭐ دالة لتحديث يدوي
     const handleManualRefresh = () => {
         fetchFollowings(true);
     };

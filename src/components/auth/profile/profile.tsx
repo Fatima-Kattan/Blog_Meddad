@@ -18,19 +18,32 @@ import { MdEdit, MdOutlineEmail, MdDelete, MdLock } from 'react-icons/md';
 import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 // Dynamic imports للتحسين
 const UserPostsFeed = dynamic(() => import('@/components/auth/profile/UserPostsFeed'), {
-    loading: () => <div className={styles.loadingSmall}>Loading posts...</div>
+    loading: () => <LoadingIcon
+        size={40}
+        message="Loading posts..."
+        position="relative"
+    />
 });
 
 const MyFollowers = dynamic(() => import('@/components/follow/myFollowers/MyFollowers'), {
-    loading: () => <div className={styles.loadingSmall}>Loading followers...</div>,
+    loading: () => <LoadingIcon
+        size={40}
+        message="Loading followers..."
+        position="relative"
+    />,
     ssr: false
 });
 
 const MyFollowing = dynamic(() => import('@/components/follow/myFollowing/MyFollowing'), {
-    loading: () => <div className={styles.loadingSmall}>Loading following...</div>,
+    loading: () => <LoadingIcon
+        size={40}
+        message="Loading following..."
+        position="relative"
+    />,
     ssr: false
 });
 
@@ -196,7 +209,15 @@ const UpdatePasswordModal: React.FC<{
                                 Cancel
                             </button>
                             <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={isUpdating}>
-                                {isUpdating ? (<><div className={styles.loadingSpinner}></div>Updating...</>) : 'Update Password'}
+                                {isUpdating ? (
+                                    <>
+                                        <LoadingIcon
+                                            size={30}
+                                            position="absolute"
+                                            message="Updating Password..."
+                                        />
+                                    </>
+                                ) : 'Update Password'}
                             </button>
                         </div>
                     </form>
@@ -282,7 +303,16 @@ const DeleteAccountModal: React.FC<{
                                 Cancel
                             </button>
                             <button type="submit" className={`${styles.btn} ${styles.btnDelete}`} disabled={isDeleting}>
-                                {isDeleting ? (<><div className={styles.loadingSpinner}></div>Deleting...</>) : 'Delete Account'}
+                                {isDeleting ? (
+                                    <>
+                                        <LoadingIcon
+                                            size={20}
+                                            position="relative"
+                                            message="Deleting..."
+                                        />
+                                        Deleting...
+                                    </>
+                                ) : 'Delete Account'}
                             </button>
                         </div>
                     </form>
@@ -324,16 +354,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
-    // تحسين: استخدام useMemo للحسابات المتكررة
     const memoizedTargetUserId = useMemo(() => targetUserId, [targetUserId]);
-    
-    // تحسين: دالة واحدة مبسطة لاستخراج الـ ID من التوكن
+
     const getCurrentUserIdFromToken = useCallback((): string | number | null => {
         try {
             const token = localStorage.getItem('token');
             if (!token) return null;
-            
-            // محاولة تحليل التوكن كـ JWT
+
             try {
                 const parts = token.split('.');
                 if (parts.length === 3) {
@@ -341,18 +368,16 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     return payload.id || payload.user_id || payload.userId || payload.sub || payload.user?.id || null;
                 }
             } catch {
-                // Fallback: البحث عن الـ ID في النص
                 const match = token.match(/"id"\s*:\s*"?(\d+)/);
                 if (match) return match[1];
             }
-            
+
             return null;
         } catch {
             return null;
         }
     }, []);
 
-    // تحسين: استخدام useCallback للدوال
     const getCurrentUserId = useCallback(async (): Promise<string | number | null> => {
         const fromToken = getCurrentUserIdFromToken();
         if (fromToken) return fromToken;
@@ -413,14 +438,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, []);
 
-    // تحسين: استخدام useCallback لـ fetchProfileData
     const fetchProfileData = useCallback(async () => {
         if (!memoizedTargetUserId) return;
-        
-        // التحقق من الـ cache أولاً
+
         const cacheKey = `profile_${memoizedTargetUserId}`;
         const cached = profileCache.get(cacheKey);
-        
+
         if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
             setUser(cached.data.user);
             setStats(cached.data.stats);
@@ -485,7 +508,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(formattedUser);
             setStats(formattedStats);
 
-            // تخزين في الـ cache
+            // Stored in cache
             profileCache.set(cacheKey, {
                 data: { user: formattedUser, stats: formattedStats },
                 timestamp: Date.now()
@@ -500,7 +523,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, [memoizedTargetUserId, getCurrentUserId]);
 
-    // تحسين: استخدام useMemo للحسابات
     const genderOptions = useMemo(() => [
         { value: 'male', label: 'Male' },
         { value: 'female', label: 'Female' },
@@ -537,7 +559,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, []);
 
-    // تحسين: useEffect مبسطة
     useEffect(() => {
         const todayDate = new Date().toISOString().split('T')[0];
         setToday(todayDate);
@@ -598,10 +619,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(response.data);
             setShowEditModal(false);
 
-            // إلغاء الـ cache بعد التحديث
+            // Clear cache after update
             const cacheKey = `profile_${user.id}`;
             profileCache.delete(cacheKey);
-            
+
             await fetchProfileData();
 
         } catch (err) {
@@ -634,23 +655,19 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     }, [router, getCurrentUserId]);
 
     const handlePostDeleted = useCallback((deletedPostId: number) => {
-        // إلغاء الـ cache عند حذف منشور
+        // Clear cache when deleting a post
         const cacheKey = `profile_${memoizedTargetUserId}`;
         profileCache.delete(cacheKey);
     }, [memoizedTargetUserId]);
 
     if (loading) {
         return (
-            <div className={styles.loading}>
-                <div className={styles.loadingSpinner}></div>
-                <p style={{
-                    color: '#cbd5e1',
-                    fontSize: '1.2rem',
-                    fontWeight: '600',
-                    letterSpacing: '0.5px'
-                }}>
-                    {memoizedTargetUserId ? `Loading Profile...` : 'Loading Your Profile...'}
-                </p>
+            <div>
+                <LoadingIcon
+                    size={55}
+                    message={memoizedTargetUserId ? "Loading Profile..." : "Loading Your Profile..."}
+                    position="fixed"
+                />
             </div>
         );
     }
@@ -988,7 +1005,15 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                     Cancel
                                 </button>
                                 <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleSaveProfile} disabled={isSaving}>
-                                    {isSaving ? (<><div className={styles.loadingSpinner} style={{ width: '20px', height: '20px', borderWidth: '2px' }}></div>Saving...</>) : 'Save Changes'}
+                                    {isSaving ? (
+                                        <>
+                                            <LoadingIcon
+                                                size={30}
+                                                position="absolute"
+                                                message="Saving..."
+                                            />
+                                        </>
+                                    ) : 'Save Changes'}
                                 </button>
                             </div>
                         </div>

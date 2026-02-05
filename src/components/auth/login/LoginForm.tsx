@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import InputField from '../../shared/InputField';
 import { loginService, LoginData } from '@/services/api/auth/loginService';
-import styles from './LoginForm.module.css'; // تغيير هنا
+import styles from './LoginForm.module.css'; 
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 const LoginForm: React.FC = () => {
     const [isClient, setIsClient] = useState(false);
@@ -20,7 +21,6 @@ const LoginForm: React.FC = () => {
 
     useEffect(() => {
         setIsClient(true);
-        // تحميل بيانات التذكر إن وجدت
         if (typeof window !== 'undefined') {
             const savedEmail = localStorage.getItem('rememberedEmail');
             if (savedEmail) {
@@ -39,11 +39,10 @@ const LoginForm: React.FC = () => {
             [name]: value
         }));
 
-        // مسح الخطأ عند التعديل
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
-        setErrorMessage(''); // مسح رسالة الخطأ العامة
+        setErrorMessage('');
     };
 
     const togglePasswordVisibility = () => {
@@ -90,20 +89,17 @@ const LoginForm: React.FC = () => {
             if (response.success) {
                 setSuccessMessage('Login successful!');
 
-                // حفظ بيانات التذكر إذا كان محددًا
                 if (rememberMe && isClient) {
                     localStorage.setItem('rememberedEmail', formData.login);
                 } else if (isClient) {
                     localStorage.removeItem('rememberedEmail');
                 }
-
-                // حفظ التوكن والمستخدم
+                // Save token and user
                 if (isClient) {
                     localStorage.setItem('token', response.data.token);
                     localStorage.setItem('user', JSON.stringify(response.data.user));
                 }
 
-                // إعادة التوجيه إلى الصفحة الرئيسية بعد 1.5 ثانية
                 setTimeout(() => {
                     window.location.href = '/';
                 }, 1500);
@@ -112,7 +108,6 @@ const LoginForm: React.FC = () => {
             const errorMsg = error.message || 'An error occurred during login';
             setErrorMessage(errorMsg);
 
-            // معالجة أخطاء محددة
             if (errorMsg.toLowerCase().includes('incorrect') || 
                 errorMsg.toLowerCase().includes('invalid')) {
                 setErrors(prev => ({ 
@@ -137,8 +132,12 @@ const LoginForm: React.FC = () => {
                             <span className={styles.subtitle}>Sign in to your account</span>
                         </div>
                     </div>
-                    <div className={styles.loadingText}>
-                        Loading login form...
+                    <div className={styles.loadingContainer}>
+                        <LoadingIcon 
+                            size={40}
+                            message="Loading login form..."
+                            position="absolute"
+                        />
                     </div>
                 </div>
             </div>
@@ -169,7 +168,6 @@ const LoginForm: React.FC = () => {
                 )}
 
                 <form onSubmit={handleSubmit} className={styles.form}>
-                    {/* استخدام InputField بدلاً من input مباشرة */}
                     <InputField
                         label="Email Address"
                         name="login"
@@ -181,7 +179,6 @@ const LoginForm: React.FC = () => {
                         error={errors.login}
                     />
 
-                    {/* للحقل password سنضيف container خاص لإضافة زر show/hide */}
                     <div className={styles.formGroup}>
                         <div className={styles.passwordContainer}>
                             <InputField
