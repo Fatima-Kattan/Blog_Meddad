@@ -18,9 +18,9 @@ interface UserCardProps {
   onClick?: () => void;
   showUnfollowButton?: boolean;
   onUnfollow?: (userId: number | string) => Promise<void> | void;
-  showFollowButton?: boolean; // جديد
-  token?: string;             // جديد: تمرير التوكن
-  setFollowings?: React.Dispatch<React.SetStateAction<any>>; // جديد: تحديث القائمة
+  showFollowButton?: boolean;
+  token?: string;             
+  setFollowings?: React.Dispatch<React.SetStateAction<any>>; 
 }
 
 export default function UserCard({
@@ -28,7 +28,7 @@ export default function UserCard({
   onClick,
   showUnfollowButton = false,
   onUnfollow,
-  showFollowButton = false, // جديد
+  showFollowButton = false, 
   token,
   setFollowings
 }: UserCardProps) {
@@ -79,7 +79,7 @@ export default function UserCard({
           </div></>
       </Link>
 
-      {/* زر Unfollow */}
+      
       {showUnfollowButton && (
         <RiUserUnfollowLine
           className={styles.unfollowIcon}
@@ -87,7 +87,7 @@ export default function UserCard({
         />
       )}
 
-      {/* زر Follow */}
+      
       {showFollowButton && token && (
         <FollowIcon
           token={token}

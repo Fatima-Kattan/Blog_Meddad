@@ -5,7 +5,7 @@ import UserCard from '../shared/UserCard/UserCard';
 import { notFollowingService, NotFollowingResponse } from "@/services/api/follow_api/notFollowings";
 import { MdOutlineGroupAdd, MdOutlinePeopleAlt } from "react-icons/md";
 import { FaPeopleArrows } from "react-icons/fa";
-import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; 
 
 function RightSidebar() {
   const [users, setUsers] = useState<NotFollowingResponse | null>(null);
@@ -18,11 +18,9 @@ function RightSidebar() {
         setLoading(true);
         setError(null);
         
-        // 1. اقرأ البيانات من localStorage
         const storedUser = localStorage.getItem("user");
         const token = localStorage.getItem("token") || "";
         
-        // 2. تحقق إذا في user في localStorage
         if (!storedUser) {
           setError("Please login to see suggested friends");
           setLoading(false);
@@ -32,14 +30,12 @@ function RightSidebar() {
         const parsedUser = JSON.parse(storedUser);
         const userId = parsedUser?.id;
         
-        // 3. تحقق إذا في userId
         if (!userId) {
           setError("No user found in localStorage");
           setLoading(false);
           return;
         }
         
-        // 4. جلب البيانات
         const data = await notFollowingService.getNotFollowings(userId, token);
         setUsers(data);
         
@@ -52,7 +48,6 @@ function RightSidebar() {
       }
     };
 
-    // تأخير بسيط لإعطاء وقت لـ hydration
     const timer = setTimeout(() => {
       fetchData();
     }, 0);
@@ -60,7 +55,6 @@ function RightSidebar() {
     return () => clearTimeout(timer);
   }, []);
 
-  // دالة لتنسيق المحتوى المعروض
   const renderContent = () => {
     if (error) {
       return <p className={styles.error}>{error}</p>;

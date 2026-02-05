@@ -1,12 +1,10 @@
 import axios from "axios";
 
-// واجهة الاستجابة من الـ API عند إنشاء الفولو
 export interface CreateFollowResponse {
-  message: string; // ممكن يرجع رسالة نجاح مثل "Follow created successfully"
-  data?: any;      // إذا الـ API بيرجع بيانات إضافية (مثلاً العلاقة الجديدة)
+  message: string; 
+  data?: any;     
 }
 
-// خدمة إنشاء الفولو
 export const followService = {
   async createFollow(token: string, followingId: number): Promise<CreateFollowResponse> {
     try {

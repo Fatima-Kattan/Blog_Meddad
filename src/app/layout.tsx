@@ -31,7 +31,6 @@ export default function RootLayout({
       <body 
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* ⭐ البروفايدر بدون بيانات أولية في الـ layout */}
         <NotificationsProvider>
           <ConditionalNavbar />
           <main className="min-h-screen">{children}</main>

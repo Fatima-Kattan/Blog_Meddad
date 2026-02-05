@@ -11,7 +11,6 @@ function MyFollowers() {
     const [userId, setUserId] = useState<number | null>(null);
     const [token, setToken] = useState<string>("");
 
-    // تهيئة البيانات من localStorage داخل useEffect
     useEffect(() => {
         if (typeof window !== 'undefined') {
             try {
@@ -30,10 +29,8 @@ function MyFollowers() {
         }
     }, []);
 
-    // جلب البيانات
     useEffect(() => {
         const fetchFollowers = async () => {
-            // تأكد من توفر البيانات المطلوبة
             if (!userId || !token) {
                 console.log("Waiting for userId or token...");
                 return;
@@ -55,11 +52,10 @@ function MyFollowers() {
         if (userId && token) {
             fetchFollowers();
         } else if (!userId && !loading && typeof window !== 'undefined') {
-            // إذا لم يتم العثور على userId بعد تحميل الصفحة
             setError("User not found. Please login to view followers.");
             setLoading(false);
         }
-    }, [userId, token]); // يعتمد على userId و token
+    }, [userId, token]);
 
     return (
         <FollowLayout

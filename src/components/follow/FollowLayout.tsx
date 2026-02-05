@@ -3,7 +3,7 @@ import React from "react";
 import UserCard from "@/components/shared/UserCard/UserCard";
 import styles from "./followLayout.module.css";
 import { IoPeople } from "react-icons/io5";
-import LoadingIcon from "@/components/shared/LoadingIcon/LoadingIcon"; // ✅ استيراد LoadingIcon
+import LoadingIcon from "@/components/shared/LoadingIcon/LoadingIcon";
 
 interface User {
   id: number | string;
@@ -41,7 +41,6 @@ export default function FollowLayout({
   showUnfollowButton = false,
   onUnfollow,
 }: FollowLayoutProps) {
-  // ✅ تم تعديل هذا الجزء فقط - حالة التحميل
   if (loading) {
     return (
       <div className={styles.container}>
@@ -49,14 +48,13 @@ export default function FollowLayout({
           <div className={styles.gradientOrb}></div>
           <div className={styles.gradientOrb}></div>
         </div>
-        {/* ✅ تم استبدال هذا الجزء فقط */}
         <div style={{ 
           position: 'relative', 
           minHeight: '500px',
           width: '100%' 
         }}>
           <LoadingIcon 
-            size={60}
+            size={45}
             message="Loading your connections..."
             position="absolute"
           />
