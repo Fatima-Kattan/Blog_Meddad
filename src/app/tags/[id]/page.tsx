@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import PostFeed from '@/components/posts/post-feed/PostFeed';
 import Link from 'next/link';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 import styles from '@/app/tags/TagPage.module.css';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -50,12 +51,9 @@ export default function TagPage() {
     }, [tagId]);
 
     if (loading) {
-        return (
-            <div className={styles.loadingContainer}>
-                <div className={styles.spinner}></div>
-                <p className={styles.loadingText}>Loading tag information...</p>
-            </div>
-        );
+        return <LoadingIcon 
+            message="Loading tag information..."
+        />;
     }
 
     return (
@@ -67,8 +65,6 @@ export default function TagPage() {
                 <p className={styles.description}>
                     Posts with tag: <strong>#{tagName}</strong>
                 </p>
-                
-                
             </div>
 
             <PostFeed 

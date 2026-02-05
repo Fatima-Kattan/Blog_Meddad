@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { HiSearch, HiX, HiUser, HiNewspaper, HiTag, HiChevronRight } from 'react-icons/hi';
 import { useSearch } from '@/hooks/use-search';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 import styles from './SearchBar.module.css';
 
 interface UserSuggestion {
@@ -159,9 +160,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ initialQuery = '', onSearch }) =>
             {isFocused && searchQuery.length >= 1 && (
                 <div className={styles.suggestionsDropdown}>
                     {isLoadingSuggestions ? (
-                        <div className={styles.loadingState}>
-                            <div className={styles.loadingSpinner}></div>
-                            <span className={styles.loadingText}>Searching...</span>
+                        <div style={{
+                            textAlign: 'center', 
+                padding: '50px 20px',
+                        }}>
+                            <LoadingIcon
+                                message="Searching..."
+                                size={40}
+                                position="relative"
+                                fullScreen={false}
+                                
+                            />
                         </div>
                     ) : (
                         <div className={styles.suggestionsContent}>
@@ -272,14 +281,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ initialQuery = '', onSearch }) =>
                             {(suggestions.users.length > 0 ||
                                 suggestions.posts.length > 0 ||
                                 suggestions.tags.length > 0) && (
-                                <div className={styles.viewAllSection}>
-                                    <button onClick={handleSearchSubmit} className={styles.viewAllButton}>
-                                        <span>View all results for</span>
-                                        <span className={styles.searchQueryHighlight}>"{searchQuery}"</span>
-                                        <HiChevronRight className={styles.viewAllArrow} />
-                                    </button>
-                                </div>
-                            )}
+                                    <div className={styles.viewAllSection}>
+                                        <button onClick={handleSearchSubmit} className={styles.viewAllButton}>
+                                            <span>View all results for</span>
+                                            <span className={styles.searchQueryHighlight}>"{searchQuery}"</span>
+                                            <HiChevronRight className={styles.viewAllArrow} />
+                                        </button>
+                                    </div>
+                                )}
 
                             {/* No Results */}
                             {!isLoadingSuggestions &&

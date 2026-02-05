@@ -40,7 +40,7 @@ export interface CommentsCountResponse {
     message: string;
 }
 
-// دالة جلب تعليقات منشور معين
+
 export const getPostComments = async (
     postId: number | string,
     page = 1,
@@ -72,7 +72,7 @@ export const getPostComments = async (
     }
 };
 
-// دالة جلب عدد التعليقات لمنشور
+
 export const getCommentsCount = async (
     postId: number | string
 ): Promise<CommentsCountResponse> => {
@@ -101,7 +101,7 @@ export const getCommentsCount = async (
     }
 };
 
-// دالة جلب تعليق واحد
+
 export const getComment = async (
     commentId: number | string
 ): Promise<SingleCommentResponse> => {

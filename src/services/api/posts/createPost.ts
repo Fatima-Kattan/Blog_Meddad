@@ -1,10 +1,10 @@
 // src/services/api/posts/createPost.ts
 
-// واجهة بيانات إنشاء البوست (مطابقة لـ Laravel Controller)
+
 export interface CreatePostData {
     title: string;
     caption: string;
-    images: string[]; // مصفوفة من الروابط
+    images: string[]; 
 }
 
 export interface CreatePostResponse {
@@ -26,7 +26,7 @@ export interface CreatePostResponse {
     message: string;
 }
 
-// دالة إنشاء البوست
+
 export const createPost = async (data: CreatePostData, token: string): Promise<CreatePostResponse> => {
     try {
         console.log('📤 Sending POST request to: http://localhost:8000/api/v1/posts');
@@ -54,7 +54,7 @@ export const createPost = async (data: CreatePostData, token: string): Promise<C
             const result = JSON.parse(responseText);
             
             if (!response.ok) {
-                // التحقق من أخطاء التحقق Laravel
+                
                 if (result.errors) {
                     const errorMessages = Object.values(result.errors).flat().join(', ');
                     throw new Error(errorMessages);

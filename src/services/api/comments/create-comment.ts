@@ -12,7 +12,7 @@ export interface CreateCommentResponse {
     comments_count?: number;
 }
 
-// دالة إنشاء تعليق جديد
+
 export const createComment = async (
     data: CreateCommentData
 ): Promise<CreateCommentResponse> => {
@@ -46,7 +46,7 @@ export const createComment = async (
         const result = JSON.parse(responseText);
 
         if (!response.ok) {
-            // التحقق من أخطاء التحقق Laravel
+            
             if (result.errors) {
                 const errorMessages = Object.values(result.errors).flat().join(', ');
                 throw new Error(errorMessages);

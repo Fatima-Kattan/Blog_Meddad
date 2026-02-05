@@ -4,7 +4,7 @@ export interface DeleteCommentResponse {
     remaining_comments?: number;
 }
 
-// دالة حذف تعليق
+
 export const deleteComment = async (
     commentId: number | string
 ): Promise<DeleteCommentResponse> => {

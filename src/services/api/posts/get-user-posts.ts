@@ -27,7 +27,7 @@ export interface UserStatsResponse {
     };
 }
 
-// ⭐ واجهة FilteredPostsResponse المعدلة
+
 export interface FilteredPostsResponse {
     success: boolean;
     message: string;
@@ -38,10 +38,10 @@ export interface FilteredPostsResponse {
     last_page: number;
     total: number;
     per_page: number;
-    has_more?: boolean; // ⭐ إضافة هذا الحقل
+    has_more?: boolean; 
 }
 
-// جلب الإحصائيات
+
 export const getUserStats = async (userId: number): Promise<UserStatsResponse> => {
     try {
         const response = await api.get(`/user/${userId}/stats`);
@@ -52,7 +52,7 @@ export const getUserStats = async (userId: number): Promise<UserStatsResponse> =
     }
 };
 
-// جلب المنشورات مع الفلترة - مع limit كبير
+
 export const getFilteredUserPosts = async (
     userId: number, 
     filter = 'all', 

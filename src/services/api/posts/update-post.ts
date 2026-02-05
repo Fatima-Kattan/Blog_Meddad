@@ -6,7 +6,7 @@ export interface UpdatePostData {
     title: string;
     caption: string;
     images: string[];
-    tags?: string[]; // ⭐ اختياري: يمكنك إرسال التاغات يدوياً إذا أردت
+    tags?: string[]; 
 }
 
 export interface UpdatePostResponse {
@@ -26,7 +26,7 @@ export interface UpdatePostResponse {
         };
         likes_count: number;
         comments_count: number;
-        tags?: Array<{ // ⭐ إضافة التاغات في الرد
+        tags?: Array<{ 
             id: number;
             tag_name: string;
         }>;
@@ -34,10 +34,7 @@ export interface UpdatePostResponse {
     message: string;
 }
 
-/**
- * ⭐ **هام:** الباكند سيتعامل مع التاغات تلقائياً من النص (caption)
- * لا تحتاج لإرسال tags يدوياً إلا إذا أردت نظاماً مختلفاً
- */
+
 export const updatePost = async (postData: UpdatePostData, token: string): Promise<UpdatePostResponse> => {
     try {
         console.log('📤 Sending update request for post ID:', postData.post_id);
@@ -48,18 +45,18 @@ export const updatePost = async (postData: UpdatePostData, token: string): Promi
             hasTagsInCaption: postData.caption?.includes('#')
         });
         
-        // ⭐ تحضير البيانات للإرسال
+        
         const requestBody: any = {
             title: postData.title,
             caption: postData.caption,
         };
 
-        // ⭐ إرسال الصور فقط إذا كانت موجودة
+        
         if (postData.images && postData.images.length > 0) {
             requestBody.images = postData.images;
         }
 
-        // ⭐ **اختياري:** إذا أردت إرسال التاغات يدوياً بدلاً من الاعتماد على التلقائي
+        
         // if (postData.tags && postData.tags.length > 0) {
         //     requestBody.tags = postData.tags;
         // }
@@ -105,10 +102,7 @@ export const updatePost = async (postData: UpdatePostData, token: string): Promi
     }
 };
 
-/**
- * ⭐ **دالة إضافية:** لمزامنة التاغات يدوياً (إذا أردت)
- * هذه الدالة تستخدم PostTagController
- */
+
 export const syncPostTags = async (postId: number, tagIds: number[], token: string) => {
     try {
         console.log('🔄 Syncing tags for post ID:', postId, 'Tags:', tagIds);
@@ -137,9 +131,7 @@ export const syncPostTags = async (postId: number, tagIds: number[], token: stri
     }
 };
 
-/**
- * ⭐ **دالة إضافية:** لربط تاغ واحد بالبوست
- */
+
 export const addTagToPost = async (postId: number, tagId: number, token: string) => {
     try {
         console.log('➕ Adding tag to post:', { postId, tagId });
@@ -168,9 +160,7 @@ export const addTagToPost = async (postId: number, tagId: number, token: string)
     }
 };
 
-/**
- * ⭐ **دالة إضافية:** لإزالة تاغ من البوست
- */
+
 export const removeTagFromPost = async (postId: number, tagId: number, token: string) => {
     try {
         console.log('➖ Removing tag from post:', { postId, tagId });
@@ -197,9 +187,7 @@ export const removeTagFromPost = async (postId: number, tagId: number, token: st
     }
 };
 
-/**
- * ⭐ **دالة إضافية:** للحصول على تاغات البوست
- */
+
 export const getPostTags = async (postId: number, token?: string) => {
     try {
         console.log('🏷️ Fetching tags for post ID:', postId);

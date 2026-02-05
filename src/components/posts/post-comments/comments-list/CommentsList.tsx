@@ -1,11 +1,11 @@
-// src/components/posts/post-comments/comments-list/CommentsList.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import styles from './CommentsList.module.css';
 import { HiTrash, HiPencil, HiDotsVertical } from 'react-icons/hi';
 import { useComments } from '@/hooks/useComments';
-import { useRouter } from 'next/navigation'; // ⭐ إضافة useRouter
+import { useRouter } from 'next/navigation';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 
 interface CommentsListProps {
     postId: number | string;
@@ -111,12 +111,21 @@ const CommentsList: React.FC<CommentsListProps> = ({
         setShowActionsForComment(prev => prev === commentId ? null : commentId);
     };
 
+    // ✅ استخدام LoadingIcon بدلاً من الـ loading القديم
     if (loading && comments.length === 0) {
         return (
-            <div className={styles.loadingContainer}>
-                <div className={styles.spinner}></div>
-                <p className={styles.loadingText}>Loading comments...</p>
-            </div>
+            <div style={{ 
+                textAlign: 'center', 
+                padding: '50px 20px',
+                width: '100%'
+            }}>
+            <LoadingIcon 
+                message="Loading comments..."
+                size={40}
+                position="relative"
+                fullScreen={false}
+            />
+        </div>
         );
     }
 

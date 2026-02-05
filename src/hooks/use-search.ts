@@ -3,7 +3,7 @@
 import { useState, useCallback } from 'react';
 import { getSearch, getQuickSearch, SearchResponse } from '@/services/api/search/search';
 
-// تعريف الأنواع
+
 export interface QuickSearchResult {
     users: Array<{
         id: number;

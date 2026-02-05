@@ -40,7 +40,7 @@ export const useComments = (
     const [totalComments, setTotalComments] = useState(0);
     const [commentsCount, setCommentsCount] = useState(0);
 
-    // جلب تعليقات المنشور
+    
     const fetchComments = useCallback(async (page: number, isLoadMore = false) => {
         try {
             setLoading(true);
@@ -69,7 +69,7 @@ export const useComments = (
         }
     }, [postId, limit]);
 
-    // جلب عدد التعليقات
+    
     const fetchCommentsCount = useCallback(async () => {
         try {
             const response = await getCommentsCount(postId);
@@ -81,13 +81,13 @@ export const useComments = (
         }
     }, [postId]);
 
-    // التحميل الأولي
+    
     useEffect(() => {
         fetchComments(currentPage, false);
         fetchCommentsCount();
     }, [fetchComments, fetchCommentsCount]);
 
-    // إنشاء تعليق جديد
+    
     const createNewComment = async (data: CreateCommentData): Promise<Comment | null> => {
         try {
             setError(null);
@@ -95,11 +95,11 @@ export const useComments = (
             const response = await createComment(data);
 
             if (response.success) {
-                // إضافة التعليق الجديد للقائمة
+                
                 const newComment = response.data;
                 setComments(prev => [newComment, ...prev]);
 
-                // تحديث العدد
+                
                 if (response.comments_count !== undefined) {
                     setCommentsCount(response.comments_count);
                     setTotalComments(prev => prev + 1);
@@ -115,7 +115,7 @@ export const useComments = (
         }
     };
 
-    // تحديث تعليق موجود
+    
     const updateExistingComment = async (
         id: number,
         data: UpdateCommentData
@@ -126,7 +126,7 @@ export const useComments = (
             const response = await updateComment(id, data);
 
             if (response.success) {
-                // تحديث التعليق في القائمة
+                
                 setComments(prev =>
                     prev.map(comment =>
                         comment.id === id ? response.data : comment
@@ -143,7 +143,7 @@ export const useComments = (
         }
     };
 
-    // حذف تعليق
+    
     const deleteExistingComment = async (id: number): Promise<boolean> => {
         try {
             setError(null);
@@ -151,10 +151,10 @@ export const useComments = (
             const response = await deleteComment(id);
 
             if (response.success) {
-                // إزالة التعليق من القائمة
+                
                 setComments(prev => prev.filter(comment => comment.id !== id));
 
-                // تحديث العدد
+                
                 if (response.remaining_comments !== undefined) {
                     setCommentsCount(response.remaining_comments);
                     setTotalComments(prev => prev - 1);
@@ -170,7 +170,7 @@ export const useComments = (
         }
     };
 
-    // تحميل المزيد
+    
     const loadMoreComments = () => {
         if (hasMore && !loading) {
             const nextPage = currentPage + 1;
@@ -179,7 +179,7 @@ export const useComments = (
         }
     };
 
-    // تحديث القائمة
+    
     const refreshComments = () => {
         setCurrentPage(1);
         fetchComments(1, false);

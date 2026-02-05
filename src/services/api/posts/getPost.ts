@@ -36,7 +36,7 @@ export interface PostsResponse {
     message?: string;
 }
 
-// 🔹 1. دالة لجلب كل البوستات
+
 export const getPosts = async (page = 1, limit = 10): Promise<PostsResponse> => {
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -66,7 +66,7 @@ export const getPosts = async (page = 1, limit = 10): Promise<PostsResponse> => 
     }
 };
 
-// 🔹 2. دالة لجلب بوست واحد
+
 export const getPost = async (id: number): Promise<{success: boolean; data: Post; message?: string}> => {
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -96,7 +96,7 @@ export const getPost = async (id: number): Promise<{success: boolean; data: Post
     }
 };
 
-// 🔹 3. دالة لجلب بوستات مستخدم
+
 export const getUserPosts = async (userId: number, page = 1, limit = 10): Promise<PostsResponse> => {
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -126,7 +126,7 @@ export const getUserPosts = async (userId: number, page = 1, limit = 10): Promis
     }
 };
 
-// 🔹 4. دالة للبحث في البوستات
+
 export const searchPosts = async (keyword: string, page = 1, limit = 10): Promise<PostsResponse> => {
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -156,7 +156,7 @@ export const searchPosts = async (keyword: string, page = 1, limit = 10): Promis
     }
 };
 
-// 🔹 5. دالة لجلب معلومات التاغ
+
 export const getTagInfo = async (tagId: number): Promise<{success: boolean; data: any; message?: string}> => {
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -192,7 +192,7 @@ export const getTagInfo = async (tagId: number): Promise<{success: boolean; data
     }
 };
 
-// 🔹 6. دالة جديدة: جلب البوستات حسب التاغ ID (المعدلة والمدمجة)
+
 export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Promise<PostsResponse> => {
     try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -219,20 +219,20 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
         let total = 0;
         
         if (data.success && data.data && data.data.posts) {
-            // 👇 **المشكلة: البوستات في data.posts.data ما عندها user object**
+            
             const rawPosts = data.data.posts.data || [];
-            // 👇 **الحل: نأخذ معلومات الـ user من data.tag.posts**
+            
             const tagPostsWithUsers = data.data.tag?.posts || [];            
-            // 🔧 **دمج البيانات: نأخذ البوستات من posts.data ونضيف لها user من tag.posts**
+            
             postsData = rawPosts.map((post: any) => {
-                // البحث عن الـ user object المقابل لهذا البوست في tag.posts
+                
                 const postWithUser = tagPostsWithUsers.find((p: any) => p.id === post.id);
                 
                 let userObj = null;
                 let tags = [];
                 
                 if (postWithUser) {
-                    // ⭐ **إذا وجدنا الـ user في tag.posts، ندمجه مع البوست**
+                    
                     if (postWithUser.user) {
                         userObj = {
                             id: postWithUser.user.id || post.user_id || 0,
@@ -241,11 +241,11 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
                         };
                     }
                     
-                    // ⭐ **نأخذ التاغات من tag.posts أيضاً**
+                    
                     tags = postWithUser.tags || [];
                 }
                 
-                // ⭐ **إذا ما لقينا user في tag.posts، ننشئ user object من user_id فقط**
+                
                 if (!userObj) {
                     userObj = {
                         id: post.user_id || 0,
@@ -254,7 +254,7 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
                     };
                 }
                 
-                // ⭐ **إنشاء البوست النهائي**
+                
                 return {
                     id: post.id || 0,
                     user_id: post.user_id || userObj.id,
@@ -283,7 +283,7 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
             if (postsData.length > 0) {
             }
         } else if (data.success && data.data && Array.isArray(data.data.data)) {
-            // Fallback: إذا كان الهيكل مختلف
+            
             postsData = data.data.data.map((post: any) => ({
                 ...post,
                 user: post.user || {
@@ -326,10 +326,10 @@ export const getPostsByTagId = async (tagId: number, page = 1, limit = 10): Prom
     }
 };
 
-// 🔹 7. دالة بديلة: جلب التاغ بالاسم أولاً ثم البحث
+
 export const getPostsByTagName = async (tagName: string, page = 1, limit = 10): Promise<PostsResponse> => {
     try {
-        // نبحث عن البوستات اللي فيها التاغ بالاسم
+        
         return await searchPosts(`#${tagName}`, page, limit);
     } catch (error) {
         console.error('Error fetching posts by tag name:', error);

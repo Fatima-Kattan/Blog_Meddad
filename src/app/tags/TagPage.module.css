@@ -52,6 +52,8 @@
     border-radius: 4px;
 }
 
+/* ⚠️ حذف أنماط الـ loading القديمة */
+/* 
 .loadingContainer {
     max-width: 800px;
     margin: 0 auto;
@@ -74,6 +76,12 @@
     font-size: 16px;
 }
 
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+*/
+
 .backLinkContainer {
     margin-top: 40px;
     text-align: center;
@@ -95,9 +103,4 @@
 
 .backLink:hover {
     background-color: #371d6f;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }

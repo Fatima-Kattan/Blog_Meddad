@@ -10,7 +10,7 @@ export interface UpdateCommentResponse {
     message: string;
 }
 
-// دالة تحديث تعليق
+
 export const updateComment = async (
     commentId: number | string,
     data: UpdateCommentData

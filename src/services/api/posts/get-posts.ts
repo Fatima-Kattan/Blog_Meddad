@@ -14,12 +14,12 @@ export interface Post {
     likes_count: number;
     comments_count: number;
     created_at: string;
-    // ⚠️ ما في is_liked هون لأنه ما بعطيه الـ API
+    
 }
 
 export interface PostsResponse {
     success: boolean;
-    data: any; // Laravel pagination data
+    data: any; 
     message: string;
 }
 
