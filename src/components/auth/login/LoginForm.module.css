@@ -20,7 +20,7 @@
     background: conic-gradient(from 0deg,
             #8b5cf6,
             #6d28d9,
-            #c624e3,
+            #b37ece,
             #6d28d9,
             #360d96);
     animation: rotate 8s linear infinite;
@@ -92,7 +92,7 @@
             #1d1523,
             #231332,
             #0e081b,
-            #ce70dd);
+            #733DEC);
     -webkit-mask:
         linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);

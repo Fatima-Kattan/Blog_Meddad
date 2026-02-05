@@ -22,10 +22,10 @@
     background: conic-gradient(
         from 0deg,
         #8b5cf6,
-        #a855f7,
-        #d946ef,
+        #8957b8,
+        #9d46ef,
         #8b5cf6,
-        #a855f7
+        #5b149d
     );
     animation: rotate 8s linear infinite;
     filter: blur(80px);
@@ -43,10 +43,10 @@
     border-radius: 50%;
     background: conic-gradient(
         from 180deg,
-        #d946ef,
+        #b146ef,
         #a855f7,
         #8b5cf6,
-        #d946ef,
+        #a87ed1,
         #a855f7
     );
     animation: rotate 10s linear infinite reverse;
@@ -95,7 +95,7 @@
         #1d1523,
         #231332,
         #0e081b,
-        #ce70dd
+        #733DEC
     );
     -webkit-mask: 
         linear-gradient(#fff 0 0) content-box, 
@@ -315,11 +315,11 @@
 .textareaField {
     width: 100%;
     padding: 0.875rem 1.25rem;
-    border: 2px solid rgba(139, 92, 246, 0.2);
+    border: 2px solid #491f73;
     border-radius: 0.75rem;
     font-size: 1rem;
     transition: all 0.3s ease;
-    background: rgba(30, 15, 50, 0.6);
+    background: #22083e;
     color: #ffffff;
     font-family: inherit;
     resize: vertical;
@@ -333,15 +333,9 @@
 
 .textareaField:focus {
     outline: none;
-    border-color: #8b5cf6;
-    background: rgba(40, 20, 70, 0.8);
+    border-color: #733DEC;
     box-shadow: 
-        0 0 0 4px rgba(139, 92, 246, 0.15),
-        inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.textareaField:hover {
-    border-color: rgba(139, 92, 246, 0.4);
+        0 0 0 3px rgba(139, 92, 246, 0.15);
 }
 
 .inputLabel {
