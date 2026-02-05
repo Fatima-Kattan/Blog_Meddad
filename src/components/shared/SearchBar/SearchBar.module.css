@@ -37,19 +37,17 @@
     font-size: 16px;
     font-weight: 500;
     color: #ffffff;
-    /* background: linear-gradient(145deg, rgba(26, 11, 46, 0.95), rgba(40, 20, 70, 0.95)); */
-    border: 2px solid rgba(139, 92, 246, 0.3);
+    border: 2px solid rgba(73, 31, 115, 0.61);
     border-radius: 13px;
     outline: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(10px);
     box-shadow: 
-        0 4px 30px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        0 4px 30px rgba(0, 0, 0, 0.3),;
 }
 
 .searchInput:hover {
-    border-color: rgba(139, 92, 246, 0.5);
+    border-color: #733DEC;
     box-shadow: 
         0 6px 40px rgba(139, 92, 246, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.15);
@@ -59,9 +57,7 @@
     border-color: #8b5cf6;
     background: linear-gradient(145deg, rgba(32, 15, 55, 0.98), rgba(50, 25, 85, 0.98));
     box-shadow: 
-        0 0 0 8px rgba(139, 92, 246, 0.08),
-        0 0 0 16px rgba(139, 92, 246, 0.04),
-        0 15px 60px rgba(139, 92, 246, 0.2);
+        0 0 8px 6px rgba(138, 92, 246, 0.207);
     transform: translateY(-1px);
 }
 /* ===== Search Icon Animation ===== */
@@ -97,9 +93,10 @@
 }
 
 .clearButton:hover {
-    background: rgba(139, 92, 246, 0.2);
-    color: #ffffff;
     transform: translateY(-50%) scale(1.1);
+    color: #f87171;
+    background: #ef444433;
+    /* transform: rotate(90deg); */
 }
 
 

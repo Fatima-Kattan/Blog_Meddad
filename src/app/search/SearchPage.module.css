@@ -47,6 +47,7 @@
     overflow-x: auto;
     padding-bottom: 2px;
     scrollbar-width: none;
+    justify-content: center;
 }
 
 .tabs::-webkit-scrollbar {
