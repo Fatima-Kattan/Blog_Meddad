@@ -444,22 +444,98 @@
 
 .cancelButton {
     flex: 1;
-    padding: 14px;
-    background: rgba(26, 11, 46, 0.8);
+    padding: 14px; /* نفس padding الزر الأساسي */
+    background: #9f3cd81a;
     border: 1px solid var(--color-border);
+    border-radius: 12px; /* نفس border-radius */
     color: var(--color-text-secondary);
-    border-radius: 12px;
+    font-size: 1rem; /* حجم خط متناسق */
+    font-weight: 600; /* نفس weight */
     cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9375rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease; /* نفس مدة الانتقال */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
 }
 
+/* تأثير اللمعان (Shimmer) لزر Cancel */
+.cancelButton::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* تأثير hover - موحد مع الزر الأساسي */
 .cancelButton:hover:not(:disabled) {
-    background: rgba(139, 92, 246, 0.1);
-    border-color: var(--color-primary);
-    color: var(--color-text);
+    background: #38144f;
+    color: white;
+    transform: translateY(-3px); /* نفس تأثير الرفع */
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1); /* ظل خفيف */
+}
+
+/* تفعيل اللمعان عند hover */
+.cancelButton:hover:not(:disabled)::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite;
+}
+
+/* تأثير النقر - موحد */
+.cancelButton:active:not(:disabled) {
     transform: translateY(-1px);
+    transition-duration: 0.1s;
+}
+
+/* حالة disabled - موحدة */
+.cancelButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* إيقاف اللمعان عند disabled */
+.cancelButton:disabled::before {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+/* كلمة Cancel بداخل span لتحكم أفضل */
+.cancelButton span {
+    position: relative;
+    z-index: 2;
+}
+
+/* أيقونة إن وجدت */
+.cancelButton .icon {
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+}
+
+/* تأثير اللمعان - نفس الـ keyframe */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+.editAvatarBtnNotOwner:hover::before {
+    animation: shimmer 1.5s infinite;
 }
 .submitButton {
     flex: 1;
