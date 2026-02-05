@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePosts } from '@/hooks/use-posts';
 import PostItem from '../post-item/PostItem';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 import styles from './PostFeed.module.css';
 import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
@@ -142,13 +143,26 @@ const PostFeed = (props: any) => {
         }
     };
 
+    // ✅ استخدام LoadingIcon لـ showLoadingOnly
     if (showLoadingOnly) {
         return (
+<<<<<<< HEAD
             <div className={styles.loadingContainer}>
                 <LoadingIcon 
                     size={50}
                     message="Loading post..."
                     position="absolute"
+=======
+            <div style={{
+                textAlign: 'center', 
+                padding: '200px 20px',
+            }}>
+                <LoadingIcon 
+                    message="Loading post..."
+                    size={50}
+                    position="relative"
+                    
+>>>>>>> 0ba8d38ea0a23a5f9f8c7cbc64aa7230d501eb51
                 />
             </div>
         );
@@ -227,12 +241,25 @@ const PostFeed = (props: any) => {
                         })
                     }
 
+                    
                     {loading && (
+<<<<<<< HEAD
                         <div className={styles.loadingContainer}>
                             <LoadingIcon 
                                 size={50}
                                 message={singlePostMode ? 'Loading post...' : 'Loading posts...'}
                                 position="absolute"
+=======
+                        <div style={{
+                            textAlign: 'center', 
+                            padding: '200px 20px',
+                        }}>
+                            <LoadingIcon 
+                                message={singlePostMode ? 'Loading post...' : 'Loading posts...'}
+                                size={40}
+                                position="relative"
+                                
+>>>>>>> 0ba8d38ea0a23a5f9f8c7cbc64aa7230d501eb51
                             />
                         </div>
                     )}

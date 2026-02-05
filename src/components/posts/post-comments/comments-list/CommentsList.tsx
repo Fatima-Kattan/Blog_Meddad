@@ -123,7 +123,7 @@ const CommentsList: React.FC<CommentsListProps> = ({
                 message="Loading comments..."
                 size={40}
                 position="relative"
-                fullScreen={false}
+                
             />
         </div>
         );

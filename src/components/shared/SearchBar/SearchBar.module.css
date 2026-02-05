@@ -151,7 +151,7 @@
 }
 
 /* ===== Loading State ===== */
-/* ⚠️ تم حذف .loadingState القديم واستبداله بـ .loadingWrapper */
+
 .loadingWrapper {
     display: flex;
     justify-content: center;

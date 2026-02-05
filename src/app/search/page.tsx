@@ -31,8 +31,7 @@ export default async function SearchPage({
                             message="Loading search..."
                             size={50}
                             position="relative"
-                            fullScreen={false}
-                            color="#8b5cf6"
+                            
                         />
                     </div>
                 }>

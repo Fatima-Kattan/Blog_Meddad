@@ -128,8 +128,7 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
                     message="Searching..."
                     size={50}
                     position="relative"
-                    fullScreen={false}
-                    color="#8b5cf6"
+                    
                 />
             </div>
         );
@@ -370,8 +369,7 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
                             message="Updating results..."
                             size={40}
                             position="relative"
-                            fullScreen={false}
-                            color="#8b5cf6"
+                            
                         />
                     </div>
                 )}
