@@ -135,9 +135,9 @@
 }
 
 .closeButton:hover {
-    background: rgba(139, 92, 246, 0.2);
-    color: var(--color-text);
-    border-color: var(--color-primary);
+    color: #f87171;
+    background: #ef444433;
+    transform: rotate(90deg);
 }
 
 .userSection {
