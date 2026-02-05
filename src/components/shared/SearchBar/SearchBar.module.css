@@ -93,9 +93,10 @@
 }
 
 .clearButton:hover {
-    background: rgba(139, 92, 246, 0.2);
-    color: #ffffff;
     transform: translateY(-50%) scale(1.1);
+    color: #f87171;
+    background: #ef444433;
+    /* transform: rotate(90deg); */
 }
 
 
