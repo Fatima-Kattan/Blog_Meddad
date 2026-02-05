@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import InputField from '../../shared/InputField';
 import { loginService, LoginData } from '@/services/api/auth/loginService';
 import styles from './LoginForm.module.css'; // تغيير هنا
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 const LoginForm: React.FC = () => {
     const [isClient, setIsClient] = useState(false);
@@ -137,8 +138,12 @@ const LoginForm: React.FC = () => {
                             <span className={styles.subtitle}>Sign in to your account</span>
                         </div>
                     </div>
-                    <div className={styles.loadingText}>
-                        Loading login form...
+                    <div className={styles.loadingContainer}>
+                        <LoadingIcon 
+                            size={40}
+                            message="Loading login form..."
+                            position="absolute"
+                        />
                     </div>
                 </div>
             </div>
