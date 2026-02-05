@@ -109,37 +109,84 @@
 .editAvatarBtn {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 8px;
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
     color: white;
     border: none;
-    padding: 14px 14px;
+    padding: 14px;
     border-radius: 12px;
     font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
-}
-
-.editAvatarBtnNotOwner {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5);
-    color: white;
-    border: none;
-    padding: 12px 12px;
-    border-radius: 12px;
-    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
     position: relative;
     overflow: hidden;
+    white-space: nowrap;
 }
 
+/* تأثير اللمعان المشابه لـ createButton */
+.editAvatarBtn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.editAvatarBtn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+
+.editAvatarBtn:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite;
+}
+
+.editAvatarBtn:active {
+    transform: translateY(-1px);
+}
+
+.editAvatarBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.editAvatarBtn:disabled::before {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+.editAvatarBtnNotOwner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
+    border: none;
+    padding: 10px 17px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* تأثير اللمعان المشابه لـ createButton */
 .editAvatarBtnNotOwner::before {
     content: '';
     position: absolute;
@@ -149,10 +196,8 @@
     bottom: 0;
     background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     transform: translateX(-100%);
-}
-
-.editAvatarBtnNotOwner:hover::before {
-    animation: shimmer 1.5s infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .editAvatarBtnNotOwner:hover {
@@ -161,31 +206,26 @@
     background: linear-gradient(135deg, #7c3aed, #4f46e5);
 }
 
+.editAvatarBtnNotOwner:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite;
+}
+
 .editAvatarBtnNotOwner:active {
     transform: translateY(-1px);
 }
 
-@keyframes shimmer {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
+.editAvatarBtnNotOwner:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-.editAvatarBtn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px rgba(124, 58, 237, 0.5);
-    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+.editAvatarBtnNotOwner:disabled::before {
+    animation: none !important;
+    opacity: 0 !important;
 }
-
-
-
-.editAvatarBtn {
-    transform: translateY(0);
-}
-
 /* معلومات المستخدم */
 .userInfo {
     text-align: center;
