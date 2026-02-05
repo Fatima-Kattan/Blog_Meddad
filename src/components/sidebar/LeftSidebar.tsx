@@ -8,6 +8,7 @@ import ProfileService from '@/services/api/auth/profileService';
 import { HiHome, HiUsers, HiCalendar } from 'react-icons/hi';
 import styles from './sidebar.module.css';
 import { MdAssistantNavigation } from 'react-icons/md';
+import LoadingIcon from '../shared/LoadingIcon/LoadingIcon';
 
 interface LeftSidebarProps {
   compact?: boolean;
@@ -81,7 +82,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ compact = false }) => {
     return (
       <aside className={`${styles.sidebar} ${compact ? styles.compact : ''}`}>
         <div className={styles.loadingContainer}>
-          <div className={styles.loadingSpinner}></div>
+          <LoadingIcon 
+            size={45}
+            message="Loading..."
+            position="absolute"
+          />
         </div>
       </aside>
     );

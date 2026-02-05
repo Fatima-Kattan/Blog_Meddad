@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import styles from '@/components/likes/likes.module.css';
+import LoadingIcon from '../shared/LoadingIcon/LoadingIcon';
 
 interface LikeButtonProps {
     postId: number;
@@ -131,9 +132,11 @@ export default function LikeButton({
             >
                 {isLoading ? (
                     <div className={styles.loadingSpinner}>
-                        <svg className={styles.spinnerIcon} viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" fill="none" strokeWidth="4"></circle>
-                        </svg>
+                        <LoadingIcon 
+                            size={20}
+                            message="Updating like..."
+                            position="absolute"
+                        />
                     </div>
                 ) : (
                     <span className={isLiked ? styles.redHeart : styles.whiteHeart}>

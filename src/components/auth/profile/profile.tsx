@@ -18,19 +18,32 @@ import { MdEdit, MdOutlineEmail, MdDelete, MdLock } from 'react-icons/md';
 import { useParams, useSearchParams, usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 // Dynamic imports للتحسين
 const UserPostsFeed = dynamic(() => import('@/components/auth/profile/UserPostsFeed'), {
-    loading: () => <div className={styles.loadingSmall}>Loading posts...</div>
+    loading: () => <LoadingIcon 
+        size={40}
+        message="Loading posts..."
+        position="relative"
+    />
 });
 
 const MyFollowers = dynamic(() => import('@/components/follow/myFollowers/MyFollowers'), {
-    loading: () => <div className={styles.loadingSmall}>Loading followers...</div>,
+    loading: () => <LoadingIcon 
+        size={40}
+        message="Loading followers..."
+        position="relative"
+    />,
     ssr: false
 });
 
 const MyFollowing = dynamic(() => import('@/components/follow/myFollowing/MyFollowing'), {
-    loading: () => <div className={styles.loadingSmall}>Loading following...</div>,
+    loading: () => <LoadingIcon 
+        size={40}
+        message="Loading following..."
+        position="relative"
+    />,
     ssr: false
 });
 
@@ -196,7 +209,15 @@ const UpdatePasswordModal: React.FC<{
                                 Cancel
                             </button>
                             <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={isUpdating}>
-                                {isUpdating ? (<><div className={styles.loadingSpinner}></div>Updating...</>) : 'Update Password'}
+                                {isUpdating ? (
+                                    <>
+                                        <LoadingIcon 
+                                            size={30}
+                                            position="absolute"
+                                            message="Updating Password..."
+                                        />
+                                    </>
+                                ) : 'Update Password'}
                             </button>
                         </div>
                     </form>
@@ -282,7 +303,16 @@ const DeleteAccountModal: React.FC<{
                                 Cancel
                             </button>
                             <button type="submit" className={`${styles.btn} ${styles.btnDelete}`} disabled={isDeleting}>
-                                {isDeleting ? (<><div className={styles.loadingSpinner}></div>Deleting...</>) : 'Delete Account'}
+                                {isDeleting ? (
+                                    <>
+                                        <LoadingIcon 
+                                            size={20}
+                                            position="relative"
+                                            message="Deleting..."
+                                        />
+                                        Deleting...
+                                    </>
+                                ) : 'Delete Account'}
                             </button>
                         </div>
                     </form>
@@ -641,16 +671,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
 
     if (loading) {
         return (
-            <div className={styles.loading}>
-                <div className={styles.loadingSpinner}></div>
-                <p style={{
-                    color: '#cbd5e1',
-                    fontSize: '1.2rem',
-                    fontWeight: '600',
-                    letterSpacing: '0.5px'
-                }}>
-                    {memoizedTargetUserId ? `Loading Profile...` : 'Loading Your Profile...'}
-                </p>
+            <div>
+                <LoadingIcon 
+                    size={55}
+                    message={memoizedTargetUserId ? "Loading Profile..." : "Loading Your Profile..."}
+                    position="fixed"
+                />
             </div>
         );
     }
@@ -988,7 +1014,15 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                     Cancel
                                 </button>
                                 <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleSaveProfile} disabled={isSaving}>
-                                    {isSaving ? (<><div className={styles.loadingSpinner} style={{ width: '20px', height: '20px', borderWidth: '2px' }}></div>Saving...</>) : 'Save Changes'}
+                                    {isSaving ? (
+                                        <>
+                                            <LoadingIcon 
+                                                size={30}
+                                                position="absolute"
+                                                message="Saving..."
+                                            />
+                                        </>
+                                    ) : 'Save Changes'}
                                 </button>
                             </div>
                         </div>
