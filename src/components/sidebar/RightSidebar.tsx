@@ -5,6 +5,7 @@ import UserCard from '../shared/UserCard/UserCard';
 import { notFollowingService, NotFollowingResponse } from "@/services/api/follow_api/notFollowings";
 import { MdOutlineGroupAdd, MdOutlinePeopleAlt } from "react-icons/md";
 import { FaPeopleArrows } from "react-icons/fa";
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 
 function RightSidebar() {
   const [users, setUsers] = useState<NotFollowingResponse | null>(null);
@@ -57,14 +58,10 @@ function RightSidebar() {
     }, 0);
 
     return () => clearTimeout(timer);
-  }, []); // [] فارغة يعني تنفذ مرة وحدة عند التحميل
+  }, []);
 
   // دالة لتنسيق المحتوى المعروض
   const renderContent = () => {
-    if (loading) {
-      return <p className={styles.statement}>Loading...</p>;
-    }
-    
     if (error) {
       return <p className={styles.error}>{error}</p>;
     }
@@ -86,20 +83,42 @@ function RightSidebar() {
       ));
     }
     
-    return <p className={styles.statement}>Great! You have followed everyone.</p>;
+    if (!loading) {
+      return <p className={styles.statement}>Great! You have followed everyone.</p>;
+    }
+    
+    return null;
   };
 
   return (
     <div className={styles.sidebarSection}>
       <div className={styles.title_follower}>
         <MdOutlinePeopleAlt className={styles.icon}/>
-      <h3 className={styles.suggestedFriends}>Suggested Friends</h3>
+        <h3 className={styles.suggestedFriends}>Suggested Friends</h3>
       </div>
       
       <div className={styles.scrollContainer}>
-        <div>
-          {renderContent()}
-        </div>
+        {/* ✅ LoadingIcon في حالة التحميل */}
+        {loading && (
+          <div style={{ 
+            position: 'relative', 
+            minHeight: '200px',
+            width: '100%'
+          }}>
+            <LoadingIcon 
+              size={50}
+              message="Loading suggested friends..."
+              position="absolute"
+            />
+          </div>
+        )}
+        
+        {/* ✅ المحتوى العادي عندما لا يكون هناك تحميل */}
+        {!loading && (
+          <div>
+            {renderContent()}
+          </div>
+        )}
       </div>
     </div>
   );
