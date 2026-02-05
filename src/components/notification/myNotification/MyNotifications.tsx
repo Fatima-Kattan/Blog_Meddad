@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import styles from './myNotifications.module.css';
 import NotificationItem from '@/components/notification/notificationItem/NotificationItem';
 import { useNotifications } from '@/context/NotificationContext'; // ✅ أضيفي
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 function MyNotifications() {
     const [loading, setLoading] = useState(true);
@@ -11,13 +12,13 @@ function MyNotifications() {
     const [filterType, setFilterType] = useState('all');
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
-    
+
     // ✅ أضيفي:
-    const { 
-        notifications, 
-        unreadCount, 
-        fetchNotifications, 
-        markAllAsRead 
+    const {
+        notifications,
+        unreadCount,
+        fetchNotifications,
+        markAllAsRead
     } = useNotifications();
 
     useEffect(() => {
@@ -83,7 +84,7 @@ function MyNotifications() {
             const notificationDate = new Date(n.created_at);
             return notificationDate.toDateString() === todayDate.toDateString();
         }).length;
-        
+
         return { todayCount: today };
     }, [notifications]);
 
@@ -178,9 +179,12 @@ function MyNotifications() {
                         </div>
                         <div className={styles.notificationsListItems}>
                             {loading && (
-                                <div className={styles.loadingContainer}>
-                                    <div className={styles.loadingSpinner}></div>
-                                    <div className={styles.loadingText}>Loading notifications...</div>
+                                <div style={{ position: 'relative', minHeight: '300px', width: '100%' }}>
+                                    <LoadingIcon
+                                        size={60}
+                                        message="Loading notifications..."
+                                        position="absolute"
+                                    />
                                 </div>
                             )}
 
