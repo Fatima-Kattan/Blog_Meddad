@@ -4,6 +4,7 @@ export const revalidate = 0;
 
 import { Suspense } from 'react';
 import SearchClient from './SearchClient';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 import styles from './SearchPage.module.css';
 
 export default async function SearchPage({
@@ -19,11 +20,20 @@ export default async function SearchPage({
         <div className={styles.searchPage}>
             <div className={styles.container}>
                 <Suspense fallback={
-                    <div className={styles.resultsContainer}>
-                        <div className={styles.loadingState}>
-                            <div className={styles.spinner}></div>
-                            <p className={styles.loadingText}>Loading search...</p>
-                        </div>
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '400px',
+                        width: '100%'
+                    }}>
+                        <LoadingIcon 
+                            message="Loading search..."
+                            size={50}
+                            position="relative"
+                            fullScreen={false}
+                            color="#8b5cf6"
+                        />
                     </div>
                 }>
                     <SearchClient

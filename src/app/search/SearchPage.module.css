@@ -116,7 +116,8 @@
     justify-content: center; 
 }
 
-/* ===== Loading State ===== */
+/* ⚠️ تم حذف قسم .loadingState و .spinner القديم */
+/* 
 .loadingState {
     display: flex;
     flex-direction: column;
@@ -148,15 +149,7 @@
     letter-spacing: 0.5px;
     text-align: center; 
 }
-.loadingOverlay {
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    justify-content: center; 
-    z-index: 1000;
-    text-align: center; 
-}
-
+*/
 
 /* ===== Error State ===== */
 .errorState {
@@ -711,9 +704,9 @@
     }
 }
 /* ===== Home Button Styles ===== */
-/* .homeButtonContainer {
+.homeButtonContainer {
     margin-bottom: 30px;
-} */
+}
 
 .homeButton {
     background: rgba(139, 92, 246, 0.15);

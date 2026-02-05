@@ -7,26 +7,21 @@ import { useEffect, useState } from 'react';
 const ConditionalNavbar = () => {
   const pathname = usePathname();
   
-  // صفحات لا نريد فيها النافبار
   const hiddenPaths = [
     '/login', 
     '/register',
-    '/search' // ⭐ أضف صفحة البحث هنا
+    '/search'
   ];
   
-  // تحقق إذا كان المسار يحتوي على /profile/
   const isProfilePage = pathname?.startsWith('/profile/');
   
-  // حالة تتبع إذا كانت صفحة البروفايل مفتوحة من الأعلى
   const [hideNavForProfile, setHideNavForProfile] = useState(false);
   
   useEffect(() => {
     if (isProfilePage && typeof window !== 'undefined') {
-      // تحقق من localStorage
       const openedFromTop = localStorage.getItem('profileOpenedFromTop') === 'true';
       setHideNavForProfile(openedFromTop);
       
-      // نظف localStorage بعد القراءة
       if (openedFromTop) {
         localStorage.removeItem('profileOpenedFromTop');
       }
@@ -35,7 +30,6 @@ const ConditionalNavbar = () => {
     }
   }, [pathname, isProfilePage]);
   
-  // قرار إخفاء النافبار
   const shouldHideNavbar = 
     hiddenPaths.includes(pathname || '') || 
     (isProfilePage && hideNavForProfile);

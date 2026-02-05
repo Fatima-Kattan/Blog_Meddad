@@ -6,17 +6,18 @@ import { useRouter } from 'next/navigation';
 import SearchBar from '@/components/shared/SearchBar/SearchBar';
 import Link from 'next/link';
 import PostFeed from '@/components/posts/post-feed/PostFeed';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 import { getSearch, SearchResponse } from '@/services/api/search/search';
 import styles from './SearchPage.module.css';
 
 interface SearchClientProps {
-  initialQuery: string;
-  initialType: string;
+    initialQuery: string;
+    initialType: string;
 }
 
 export default function SearchClient({ initialQuery, initialType }: SearchClientProps) {
     const router = useRouter();
-    
+
     const [activeTab, setActiveTab] = useState(initialType);
     const [query, setQuery] = useState(initialQuery);
     const [searchData, setSearchData] = useState<SearchResponse | null>(null);
@@ -37,10 +38,10 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
 
         try {
             const data = await getSearch(searchQuery, tab);
-            
+
             if (data.success) {
                 setSearchData(data);
-                
+
                 // حفظ البيانات الأصلية عندما يكون التبويب "all"
                 if (tab === 'all') {
                     setOriginalAllData(data);
@@ -72,7 +73,7 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
     // معالجة البحث من شريط البحث
     const handleSearch = (newQuery: string) => {
         setQuery(newQuery);
-        
+
         if (newQuery.trim()) {
             router.push(`/search?q=${encodeURIComponent(newQuery)}&type=${activeTab}`);
             performSearch(newQuery, activeTab);
@@ -86,7 +87,7 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
     // تغيير التبويب
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
-        
+
         if (query) {
             router.push(`/search?q=${encodeURIComponent(query)}&type=${tab}`, { scroll: false });
             performSearch(query, tab);
@@ -103,7 +104,7 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
 
         // استخدم البيانات الأصلية للـ "all" عند توفرها
         const displayData = originalAllData || searchData;
-        
+
         if (!displayData) return null;
 
         return {
@@ -116,14 +117,20 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
 
     const tabCounts = getTabCounts();
 
-    // عرض حالة التحميل
+    // ✅ عرض حالة التحميل باستخدام LoadingIcon
     if (loading && !searchData) {
         return (
-            <div className={styles.resultsContainer}>
-                <div className={styles.loadingState}>
-                    <div className={styles.spinner}></div>
-                    <p className={styles.loadingText}>Searching...</p>
-                </div>
+            <div style={{
+                textAlign: 'center', 
+                padding: '300px 20px',
+            }}>
+                <LoadingIcon
+                    message="Searching..."
+                    size={50}
+                    position="relative"
+                    fullScreen={false}
+                    color="#8b5cf6"
+                />
             </div>
         );
     }
@@ -249,8 +256,8 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
                                     <div className={styles.sectionHeader}>
                                         <h2 className={styles.sectionTitle}>Users</h2>
                                         <span className={styles.sectionCount}>
-                                            {activeTab === 'all' && originalAllData 
-                                                ? originalAllData.users_count 
+                                            {activeTab === 'all' && originalAllData
+                                                ? originalAllData.users_count
                                                 : searchData.users_count} users
                                         </span>
                                     </div>
@@ -296,8 +303,8 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
                                     <div className={styles.sectionHeader}>
                                         <h2 className={styles.sectionTitle}>Posts</h2>
                                         <span className={styles.sectionCount}>
-                                            {activeTab === 'all' && originalAllData 
-                                                ? originalAllData.posts_count 
+                                            {activeTab === 'all' && originalAllData
+                                                ? originalAllData.posts_count
                                                 : searchData.posts_count} posts
                                         </span>
                                     </div>
@@ -325,8 +332,8 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
                                     <div className={styles.sectionHeader}>
                                         <h2 className={styles.sectionTitle}>Tags</h2>
                                         <span className={styles.sectionCount}>
-                                            {activeTab === 'all' && originalAllData 
-                                                ? originalAllData.tags_count 
+                                            {activeTab === 'all' && originalAllData
+                                                ? originalAllData.tags_count
                                                 : searchData.tags_count} tags
                                         </span>
                                     </div>
@@ -353,11 +360,19 @@ export default function SearchClient({ initialQuery, initialType }: SearchClient
                     </div>
                 )}
 
-                {/* Loading أثناء وجود نتائج (للتحديث) */}
+                {/* ✅ Loading أثناء وجود نتائج باستخدام LoadingIcon */}
                 {loading && searchData && (
-                    <div className={styles.loadingOverlay}>
-                        <div className={styles.spinner}></div>
-                        <p>Updating results...</p>
+                    <div style={{
+                        textAlign: 'center', 
+                        padding: '50px 20px',
+                    }}>
+                        <LoadingIcon
+                            message="Updating results..."
+                            size={40}
+                            position="relative"
+                            fullScreen={false}
+                            color="#8b5cf6"
+                        />
                     </div>
                 )}
             </div>

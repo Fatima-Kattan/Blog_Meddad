@@ -7,7 +7,6 @@ import styles from './Navbar.module.css';
 import SearchBar from '../SearchBar/SearchBar';
 import api from '@/services/api/auth/api';
 
-// الأيقونات الأساسية فقط
 import {
     HiHome,
     HiUserCircle,
@@ -27,7 +26,7 @@ import {
 
 import { IoMdAddCircleOutline, IoMdNotifications } from "react-icons/io";
 import { IoLogInOutline } from 'react-icons/io5';
-import { IoNotificationsOutline } from 'react-icons/io5'; // ⭐ إضافة أيقونة الإشعارات
+import { IoNotificationsOutline } from 'react-icons/io5';
 import NotificationIcon from '@/components/notification/notification_icon/NotificationIcon';
 
 const Navbar = () => {
@@ -48,7 +47,6 @@ const Navbar = () => {
 
     const profileMenuRef = useRef<HTMLDivElement>(null);
 
-    // تأثير التمرير
     useEffect(() => {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 0);
@@ -57,7 +55,6 @@ const Navbar = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    // ⭐⭐ **دالة لجلب بيانات المستخدم من قاعدة البيانات** ⭐⭐
     const fetchUserFromDatabase = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -66,7 +63,6 @@ const Navbar = () => {
                 return;
             }
 
-            // جلب بيانات المستخدم من API
             const response = await api.get('/user', {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -78,10 +74,8 @@ const Navbar = () => {
                 setUserFromDB(userData);
                 setIsAuthenticated(true);
 
-                // تحديث localStorage بالبيانات المحدثة
                 localStorage.setItem('user', JSON.stringify(userData));
 
-                // معالجة الصورة
                 processUserImage(userData);
             } else {
                 setIsAuthenticated(false);
@@ -96,7 +90,6 @@ const Navbar = () => {
         }
     };
 
-    // ⭐⭐ **دالة لمعالجة صورة المستخدم** ⭐⭐
     const processUserImage = (userData: any) => {
         let imageUrl = '';
 
@@ -105,7 +98,6 @@ const Navbar = () => {
             userData.image === null ||
             userData.image.trim() === '') {
 
-            // إنشاء صورة افتراضية
             const name = userData.full_name || userData.email || 'User';
             const initials = name
                 .split(' ')
@@ -116,14 +108,11 @@ const Navbar = () => {
 
             imageUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=100`;
         } else {
-            // إذا كانت هناك صورة
             imageUrl = userData.image;
 
-            // تحويل المسار النسبي إلى مسار كامل
             if (imageUrl.startsWith('/')) {
                 imageUrl = `http://localhost:8000${imageUrl}`;
             } else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-                // إذا كانت مجرد اسم ملف
                 imageUrl = `http://localhost:8000/uploads/${imageUrl}`;
             }
         }
@@ -132,7 +121,6 @@ const Navbar = () => {
         setUser(userData);
     };
 
-    // ⭐⭐ **التحقق من تسجيل الدخول وجلب البيانات** ⭐⭐
     useEffect(() => {
         const checkAuthAndFetchData = async () => {
             if (typeof window !== 'undefined') {
@@ -147,7 +135,6 @@ const Navbar = () => {
                             processUserImage(parsedUser);
                             setIsAuthenticated(true);
 
-                            // ⭐⭐ **جلب البيانات المحدثة من قاعدة البيانات** ⭐⭐
                             fetchUserFromDatabase();
                         } catch (error) {
                             console.error('Error parsing stored user:', error);
@@ -156,7 +143,6 @@ const Navbar = () => {
                             setIsAuthenticated(false);
                         }
                     } else {
-                        // ⭐⭐ **لا يوجد بيانات في localStorage، جلب من قاعدة البيانات** ⭐⭐
                         await fetchUserFromDatabase();
                     }
                 } else {
@@ -171,22 +157,18 @@ const Navbar = () => {
         checkAuthAndFetchData();
     }, []);
 
-    // ⭐⭐ **جلب بيانات محدثة عند فتح البروفايل** ⭐⭐
     const refreshUserData = async () => {
         if (isAuthenticated) {
             await fetchUserFromDatabase();
         }
     };
 
-    // ⭐⭐ **التعديل هنا: فتح قائمة البروفايل بدون تأخير** ⭐⭐
     const handleProfileMenuClick = () => {
-        // افتح القائمة فوراً
         setShowProfileMenu(!showProfileMenu);
 
-        // إذا بتفتح القائمة وكانت البيانات قديمة
         if (!showProfileMenu) {
             const now = new Date();
-            if (!lastDataRefresh || (now.getTime() - lastDataRefresh.getTime()) > 60000) { // دقيقة
+            if (!lastDataRefresh || (now.getTime() - lastDataRefresh.getTime()) > 60000) {
                 refreshUserData().then(() => {
                     setLastDataRefresh(now);
                 });
@@ -194,7 +176,6 @@ const Navbar = () => {
         }
     };
 
-    // إغلاق القائمة عند النقر خارجها
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (profileMenuRef.current &&
@@ -209,9 +190,7 @@ const Navbar = () => {
         };
     }, []);
 
-    // ⭐ **دالة للحصول على صورة المستخدم (من قاعدة البيانات أولاً)** ⭐
     const getUserImage = (size: 'small' | 'large' = 'small') => {
-        // استخدم البيانات من قاعدة البيانات أولاً
         const currentUser = userFromDB || user;
 
         if (userImage && userImage !== '') return userImage;
@@ -229,11 +208,9 @@ const Navbar = () => {
             return `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=${imageSize}`;
         }
 
-        // صورة افتراضية
         return `https://ui-avatars.com/api/?name=US&background=8b5cf6&color=fff&bold=true&size=${size === 'small' ? '100' : '200'}`;
     };
 
-    // معالجة أخطاء تحميل الصور
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         const imgElement = e.currentTarget;
         const currentUser = userFromDB || user;
@@ -248,32 +225,27 @@ const Navbar = () => {
         imgElement.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=8b5cf6&color=fff&bold=true&size=100`;
     };
 
-    // ⭐⭐ **دالة للحصول على الـ ID للمستخدم الحالي** ⭐⭐
     const getCurrentUserId = useCallback(() => {
         const currentUser = userFromDB || user;
         return currentUser?.id || null;
     }, [userFromDB, user]);
 
-    // ⭐⭐ **تعديل navLinks - إزالة التريندينج وإضافة الإشعارات** ⭐⭐
     const navLinks = [
         { id: 'home', href: '/', label: 'Home', icon: <HiHome size={24} /> },
-        { id: 'notifications', href: '/notifications', label: 'Notifications', icon: <IoMdNotifications size={22} /> }, // ⭐ استبدال التريندينج بالإشعارات
+        { id: 'notifications', href: '/notifications', label: 'Notifications', icon: <IoMdNotifications size={22} /> },
         {
             id: 'profile',
-            href: '#', // ⭐⭐ غير إلى #
+            href: '#',
             label: 'Profile',
             icon: <HiUserCircle size={24} style={{ color: '#8b5cf6' }} />
         },
-        { id: 'posts', href: '#', label: 'MyPosts', icon: <FaFeatherAlt size={22} /> }, // ⭐⭐ غير هنا!
+        { id: 'posts', href: '#', label: 'MyPosts', icon: <FaFeatherAlt size={22} /> },
     ];
 
-    // ⭐⭐ **تعديل handleTabClick** ⭐⭐
     const handleTabClick = useCallback(async (tabId: string, href: string) => {
         setActiveTab(tabId);
 
-        // ⭐⭐ التعامل الخاص بالبروفايل من القائمة السفلية
         if (tabId === 'profile') {
-            // ⭐⭐ تأكد من إزالة العلامة إذا فُتح من الأسفل
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('profileOpenedFromTop');
             }
@@ -293,7 +265,6 @@ const Navbar = () => {
             if (userId) {
                 router.push(`/myPost/${userId}`);
             } else {
-                // إذا لم يكن مسجل دخول، أرسله لصفحة تسجيل الدخول
                 router.push('/login');
             }
 
@@ -302,7 +273,6 @@ const Navbar = () => {
             return;
         }
 
-        // لباقي التبويبات
         router.push(href);
         setIsMenuOpen(false);
         setShowProfileMenu(false);
@@ -335,7 +305,6 @@ const Navbar = () => {
         }
     }, [router]);
 
-    // ⭐⭐ **دالة للحصول على بيانات المستخدم الحالية** ⭐⭐
     const getCurrentUser = useCallback(() => {
         return userFromDB || user;
     }, [userFromDB, user]);
@@ -347,7 +316,6 @@ const Navbar = () => {
                     <div className={styles.leftSection}>
                         <div className={styles.logo}>
                             <div className={styles.logoIcon}>
-                                {/*  <FaMagic size={24} /> */}
                                 <svg
                                     version="1.1"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -382,11 +350,9 @@ const Navbar = () => {
         <>
             <nav className={`${styles.navbar} ${isScrolled ? styles.scrolled : ''}`}>
                 <div className={styles.container}>
-                    {/* الجزء الأيسر: اللوجو */}
                     <div className={styles.leftSection}>
                         <Link href="/" className={styles.logo}>
                             <div className={styles.logoIcon}>
-                                {/* <FaMagic size={24} /> */}
                                 <svg
                                     version="1.1"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -405,23 +371,18 @@ const Navbar = () => {
                         </Link>
                     </div>
 
-                    {/* الجزء الأوسط: شريط البحث */}
                     <div className={styles.centerSection}>
                         <SearchBar />
                     </div>
 
-                    {/* الجزء الأيمن: أيقونات */}
                     <div className={styles.rightSection}>
 
-
-                        {/* إشعارات (في الجزء العلوي للأجهزة الكبيرة فقط) */}
                         {isAuthenticated && (
                             <div className={styles.notificationContainer}>
                                 <NotificationIcon />
                             </div>
                         )}
 
-                        {/* عرض البروفايل أو أزرار الدخول */}
                         {isAuthenticated ? (
                             <div className={styles.profileDropdown} ref={profileMenuRef}>
                                 <button
@@ -441,7 +402,6 @@ const Navbar = () => {
                                     </div>
                                 </button>
 
-                                {/* قائمة البروفايل المنسدلة */}
                                 {showProfileMenu && (
                                     <div className={styles.profileMenu}>
                                         <div className={styles.profileMenuHeader}>
@@ -460,29 +420,24 @@ const Navbar = () => {
 
                                         <div className={styles.menuDivider} />
 
-                                        {/* ⭐⭐ استخدم button بدل Link للتحكم الكامل ⭐⭐ */}
                                         <button
                                             className={styles.menuItem}
                                             onClick={() => {
-                                                // ⭐⭐ ضع علامة أن البروفايل فتح من الأعلى
                                                 if (typeof window !== 'undefined') {
                                                     localStorage.setItem('profileOpenedFromTop', 'true');
                                                 }
 
-                                                // انتقل إلى صفحة البروفايل
                                                 const userId = getCurrentUserId();
                                                 if (userId) {
                                                     router.push(`/profile/${userId}`);
                                                 }
 
-                                                // أغلق القائمة المنسدلة
                                                 setShowProfileMenu(false);
                                             }}
                                         >
                                             <RiUserStarLine size={20} />
                                             <span>My Profile</span>
                                         </button>
-                                        {/* ⭐⭐ تعديل هنا! ⭐⭐ */}
                                         <button
                                             className={styles.menuItem}
                                             onClick={() => {
@@ -522,7 +477,6 @@ const Navbar = () => {
                             </div>
                         )}
 
-                        {/* زر القائمة للموبايل */}
                         <button
                             className={styles.mobileMenuButton}
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -533,7 +487,6 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* القائمة السفلية */}
                 <div className={styles.bottomNav}>
                     <div className={styles.bottomNavContainer}>
                         {navLinks.map((link) => (
@@ -552,7 +505,6 @@ const Navbar = () => {
                 </div>
             </nav>
 
-            {/* قائمة الجوال المنبثقة */}
             {isMenuOpen && (
                 <div className={styles.mobileMenu}>
                     <div className={styles.mobileMenuHeader}>
@@ -587,11 +539,9 @@ const Navbar = () => {
                     <div className={styles.mobileLinks}>
                         {isAuthenticated ? (
                             <>
-                                {/* ⭐⭐ تعديل رابط البروفايل للجوال ⭐⭐ */}
                                 <button
                                     className={`${styles.mobileLink} ${activeTab === 'profile' ? styles.active : ''}`}
                                     onClick={() => {
-                                        // ⭐⭐ ضع علامة للفتح من الأعلى للجوال أيضًا
                                         if (typeof window !== 'undefined') {
                                             localStorage.setItem('profileOpenedFromTop', 'true');
                                         }
@@ -609,7 +559,6 @@ const Navbar = () => {
                                     Profile
                                 </button>
 
-                                {/* ⭐⭐ تعديل هنا! ⭐⭐ */}
                                 {navLinks.filter(link => link.id !== 'profile' && link.id !== 'posts').map((link) => (
                                     <Link
                                         key={link.id}
@@ -626,7 +575,6 @@ const Navbar = () => {
                                     </Link>
                                 ))}
 
-                                {/* ⭐⭐ رابط Posts خاص في قائمة الجوال ⭐⭐ */}
                                 <button
                                     className={`${styles.mobileLink} ${activeTab === 'posts' ? styles.active : ''}`}
                                     onClick={() => {
