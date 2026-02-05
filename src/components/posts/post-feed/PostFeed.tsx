@@ -5,7 +5,6 @@ import { usePosts } from '@/hooks/use-posts';
 import PostItem from '../post-item/PostItem';
 import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 import styles from './PostFeed.module.css';
-import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 const PostFeed = (props: any) => {
     const {
@@ -21,7 +20,7 @@ const PostFeed = (props: any) => {
         isSearchResults = false
     } = props;
     
-    // 👇 We use usePosts for regular data
+    // 👇 نستخدم usePosts للبيانات العادية
     const { 
         posts: fetchedPosts, 
         loading: postsLoading, 
@@ -36,17 +35,17 @@ const PostFeed = (props: any) => {
         userId,
         searchKeyword: isSearchResults ? undefined : searchKeyword,
         tagName,
-        tagId, // 👈 Pass tagId here
+        tagId, // 👈 مرر tagId هنا
         hideInfiniteScroll
     });
 
-    // 👇 State for search results data
+    // 👇 state للبيانات في حالة نتائج البحث
     const [searchPosts, setSearchPosts] = useState<any[]>([]);
     const [searchLoading, setSearchLoading] = useState(false);
 
     useEffect(() => {
         if (isSearchResults) {
-            // 👇 For search results, we use initialPosts directly
+            // 👇 لنتائج البحث، نستخدم initialPosts مباشرة
             setSearchLoading(true);
             const formattedPosts = initialPosts.map(post => ({
                 ...post,
@@ -76,14 +75,14 @@ const PostFeed = (props: any) => {
         }
     }, [initialPosts, isSearchResults]);
 
-    // 👇 Determine which posts to display
+    // 👇 تحديد أي posts نعرض
     const postsToDisplay = isSearchResults ? searchPosts : fetchedPosts;
     const loading = isSearchResults ? searchLoading : postsLoading;
     const error = isSearchResults ? null : postsError;
 
-    // 🔧 **Filter missing posts**
+    // 🔧 **تصفية البوستات الناقصة**
     const validPosts = postsToDisplay.filter(post => {
-        // Make sure post exists and has an id
+        // تأكد من وجود post ووجود id
         if (!post || typeof post !== 'object') {
             console.warn('⚠️ Invalid post object:', post);
             return false;
@@ -101,7 +100,7 @@ const PostFeed = (props: any) => {
     });
     const observerRef = useRef<HTMLDivElement>(null);
 
-    // Auto infinite scroll - for regular data only
+    // Auto infinite scroll - للبيانات العادية فقط
     useEffect(() => {
         if (isSearchResults || hideInfiniteScroll || singlePostMode || userId || searchKeyword || tagName || tagId) return;
 
@@ -146,13 +145,6 @@ const PostFeed = (props: any) => {
     // ✅ استخدام LoadingIcon لـ showLoadingOnly
     if (showLoadingOnly) {
         return (
-<<<<<<< HEAD
-            <div className={styles.loadingContainer}>
-                <LoadingIcon 
-                    size={50}
-                    message="Loading post..."
-                    position="absolute"
-=======
             <div style={{
                 textAlign: 'center', 
                 padding: '200px 20px',
@@ -162,7 +154,6 @@ const PostFeed = (props: any) => {
                     size={50}
                     position="relative"
                     
->>>>>>> 0ba8d38ea0a23a5f9f8c7cbc64aa7230d501eb51
                 />
             </div>
         );
@@ -209,13 +200,13 @@ const PostFeed = (props: any) => {
                 <>
                     {
                         validPosts.map((post: any) => {
-                            // 🔧 **Add additional check before render**
+                            // 🔧 **أضف فحص إضافي قبل الـ render**
                             if (!post || !post.id) {
                                 console.error('❌ Invalid post in map:', post);
                                 return null;
                             }
 
-                            // 🔧 **Ensure user object exists**
+                            // 🔧 **تأكد من وجود user object**
                             const safePost = {
                                 ...post,
                                 user: post.user || {
@@ -243,13 +234,6 @@ const PostFeed = (props: any) => {
 
                     
                     {loading && (
-<<<<<<< HEAD
-                        <div className={styles.loadingContainer}>
-                            <LoadingIcon 
-                                size={50}
-                                message={singlePostMode ? 'Loading post...' : 'Loading posts...'}
-                                position="absolute"
-=======
                         <div style={{
                             textAlign: 'center', 
                             padding: '200px 20px',
@@ -259,12 +243,11 @@ const PostFeed = (props: any) => {
                                 size={40}
                                 position="relative"
                                 
->>>>>>> 0ba8d38ea0a23a5f9f8c7cbc64aa7230d501eb51
                             />
                         </div>
                     )}
 
-                    {/* 👇 Load More for regular data only */}
+                    {/* 👇 Load More للبيانات العادية فقط */}
                     {!isSearchResults && !tagId && hasMore && !loading && !hideInfiniteScroll && !singlePostMode && !userId && !searchKeyword && !tagName && (
                         <div ref={observerRef} className={styles.loadMoreTrigger}>
                             <button
