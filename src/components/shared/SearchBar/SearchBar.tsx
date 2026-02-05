@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { HiSearch, HiX, HiUser, HiNewspaper, HiTag, HiChevronRight } from 'react-icons/hi';
 import { useSearch } from '@/hooks/use-search';
-import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; 
 import styles from './SearchBar.module.css';
 
 interface UserSuggestion {
@@ -168,7 +168,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ initialQuery = '', onSearch }) =>
                                 message="Searching..."
                                 size={40}
                                 position="relative"
-                                fullScreen={false}
+                                
                                 
                             />
                         </div>

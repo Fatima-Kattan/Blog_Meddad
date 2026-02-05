@@ -18,13 +18,13 @@ interface UpdatePostProps {
         title: string;
         caption: string;
         images: string[];
-        tags?: Array<{ // ⭐ إضافة tags
+        tags?: Array<{
             id: number;
             tag_name: string;
         }>;
     };
     onClose: () => void;
-    onPostUpdated: (updatedPost: any) => void; // ⭐ تعديل لاستقبال الـ post المحدث
+    onPostUpdated: (updatedPost: any) => void;
 }
 
 const UpdatePost: React.FC<UpdatePostProps> = ({ 
@@ -48,7 +48,6 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
     
     const modalRef = useRef<HTMLDivElement>(null);
 
-    // ⭐ دالة لتمييز التاغات في النص
     const highlightHashtags = (text: string) => {
         return text.replace(/#(\w+)/g, '<span class="hashtag-highlight">#$1</span>');
     };
@@ -63,13 +62,11 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
         }
     }, [postData.caption]);
 
-    // إظهار الإشعار
     const showNotification = (message: string, type: 'success' | 'error' | 'info') => {
         setNotification({ message, type });
         setTimeout(() => setNotification(null), 3000);
     };
 
-    // ✅ الحل: استخدام useMemo للمقارنة مع التاغات
     const hasChanges = useMemo(() => {
         if (postData.title !== post.title) return true;
         if (postData.caption !== post.caption) return true;
@@ -80,7 +77,6 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
             if (postData.images[i] !== post.images[i]) return true;
         }
         
-        // ⭐ التحقق من تغيير التاغات (مقارنة نصية)
         const oldHashtags = (post.caption?.match(/#(\w+)/g) || []).sort().join(',');
         const newHashtags = (postData.caption?.match(/#(\w+)/g) || []).sort().join(',');
         if (oldHashtags !== newHashtags) return true;
@@ -93,7 +89,6 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
         imgElement.src = 'https://ui-avatars.com/api/?name=User&background=8b5cf6&color=fff&size=40';
     };
 
-    // إغلاق المودال عند الضغط على ESC
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
@@ -108,7 +103,6 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
         };
     }, [onClose]);
 
-    // إغلاق عند النقر خارج المودال
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
@@ -191,15 +185,14 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
                 throw new Error('Authentication required. Please login again.');
             }
 
-            console.log('📤 Updating post with data:', postData);
-            console.log('🏷️ Hashtags in caption:', postData.caption.match(/#(\w+)/g));
+            console.log('Updating post with data:', postData);
+            console.log('Hashtags in caption:', postData.caption.match(/#(\w+)/g));
             
             const response = await updatePost(postData, token);
             
             showNotification('Post updated successfully!', 'success');
-            console.log('✅ Post updated with tags:', response.data?.tags);
+            console.log('Post updated with tags:', response.data?.tags);
 
-            // ⭐ إنشاء الـ updatedPost object مع التاغات
             const updatedPost = {
                 id: response.data.id,
                 user: {
@@ -213,23 +206,21 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
                 
                 created_at: response.data.created_at,
                 updated_at: response.data.updated_at,
-                tags: response.data.tags || [] // ⭐ إضافة التاغات
+                tags: response.data.tags || []
             };
             
-            console.log('🎉 Formatted updated post:', updatedPost);
+            console.log('Formatted updated post:', updatedPost);
             
-            // ✅ استدعاء callback وإرسال الـ post المحدث
             if (onPostUpdated) {
                 onPostUpdated(updatedPost);
             }
             
-            // ✅ إغلاق المودال بعد التأكد من تحديث البيانات
             setTimeout(() => {
                 onClose();
             }, 500);
             
         } catch (error: any) {
-            console.error('❌ Error updating post:', error);
+            console.error('Error updating post:', error);
             showNotification(error.message || 'Failed to update post', 'error');
         } finally {
             setIsLoading(false);
@@ -382,9 +373,6 @@ const UpdatePost: React.FC<UpdatePostProps> = ({
                                     You have reached the maximum limit of 4 images
                                 </p>
                             )}
-                            {/* <p className={styles.urlHint}>
-                                Enter a direct link to an image (e.g., https://example.com/image.jpg)
-                            </p> */}
                         </div>
                     </div>
 

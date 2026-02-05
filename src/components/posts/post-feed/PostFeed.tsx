@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { usePosts } from '@/hooks/use-posts';
 import PostItem from '../post-item/PostItem';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon'; // ✅ استيراد LoadingIcon
 import styles from './PostFeed.module.css';
 
 const PostFeed = (props: any) => {
@@ -141,11 +142,19 @@ const PostFeed = (props: any) => {
         }
     };
 
+    // ✅ استخدام LoadingIcon لـ showLoadingOnly
     if (showLoadingOnly) {
         return (
-            <div className={styles.loadingContainer}>
-                <div className={styles.spinner}></div>
-                <p>Loading post...</p>
+            <div style={{
+                textAlign: 'center', 
+                padding: '200px 20px',
+            }}>
+                <LoadingIcon 
+                    message="Loading post..."
+                    size={50}
+                    position="relative"
+                    
+                />
             </div>
         );
     }
@@ -223,12 +232,18 @@ const PostFeed = (props: any) => {
                         })
                     }
 
+                    
                     {loading && (
-                        <div className={styles.loadingContainer}>
-                            <div className={styles.spinner}></div>
-                            <p>
-                                {singlePostMode ? 'Loading post...' : 'Loading posts...'}
-                            </p>
+                        <div style={{
+                            textAlign: 'center', 
+                            padding: '200px 20px',
+                        }}>
+                            <LoadingIcon 
+                                message={singlePostMode ? 'Loading post...' : 'Loading posts...'}
+                                size={40}
+                                position="relative"
+                                
+                            />
                         </div>
                     )}
 
