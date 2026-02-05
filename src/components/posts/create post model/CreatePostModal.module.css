@@ -1,13 +1,13 @@
 /* CreatePostModal.module.css */
 
 :root {
-    --color-primary: #8b5cf6;
+    --color-primary: #733DEC;
     --color-primary-dark: #6d28d9;
     --color-secondary: #a78bfa;
     --color-background: #0a0418;
-    --color-surface: #1a0b2e;
+    --color-surface: #160722;
     --color-surface-light: #2a1b42;
-    --color-border: rgba(139, 92, 246, 0.3);
+    --color-border: #491f73ff;
     --color-border-light: rgba(139, 92, 246, 0.2);
     --color-text: #ffffff;
     --color-text-secondary: #c4b5fd;
@@ -35,7 +35,7 @@
 }
 
 .modalContainer {
-    background: var(--color-surface);
+    background: #160722;
     border-radius: 20px;
     width: 90%;
     max-width: 600px;
@@ -94,7 +94,7 @@
     justify-content: space-between;
     padding: 20px 24px;
     border-bottom: 1px solid var(--color-border);
-    background: var(--color-surface);
+    background: #160722;
     position: sticky;
     top: 0;
     z-index: 100; 
@@ -109,7 +109,7 @@
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--color-text);
-    background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 100%);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -180,24 +180,18 @@
 .titleInput {
     width: 100%;
     padding: 12px 16px;
-    background: rgba(10, 4, 24, 0.5);
-    border: 1px solid var(--color-border);
-    border-radius: 12px;
+    background: #22083e;
+    border: 2px solid #491f73ff;
+    border-radius: 0.5rem;
     color: var(--color-text);
     font-size: 1rem;
     font-weight: 400;
     outline: none;
     transition: all 0.2s ease;
 }
-                               
-                               
 .titleInput:focus {
-    border-color: var(--color-primary);
+    border-color:#733DEC;
     box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
-}
-
-.titleInput::placeholder {
-    color: rgba(167, 139, 250, 0.567);
 }
 
 .textAreaContainer {
@@ -209,8 +203,8 @@
     width: 100%;
     min-height: 120px;
     padding: 12px 16px;
-    background: rgba(10, 4, 24, 0.5);
-    border: 1px solid var(--color-border);
+    background: #22083e;
+    border: 2px solid var(--color-border);
     border-radius: 12px;
     color: var(--color-text);
     font-size: 1rem;
@@ -224,10 +218,6 @@
 .postTextarea:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
-}
-
-.postTextarea::placeholder {
-    color: rgba(167, 139, 250, 0.567);
 }
 
 /* عرض الصور المضافة */
