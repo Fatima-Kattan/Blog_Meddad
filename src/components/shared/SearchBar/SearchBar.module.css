@@ -37,7 +37,7 @@
     font-size: 16px;
     font-weight: 500;
     color: #ffffff;
-    border: 2px solid #491f73ff;
+    border: 2px solid rgba(73, 31, 115, 0.61);
     border-radius: 13px;
     outline: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -57,7 +57,7 @@
     border-color: #8b5cf6;
     background: linear-gradient(145deg, rgba(32, 15, 55, 0.98), rgba(50, 25, 85, 0.98));
     box-shadow: 
-        0 0 10px 8px rgba(138, 92, 246, 0.207);
+        0 0 8px 6px rgba(138, 92, 246, 0.207);
     transform: translateY(-1px);
 }
 /* ===== Search Icon Animation ===== */
