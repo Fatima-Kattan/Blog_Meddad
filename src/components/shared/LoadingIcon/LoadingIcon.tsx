@@ -5,37 +5,22 @@ const LoadingIcon = ({
     size = 40,
     message = '',
     zIndex = 1000,
-    position = 'absolute' // ✅ خاصية position مع قيمة افتراضية
+    position = 'absolute'
 }) => {
-    // ✅ position ديناميكي يأتي من props
-    const containerStyle = {
-        position: position, // ✅ ديناميكي
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: zIndex,
-        backgroundColor: 'transparent'
-    };
-
-    const circleStyle = {
-        width: `${size}px`,
-        height: `${size}px`
-    };
-
-    const messageStyle = {
-        marginTop: '10px',
-        color: '#a78bfa',
-        fontSize: `${Math.max(12, size / 3)}px`,
-        textAlign: 'center'
-    };
+    // ✅ فقط الأنماط الديناميكية inline
+    const dynamicStyles = {
+        '--dot-size': `${size}px`,
+        '--font-size': `${Math.max(12, size / 3)}px`,
+        '--z-index': zIndex,
+        position: position,
+    } as React.CSSProperties;
 
     return (
-        <div className={styles.loadingIconContainer} style={containerStyle}>
-            <div className={styles.skCircle} style={circleStyle}>
+        <div 
+            className={styles.loadingIconContainer} 
+            style={dynamicStyles}
+        >
+            <div className={styles.skCircle}>
                 {[...Array(12)].map((_, index) => (
                     <div
                         key={index}
@@ -43,7 +28,7 @@ const LoadingIcon = ({
                     ></div>
                 ))}
             </div>
-            {message && <div className={styles.loadingMessage} style={messageStyle}>{message}</div>}
+            {message && <div className={styles.loadingMessage}>{message}</div>}
         </div>
     );
 };

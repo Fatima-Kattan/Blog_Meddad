@@ -106,7 +106,7 @@ function RightSidebar() {
             width: '100%'
           }}>
             <LoadingIcon 
-              size={50}
+              size={45}
               message="Loading ..."
               position="absolute"
             />
