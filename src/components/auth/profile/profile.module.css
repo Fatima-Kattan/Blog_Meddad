@@ -1502,8 +1502,8 @@
 .formInput {
     width: 100%;
     padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(140, 90, 242, 0.3);
+    background: #22083e;
+    border: 2px solid #431C69;
     border-radius: 10px;
     font-size: 1rem;
     transition: all 0.2s;
@@ -1516,9 +1516,8 @@
 
 .formInput:focus {
     outline: none;
-    border-color: #8c5af2;
+    border-color: #733DEC;
     box-shadow: 0 0 0 3px rgba(140, 90, 242, 0.2);
-    background: rgba(255, 255, 255, 0.08);
 }
 
 .formInput:disabled {

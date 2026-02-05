@@ -72,7 +72,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
         
         .select-field:focus {
           outline: none;
-          border-color: #b721ff;
+          border-color: #733DEC;
           box-shadow: 0 0 0 3px rgba(183, 33, 255, 0.1);
         }
         

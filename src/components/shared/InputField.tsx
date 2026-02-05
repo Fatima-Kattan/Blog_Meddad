@@ -42,7 +42,7 @@ const InputField: React.FC<InputFieldProps> = ({
             />
             {error && <p className="error-message">{error}</p>}
 
-            <style jsx>{`
+            <style>{`
         .input-group {
           margin-bottom: 1rem;
           width: 100%;
@@ -70,7 +70,7 @@ const InputField: React.FC<InputFieldProps> = ({
         .input-field:focus {
           outline: none;
           color:white;
-          border-color: #b721ff;
+          border-color: #733DEC;
           box-shadow: 0 0 0 3px rgba(183, 33, 255, 0.1);
         }
         
