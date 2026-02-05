@@ -1,11 +1,12 @@
 /* components/follow/followLayout.module.css */
 .container {
   min-height: 100vh;
-  background: 
+  background: #210c37;
+/*  background: 
     radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(198, 36, 227, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 40% 80%, rgba(109, 40, 217, 0.1) 0%, transparent 50%),
-    linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); */
   padding: 2rem 1rem;
   position: relative;
   overflow-x: hidden;
@@ -79,11 +80,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
-  background: linear-gradient(135deg, 
-    #8b5cf6 0%, 
-    #c624e3 50%, 
-    #6d28d9 100%
-  );
+  background:linear-gradient(135deg, #8e6cc8, #9006f3a4);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -101,9 +98,9 @@
   height: 2px;
   background: linear-gradient(90deg, 
     transparent, 
+    #4f29b0, 
     #8b5cf6, 
-    #c624e3, 
-    #8b5cf6, 
+    #4f29b0, 
     transparent
   );
   border-radius: 2px;
@@ -116,7 +113,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1rem;
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(15px);
@@ -136,12 +133,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: conic-gradient(
-    from 0deg,
-    #8b5cf6,
-    #6d28d9,
-    #c624e3
-  );
+  background: linear-gradient(135deg, #8e6cc8, #9006f3a4);
   border-radius: 12px;
   color: white;
   font-size: 1.2rem;
@@ -155,19 +147,15 @@
 }
 
 .statsTitle {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.744);
   font-weight: 500;
 }
 
 .statsNumber {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(135deg, 
-    #8b5cf6 0%, 
-    #c624e3 50%, 
-    #6d28d9 100%
-  );
+  background:  #9163e1;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -307,6 +295,12 @@
   height: 80px;
   margin: 0 auto 1.5rem;
   position: relative;
+}
+
+.icon{
+  width: 40px;
+  height: 28px;
+  color: #cdb8e2;
 }
 
 .emptyIcon::before {

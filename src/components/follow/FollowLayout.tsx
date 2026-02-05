@@ -3,6 +3,7 @@
 import React from "react";
 import UserCard from "@/components/shared/UserCard/UserCard";
 import styles from "./followLayout.module.css";
+import { IoPeople } from "react-icons/io5";
 
 interface User {
   id: number | string;
@@ -37,7 +38,7 @@ export default function FollowLayout({
   emptyMessage,
   emptySubmessage,
   onUserClick,
-  icon = "👥",
+  icon = <IoPeople />,
   statsTitle = "Total Connections",
   showUnfollowButton = false,
   onUnfollow,
@@ -89,7 +90,7 @@ export default function FollowLayout({
       <header className={styles.header}>
         <h1 className={styles.title}>{title}</h1>
         <div className={styles.statsContainer}>
-          <div className={styles.statsIcon}>{icon}</div>
+          <div className={styles.statsIcon}><IoPeople className={styles.icon}/></div>
           <div className={styles.statsContent}>
             <div className={styles.statsTitle}>{statsTitle}</div>
             <div className={styles.statsNumber}>{count}</div>
