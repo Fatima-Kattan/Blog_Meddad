@@ -1,12 +1,6 @@
-/* components/follow/followLayout.module.css */
 .container {
   min-height: 100vh;
   background: #210c37;
-/*  background: 
-    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(198, 36, 227, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, rgba(109, 40, 217, 0.1) 0%, transparent 50%),
-    linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%); */
   padding: 2rem 1rem;
   position: relative;
   overflow-x: hidden;
@@ -14,7 +8,6 @@
   border: 1px solid #7c3aed;
 }
 
-/* تأثيرات خلفية متحركة */
 .backgroundEffects {
   position: fixed;
   top: 0;
@@ -67,7 +60,6 @@
   }
 }
 
-/* الهيدر */
 .header {
   position: relative;
   z-index: 2;
@@ -106,7 +98,6 @@
   border-radius: 2px;
 }
 
-/* إحصائيات في سطر واحد */
 .statsContainer {
   position: relative;
   z-index: 2;
@@ -161,7 +152,6 @@
   background-clip: text;
 }
 
-/* قسم القائمة */
 .listSection {
   position: relative;
   z-index: 2;
@@ -180,7 +170,6 @@
   margin-top: 1rem;
 }
 
-/* تخصيص السكرول */
 .listContainer::-webkit-scrollbar {
   width: 6px;
 }
@@ -209,7 +198,6 @@
   );
 }
 
-/* كارد المستخدمين */
 .userCardWrapper {
   transition: transform 0.3s ease;
   width: 100%;
@@ -219,7 +207,6 @@
   transform: translateY(-3px);
 }
 
-/* حالة التحميل */
 .loadingContainer {
   min-height: 50vh;
   display: flex;
@@ -282,7 +269,6 @@
   }
 }
 
-/* رسالة فارغة */
 .emptyState {
   text-align: center;
   padding: 3rem 1rem;
@@ -342,7 +328,6 @@
   font-size: 0.9rem;
 }
 
-/* رسالة الخطأ */
 .errorContainer {
   text-align: center;
   padding: 3rem 1rem;
@@ -372,7 +357,6 @@
   box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
 }
 
-/* التجاوبية */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;

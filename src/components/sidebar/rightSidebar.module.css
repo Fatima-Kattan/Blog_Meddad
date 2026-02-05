@@ -1,6 +1,6 @@
 .sidebarSection {
-  width: 317px; /* 320 .. 305 */
-  height: 77%;/* 486 ..441 */
+  width: 317px; 
+  height: 77%;
   background: #1a0b2e;
   border: 1px solid #8b5cf64d;
   border-radius: 16px;
@@ -23,16 +23,14 @@
   filter: drop-shadow(0px 4px 8px rgba(240, 240, 240, 0.275));
   flex-shrink: 0;
 }
-/* أضف هذه الأنماط إلى ملف CSS الخاص بك */
 
-/* إضافة div داخلي للسكرول */
 .sidebarSection > div:last-child {
   flex: 1;
-  overflow-y: auto; /* تفعيل السكرول العمودي */
-  padding-right: 4px; /* مسافة للسكرول */
+  overflow-y: auto; 
+  padding-right: 4px; 
 }
 
-/* تخصيص شكل السكرول */
+
 .sidebarSection > div:last-child::-webkit-scrollbar {
   width: 6px;
 }
@@ -51,7 +49,6 @@
   background: rgba(139, 92, 246, 0.7);
 }
 
-/* التأكد من أن كروت المستخدمين لا تتأثر بالسكرول */
 .sidebarSection > div:last-child > div {
   display: flex;
   flex-direction: column;
@@ -82,7 +79,6 @@
   overflow: hidden;
 }
 
-/* إطار متحرك للتحميل فقط */
 .statement.loading {
   animation: loadingPulse 2s ease-in-out infinite;
 }
@@ -103,7 +99,6 @@
   }
 }
 
-/* تأثير توهج خلفي */
 .statement::before {
   content: '';
   position: absolute;
@@ -123,7 +118,6 @@
   opacity: 1;
 }
 
-/* تدرج نصي */
 .statement p {
   font-size: 1.125rem;
   font-weight: 600;
@@ -156,7 +150,6 @@
   }
 }
 
-/* أيقونة التحميل */
 .statement.loading p::before {
   content: '';
   display: inline-block;
@@ -180,7 +173,6 @@
   }
 }
 
-/* أيقونة النجاح */
 .statement:not(.loading) p::before {
   content: '✓';
   display: inline-block;
@@ -198,7 +190,6 @@
   vertical-align: middle;
 }
 
-/* تأثيرات إضافية للتحميل */
 .loadingDots {
   display: inline-block;
   animation: loadingDots 1.5s infinite;
@@ -223,7 +214,6 @@
 }
 
 
-/* تأثيرات دخول وخروج */
 .statement {
   animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -239,7 +229,6 @@
   }
 }
 
-/* تصميم متجاوب */
 @media (max-width: 768px) {
   .statement {
     padding: 1rem 1.25rem;
@@ -277,7 +266,6 @@
   }
 }
 
-/* تأثيرات جزئيات خلفية */
 .statement::after {
   content: '';
   position: absolute;
@@ -289,7 +277,6 @@
   pointer-events: none;
 }
 
-/* تأثير تفاعل اللمس */
 .statement:active {
   transform: scale(0.98);
   transition: transform 0.1s ease;

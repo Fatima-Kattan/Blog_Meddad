@@ -7,7 +7,6 @@ const LoadingIcon = ({
     zIndex = 1000,
     position = 'absolute'
 }) => {
-    // ✅ فقط الأنماط الديناميكية inline
     const dynamicStyles = {
         '--dot-size': `${size}px`,
         '--font-size': `${Math.max(12, size / 3)}px`,

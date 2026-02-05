@@ -1,10 +1,8 @@
 import { redirect } from 'next/navigation';
 import NotificationsClient from './NotificationsClient';
 
-// ⭐ هذا السطر يجعل الصفحة Dynamic
 export const dynamic = 'force-dynamic';
 
-// ⭐ Interface للإشعارات (نسخ من context) - احتفظي به للتوافق
 interface Notification {
     id: number;
     type: string;

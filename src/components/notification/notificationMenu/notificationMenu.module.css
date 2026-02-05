@@ -3,7 +3,6 @@
   background: #160728fa;
   border: 1px solid rgba(139, 92, 246, 0.25);
   border-radius: 16px;
-  /* margin-top: 12px; */
   padding-top: 9px;
   top: 100%;
   right: 0;
@@ -15,7 +14,6 @@
   min-width: 320px;
   max-height: 500px;
   overflow-y: auto;
-  /* position: absolute; */
 }
 .title {
   font-size: 1rem;
@@ -26,7 +24,6 @@
   border-bottom: 1px solid rgba(139, 92, 246, 0.2);
   margin-bottom: 8px;
 }
-/* شريط التمرير المخصص */
 .menu::-webkit-scrollbar {
   width: 6px;
 }
@@ -145,7 +142,6 @@
   transform: translateX(4px);
 }
 
-/* تأثير دخول للقائمة */
 @keyframes menuSlideIn {
   from {
     opacity: 0;
@@ -161,7 +157,6 @@
   animation: menuSlideIn 0.3s ease-out forwards;
 }
 
-/* فاصل بين الإشعارات */
 .menu > div:not(:last-child) {
   border-bottom: 1px solid rgba(139, 92, 246, 0.1);
 }

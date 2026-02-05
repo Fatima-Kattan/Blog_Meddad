@@ -3,7 +3,7 @@ import React from 'react';
 import NotificationItem from '../notificationItem/NotificationItem';
 import { useNotifications } from '@/context/NotificationContext';
 import { useRouter } from 'next/navigation';
-import styles from './notificationMenu.module.css'; // ✅ استدعاء ملف التنسيقات
+import styles from './notificationMenu.module.css'; 
 
 function NotificationMenu() {
   const { notifications, markAsRead } = useNotifications();
@@ -31,7 +31,7 @@ function NotificationMenu() {
       {notifications.length > 0 && (
         <button
           onClick={() => router.push('/notifications')}
-          className={styles.moreBtn} // ✅ زر منسق من الملف الخارجي
+          className={styles.moreBtn} 
         >
           Show All Notifications
         </button>

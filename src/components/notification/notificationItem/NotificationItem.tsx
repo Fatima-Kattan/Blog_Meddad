@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import styles from './notificationItem.module.css';
 import { useNotifications } from '@/context/NotificationContext';
 import { FiCheckCircle } from 'react-icons/fi';
-import LoadingIcon from "@/components/shared/LoadingIcon/LoadingIcon"; // ✅ استيراد LoadingIcon
+import LoadingIcon from "@/components/shared/LoadingIcon/LoadingIcon";
 
 interface Actor {
     id: number;
@@ -78,7 +78,7 @@ function NotificationItem({ notification }: NotificationItemProps) {
 
             {!isRead && (
                 <div className={styles.markReadContainer}>
-                    {/* ✅ LoadingIcon أثناء التحميل */}
+                    
                     {loading ? (
                         <div style={{ 
                             position: 'relative', 

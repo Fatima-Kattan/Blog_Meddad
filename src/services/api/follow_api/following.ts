@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// واجهة المستخدم اللي عم نتابعه
 export interface FollowingUser {
   id: number;
   full_name: string;
@@ -15,7 +14,6 @@ export interface FollowingUser {
   updated_at: string;
 }
 
-// واجهة العلاقة (follower/following)
 export interface FollowingData {
   id: number;
   follower_id: number;
@@ -26,13 +24,11 @@ export interface FollowingData {
   following: FollowingUser;
 }
 
-// واجهة الاستجابة من الـ API
 export interface FollowingResponse {
   count: number;
   data: FollowingData[];
 }
 
-// خدمة الـ followings
 export const followingService = {
   async getFollowings(userId: number, token: string): Promise<FollowingResponse> {
     try {

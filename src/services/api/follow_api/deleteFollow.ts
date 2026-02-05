@@ -1,11 +1,9 @@
 import axios from "axios";
 
-// واجهة الاستجابة من الـ API عند الحذف
 export interface DeleteResponse {
-  message: string; // السيرفر عادة بيرجع رسالة نجاح أو خطأ
+  message: string; 
 }
 
-// خدمة الـ follows (الحذف)
 export const followsService = {
   async deleteFollow(userId: number, token: string): Promise<DeleteResponse> {
     try {

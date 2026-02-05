@@ -1,6 +1,5 @@
 import axios from "axios";
 
-// واجهة المستخدم اللي مش متابعينه
 export interface NotFollowingUser {
   id: number;
   full_name: string;
@@ -15,13 +14,11 @@ export interface NotFollowingUser {
   updated_at: string;
 }
 
-// واجهة الاستجابة من الـ API
 export interface NotFollowingResponse {
   count: number;
   data: NotFollowingUser[];
 }
 
-// خدمة الـ not-followings
 export const notFollowingService = {
   async getNotFollowings(userId: number, token: string): Promise<NotFollowingResponse> {
     try {

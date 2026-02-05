@@ -73,7 +73,6 @@
   }
 }
 
-/* أنيميشن دخول القائمة */
 @keyframes menuSlideIn {
   from {
     opacity: 0;
@@ -85,7 +84,6 @@
   }
 }
 
-/* شريط التمرير المخصص */
 .menuWrapper::-webkit-scrollbar {
   width: 6px;
 }
@@ -105,7 +103,6 @@
   background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
 }
 
-/* تحسينات للجوال */
 @media (max-width: 768px) {
   .menuWrapper {
     position: fixed;
@@ -129,7 +126,6 @@
   }
 }
 
-/* تحسينات للشاشات الصغيرة جداً */
 @media (max-width: 480px) {
   .menuWrapper {
     width: 100%;

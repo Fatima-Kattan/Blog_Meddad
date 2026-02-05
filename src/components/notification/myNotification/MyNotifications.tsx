@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import styles from './myNotifications.module.css';
 import NotificationItem from '@/components/notification/notificationItem/NotificationItem';
-import { useNotifications } from '@/context/NotificationContext'; // ✅ أضيفي
+import { useNotifications } from '@/context/NotificationContext';
 import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 function MyNotifications() {
@@ -13,7 +13,7 @@ function MyNotifications() {
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
 
-    // ✅ أضيفي:
+    
     const {
         notifications,
         unreadCount,
@@ -25,7 +25,7 @@ function MyNotifications() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                await fetchNotifications(); // ✅ غيري
+                await fetchNotifications(); 
             } catch (err: any) {
                 setError("You can't view notifications without signing in. Please sign in.");
             } finally {
@@ -65,7 +65,7 @@ function MyNotifications() {
 
     const handleMarkAllAsRead = async () => {
         try {
-            await markAllAsRead(); // ✅ غيري
+            await markAllAsRead(); 
         } catch (err) {
             setError("Failed to mark all as read");
             setTimeout(() => setError(null), 3000);
@@ -92,7 +92,6 @@ function MyNotifications() {
         <div className={styles.pageContainer}>
             <div className={styles.mainContainer}>
                 <div className={styles.sectionsContainer}>
-                    {/* Left Section - Filters */}
                     <div className={styles.leftSection}>
                         <h2>Filter</h2>
 
@@ -143,7 +142,6 @@ function MyNotifications() {
                             Reset All Filters
                         </button>
 
-                        {/* Stats Section */}
                         <div className={styles.statsContainer}>
                             <div className={styles.statItem}>
                                 <div className={styles.statValue}>{notifications.length}</div>
@@ -158,14 +156,12 @@ function MyNotifications() {
                                 <div className={styles.statLabel}>Today</div>
                             </div>
                             <div className={styles.statItem}>
-                                {/* ⭐ استخدمي filteredNotifications مباشرة */}
                                 <div className={styles.statValue}>{filteredNotifications.length}</div>
                                 <div className={styles.statLabel}>Filtered</div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Right Section - Notifications List */}
                     <div className={styles.rightSection}>
                         <div className={styles.notificationsHeader}>
                             <h2>Notifications List</h2>
@@ -199,7 +195,6 @@ function MyNotifications() {
 
                             {!loading && !error && filteredNotifications.length > 0 && (
                                 <div className={styles.notificationsList}>
-                                    {/* ⭐ استخدمي filteredNotifications مباشرة */}
                                     {filteredNotifications.map((notification) => (
                                         <NotificationItem
                                             key={notification.id}

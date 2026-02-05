@@ -33,27 +33,25 @@ const NotificationsContext = createContext<NotificationsContextType | null>(null
 
 interface NotificationsProviderProps {
   children: React.ReactNode;
-  initialNotifications?: Notification[];    // ⭐ أضيفي هذا
-  initialUnreadCount?: number;             // ⭐ أضيفي هذا
+  initialNotifications?: Notification[];    
+  initialUnreadCount?: number;            
 }
 
 export const NotificationsProvider = ({ 
   children,
-  initialNotifications = [],  // ⭐ قيمة افتراضية
-  initialUnreadCount = 0      // ⭐ قيمة افتراضية
+  initialNotifications = [],  
+  initialUnreadCount = 0      
 }: NotificationsProviderProps) => {
-  // ⭐ استخدمي البيانات الأولية من السيرفر
   const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const [unreadCount, setUnreadCount] = useState<number>(initialUnreadCount);
-  const [isLoading, setIsLoading] = useState(false); // ⭐ false لأن البيانات جاهزة أولياً
+  const [isLoading, setIsLoading] = useState(false); 
   const [isPolling, setIsPolling] = useState(true);
   const [token, setToken] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<number>(0);
   const [hasInitialData, setHasInitialData] = useState<boolean>(initialNotifications.length > 0);
   
-  const CACHE_DURATION = 5000; // 5 ثواني
+  const CACHE_DURATION = 5000; 
 
-  // ✅ جلب التوكن من localStorage بعد التأكد من العميل
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedToken = localStorage.getItem('token');
@@ -63,11 +61,9 @@ export const NotificationsProvider = ({
     }
   }, []);
 
-  // ✅ جلب الإشعارات مع cache و retry
   const fetchNotifications = useCallback(async (force = false, retryCount = 0) => {
     if (!token) return;
 
-    // ✅ التحقق من الكاش
     const now = Date.now();
     if (!force && now - lastFetched < CACHE_DURATION) {
       return;
@@ -90,7 +86,6 @@ export const NotificationsProvider = ({
     } catch (err) {
       console.error('خطأ في جلب الإشعارات:', err);
       
-      // ✅ Retry logic (3 محاولات)
       if (retryCount < 3) {
         const delay = Math.min(1000 * 2 ** retryCount, 10000);
         setTimeout(() => {
@@ -102,28 +97,23 @@ export const NotificationsProvider = ({
     }
   }, [token, lastFetched]);
 
-  // ✅ تحديث إشعار واحد
   const markAsRead = useCallback(async (id: number) => {
     if (!token) return;
 
-    // 1. ✅ تحديث فوري في الواجهة
     setNotifications(prev => 
       prev.map(n => 
         n.id === id ? { ...n, is_read: true } : n
       )
     );
     
-    // 2. ✅ تحديث unreadCount فورياً
     setUnreadCount(prev => Math.max(0, prev - 1));
 
-    // 3. ✅ إرسال الطلب للسيرفر
     try {
       await notificationReadService.markAsRead(id, token);
       console.log('✅ تم تحديث السيرفر بنجاح');
     } catch (err) {
       console.error('❌ فشل تحديث السيرفر:', err);
       
-      // 4. ✅ التراجع عن التحديث
       setNotifications(prev => 
         prev.map(n => 
           n.id === id ? { ...n, is_read: false } : n
@@ -133,35 +123,27 @@ export const NotificationsProvider = ({
     }
   }, [token]);
 
-  // ✅ تحديث الكل
   const markAllAsRead = useCallback(async () => {
     if (unreadCount === 0 || !token) return;
 
-    // 1. ✅ تحديث فوري
     setNotifications(prev => 
       prev.map(n => ({ ...n, is_read: true }))
     );
     setUnreadCount(0);
 
-    // 2. ✅ إرسال للسيرفر
     try {
-      // إذا كان لديك خدمة markAllAsRead
-      // await markAllAsReadService(token);
     } catch (err) {
       console.error('❌ فشل تحديث الكل:', err);
     }
   }, [unreadCount, token]);
 
-  // ✅ تحديث يدوي
   const handleManualRefresh = useCallback(() => {
     fetchNotifications(true);
   }, [fetchNotifications]);
 
-  // ✅ Polling ذكي (فقط عند رؤية الصفحة)
   useEffect(() => {
     if (!isPolling || !token) return;
 
-    // ⭐ إذا لم يكن لدينا بيانات أولية، جلب البيانات
     if (!hasInitialData) {
       fetchNotifications();
     }
@@ -178,7 +160,7 @@ export const NotificationsProvider = ({
       if (document.visibilityState === 'visible') {
         fetchNotifications();
       }
-    }, 15000); // 15 ثانية
+    }, 15000); 
 
     return () => {
       clearInterval(interval);
