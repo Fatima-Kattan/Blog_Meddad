@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import styles from './likes.module.css';
+import LoadingIcon from '../shared/LoadingIcon/LoadingIcon';
 
 interface LikeUser {
     id: number;
@@ -170,8 +171,11 @@ export default function LikesModal({ postId, postTitle = '', isOpen, onClose }: 
                 <div className={styles.modalContent}>
                     {loading ? (
                         <div className={styles.loadingContainer}>
-                            <div className={styles.spinner}></div>
-                            <p>Loading likes...</p>
+                            <LoadingIcon 
+                                size={45}
+                                message="Loading likes..."
+                                position="absolute"
+                            />
                         </div>
                     ) : error ? (
                         <div className={styles.errorContainer}>
