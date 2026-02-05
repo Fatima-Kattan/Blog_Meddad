@@ -1354,36 +1354,8 @@
 
 /* Simple delete account button styles */
 .accountActionsSection {
-    margin-top: 2rem;
+    margin-top: 0.9rem;
     padding: 0;
-}
-
-.btnDeleteAccountSimple {
-    width: 100%;
-    padding: 14px 20px;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.btnDeleteAccountSimple:hover:not(:disabled) {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
-}
-
-.btnDeleteAccountSimple:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
 }
 
 /* Modal styles with black and purple theme */
@@ -1553,16 +1525,95 @@
     color: white;
 }
 
-.btnDelete {
+.btnDeleteAccountSimple {
+    width: 100%;
+    flex: 1;
+    padding: 15px 18px; /* نفس padding زر Cancel */
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     border: none;
+    border-radius: 12px; /* نفس border-radius */
+    font-size: 1rem; /* نفس حجم الخط */
+    font-weight: 600; /* نفس weight */
+    cursor: pointer;
+    transition: all 0.3s ease; /* نفس مدة الانتقال */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
 }
 
-.btnDelete:hover:not(:disabled) {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+/* تأثير اللمعان (Shimmer) لزر Delete */
+.btnDeleteAccountSimple::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* تأثير hover مع الحفاظ على اللون الأحمر */
+.btnDeleteAccountSimple:hover:not(:disabled) {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); /* لون أحمر داكن عند hover */
+    transform: translateY(-3px); /* نفس تأثير الرفع لزر Cancel */
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4); /* ظل أحمر */
+}
+
+/* تفعيل اللمعان عند hover */
+.btnDeleteAccountSimple:hover:not(:disabled)::before {
+    opacity: 1;
+    animation: shimmer 1.5s infinite; /* نفس تأثير اللمعان */
+}
+
+/* تأثير النقر - نفس تأثير زر Cancel */
+.btnDeleteAccountSimple:active:not(:disabled) {
+    transform: translateY(-1px);
+    transition-duration: 0.1s;
+}
+
+/* حالة disabled - موحدة مع زر Cancel */
+.btnDeleteAccountSimple:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* إيقاف اللمعان عند disabled */
+.btnDeleteAccountSimple:disabled::before {
+    animation: none !important;
+    opacity: 0 !important;
+}
+
+/* كلمة Delete بداخل span لتحكم أفضل */
+.btnDeleteAccountSimple span {
+    position: relative;
+    z-index: 2;
+}
+
+/* أيقونة إن وجدت */
+.btnDelete .icon {
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+}
+
+/* تأثير اللمعان - نفس الـ keyframe */
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .btn:disabled {
