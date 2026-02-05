@@ -461,19 +461,18 @@
     color: var(--color-text);
     transform: translateY(-1px);
 }
-
 .submitButton {
     flex: 1;
     padding: 14px;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    color: var(--color-text);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    color: white;
     border: none;
     border-radius: 12px;
     font-weight: 600;
     font-size: 0.9375rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
     position: relative;
     overflow: hidden;
 }
@@ -482,26 +481,25 @@
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.2),
-        transparent
-    );
-    transition: 0.5s;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
 }
 
 .submitButton:hover::before {
-    left: 100%;
+    animation: shimmer 1.5s infinite;
 }
 
 .submitButton:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4);
-    background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(124, 58, 237, 0.5);
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+}
+
+.submitButton:active:not(:disabled) {
+    transform: translateY(-1px);
 }
 
 .submitButton:disabled {
@@ -509,6 +507,19 @@
     cursor: not-allowed;
     transform: none !important;
     box-shadow: none !important;
+}
+
+.submitButton:disabled::before {
+    animation: none !important;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* Spinner Animation */
