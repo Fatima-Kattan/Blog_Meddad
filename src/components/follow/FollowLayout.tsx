@@ -1,9 +1,9 @@
-// components/shared/FollowLayout/FollowLayout.tsx
 "use client";
 import React from "react";
 import UserCard from "@/components/shared/UserCard/UserCard";
 import styles from "./followLayout.module.css";
 import { IoPeople } from "react-icons/io5";
+import LoadingIcon from "@/components/shared/LoadingIcon/LoadingIcon"; // ✅ استيراد LoadingIcon
 
 interface User {
   id: number | string;
@@ -13,18 +13,16 @@ interface User {
 }
 
 interface FollowLayoutProps {
-  title: string;              // العنوان (Your Followers / Your Followings)
-  count: number;              // العدد الكلي
-  users: User[];              // قائمة المستخدمين
-  loading: boolean;           // حالة التحميل
-  error: string | null;       // حالة الخطأ
-  emptyMessage: string;       // رسالة فارغة
-  emptySubmessage: string;    // رسالة فرعية فارغة
-  onUserClick?: (user: User) => void; // حدث النقر على مستخدم
-  icon?: React.ReactNode;     // أيقونة قابلة للتخصيص
-  statsTitle?: string;        // عنوان الإحصائيات القابل للتخصيص
-
-  // جديد: دعم زر Unfollow
+  title: string;
+  count: number;
+  users: User[];
+  loading: boolean;
+  error: string | null;
+  emptyMessage: string;
+  emptySubmessage: string;
+  onUserClick?: (user: User) => void;
+  icon?: React.ReactNode;
+  statsTitle?: string;
   showUnfollowButton?: boolean;
   onUnfollow?: (userId: number | string) => Promise<void> | void;
 }
@@ -43,6 +41,7 @@ export default function FollowLayout({
   showUnfollowButton = false,
   onUnfollow,
 }: FollowLayoutProps) {
+  // ✅ تم تعديل هذا الجزء فقط - حالة التحميل
   if (loading) {
     return (
       <div className={styles.container}>
@@ -50,9 +49,17 @@ export default function FollowLayout({
           <div className={styles.gradientOrb}></div>
           <div className={styles.gradientOrb}></div>
         </div>
-        <div className={styles.loadingContainer}>
-          <div className={styles.loadingSpinner}></div>
-          <p className={styles.loadingText}>Loading your connections...</p>
+        {/* ✅ تم استبدال هذا الجزء فقط */}
+        <div style={{ 
+          position: 'relative', 
+          minHeight: '500px',
+          width: '100%' 
+        }}>
+          <LoadingIcon 
+            size={60}
+            message="Loading your connections..."
+            position="absolute"
+          />
         </div>
       </div>
     );

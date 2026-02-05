@@ -106,8 +106,8 @@ function RightSidebar() {
             width: '100%'
           }}>
             <LoadingIcon 
-              size={50}
-              message="Loading suggested friends..."
+              size={45}
+              message="Loading ..."
               position="absolute"
             />
           </div>
