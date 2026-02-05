@@ -33,6 +33,7 @@ import {
 } from 'react-icons/gi';
 import styles from './MyPostsPage.module.css';
 import { getUserStats, getFilteredUserPosts } from '@/services/api/posts/get-user-posts';
+import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
@@ -395,24 +396,11 @@ export default function MyPostsPage() {
                 {/* Loading State للتحميل الأولي */}
                 {loading && (
                     <div className={styles.loadingContainer}>
-                        <div className={styles.loadingAnimation}>
-                            <GiStaryu className={styles.loadingStar} />
-                            <GiStaryu className={styles.loadingStar} style={{ animationDelay: '0.2s' }} />
-                            <GiStaryu className={styles.loadingStar} style={{ animationDelay: '0.4s' }} />
-                        </div>
-                        <p className={styles.loadingText}>Loading your creative journey...</p>
-                    </div>
-                )}
-
-                {/* Loading State للفلتر فقط */}
-                {!loading && filterLoading && (
-                    <div className={styles.loadingContainer}>
-                        <div className={styles.loadingAnimation}>
-                            <GiStaryu className={styles.loadingStar} />
-                            <GiStaryu className={styles.loadingStar} style={{ animationDelay: '0.2s' }} />
-                            <GiStaryu className={styles.loadingStar} style={{ animationDelay: '0.4s' }} />
-                        </div>
-                        <p className={styles.loadingText}>Loading posts...</p>
+                        <LoadingIcon 
+                            size={60}
+                            message="Loading your Posts"
+                            position="fix"
+                        />
                     </div>
                 )}
 
