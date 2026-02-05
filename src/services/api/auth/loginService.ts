@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 export interface LoginData {
-    login: string; // يمكن أن يكون email
+    login: string;
     password: string;
 }
 

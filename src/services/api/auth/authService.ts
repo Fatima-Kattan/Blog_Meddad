@@ -30,10 +30,6 @@ export interface RegisterResponse {
         token_type: string;
     };
 }
-
-// src/services/api/authService.ts
-
-
 class AuthService {
     private baseURL = 'http://localhost:8000/api/v1';
 
@@ -43,7 +39,7 @@ class AuthService {
 
         const formData = new FormData();
 
-        // أضف جميع الحقول كـ FormData
+        // Add all fields as FormData
         formData.append('full_name', data.full_name);
         formData.append('email', data.email);
         formData.append('password', data.password);
@@ -59,7 +55,7 @@ class AuthService {
             formData.append('image', data.image);
         }
 
-        // 🔍 تحقق من محتويات FormData (للتشفيت فقط)
+        // 🔍 Check FormData contents (for debugging only)
         for (let [key, value] of formData.entries()) {
             console.log(`📝 ${key}:`, value);
         }
@@ -68,29 +64,29 @@ class AuthService {
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
-                    // ⚠️ لا تضف 'Content-Type' هنا - سيقوم fetch بإضافته تلقائياً مع boundary لـ FormData
+                    // ⚠️ Do not add 'Content-Type' here - fetch will add it automatically with boundary for FormData
                     'Accept': 'application/json',
-                    // إذا كنت بحاجة إلى token:
+                    // If you need token:
                     // 'Authorization': `Bearer ${token}`
                 },
-                body: formData, // ⭐ أرسل FormData بدلاً من JSON
+                body: formData, // ⭐ Send FormData instead of JSON
             });
 
             const responseText = await response.text();
             console.log('📨 Response status:', response.status);
             console.log('📄 Response (first 500 chars):', responseText.substring(0, 500));
 
-            // تحقق إذا كان HTML
+            // Check if it's HTML
             if (responseText.trim().startsWith('<!DOCTYPE')) {
                 console.error('❌ Server returned HTML!');
 
-                // 🔍 سجل الـ HTML الكامل للمساعدة في التشخيص
+                // 🔍 Log full HTML for diagnosis help
                 console.error('📄 Full HTML response (first 1000 chars):', responseText.substring(0, 1000));
 
                 throw new Error(`Server error ${response.status}: Received HTML page`);
             }
 
-            // حاول تحليل الـ JSON
+            // Try to parse JSON
             try {
                 const result = JSON.parse(responseText);
 

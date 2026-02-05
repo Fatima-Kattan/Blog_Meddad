@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { logoutService, LogoutResponse } from '../../../services/api/logoutService';
+import { logoutService, LogoutResponse } from '@/services/api/auth/logoutService'
 import { useRouter } from 'next/navigation';
 import './LogoutButton.css';
 
@@ -12,8 +12,8 @@ interface LogoutButtonProps {
     variant?: 'primary' | 'secondary' | 'danger';
 }
 
-const LogoutButton: React.FC<LogoutButtonProps> = ({ 
-    className = '', 
+const LogoutButton: React.FC<LogoutButtonProps> = ({
+    className = '',
     showIcon = true,
     variant = 'danger'
 }) => {
@@ -31,12 +31,12 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
 
         try {
             const response: LogoutResponse = await logoutService.logout();
-            
+
             if (response.success) {
-                // إعادة التوجيه إلى صفحة تسجيل الدخول
+                // Redirect to the login page
                 router.push('/login');
-                
-                // إعادة تحميل الصفحة للتأكد من إزالة جميع البيانات
+
+                // Reload the page to ensure all data is removed
                 setTimeout(() => {
                     window.location.reload();
                 }, 500);
@@ -45,8 +45,7 @@ const LogoutButton: React.FC<LogoutButtonProps> = ({
             }
         } catch (error: any) {
             setError(error.message || 'An error occurred during logout');
-            
-            // إعادة التوجيه على أي حال
+
             setTimeout(() => {
                 router.push('/login');
                 window.location.reload();

@@ -22,7 +22,7 @@ import LoadingIcon from '@/components/shared/LoadingIcon/LoadingIcon';
 
 // Dynamic imports للتحسين
 const UserPostsFeed = dynamic(() => import('@/components/auth/profile/UserPostsFeed'), {
-    loading: () => <LoadingIcon 
+    loading: () => <LoadingIcon
         size={40}
         message="Loading posts..."
         position="relative"
@@ -30,7 +30,7 @@ const UserPostsFeed = dynamic(() => import('@/components/auth/profile/UserPostsF
 });
 
 const MyFollowers = dynamic(() => import('@/components/follow/myFollowers/MyFollowers'), {
-    loading: () => <LoadingIcon 
+    loading: () => <LoadingIcon
         size={40}
         message="Loading followers..."
         position="relative"
@@ -39,7 +39,7 @@ const MyFollowers = dynamic(() => import('@/components/follow/myFollowers/MyFoll
 });
 
 const MyFollowing = dynamic(() => import('@/components/follow/myFollowing/MyFollowing'), {
-    loading: () => <LoadingIcon 
+    loading: () => <LoadingIcon
         size={40}
         message="Loading following..."
         position="relative"
@@ -211,7 +211,7 @@ const UpdatePasswordModal: React.FC<{
                             <button type="submit" className={`${styles.btn} ${styles.btnPrimary}`} disabled={isUpdating}>
                                 {isUpdating ? (
                                     <>
-                                        <LoadingIcon 
+                                        <LoadingIcon
                                             size={30}
                                             position="absolute"
                                             message="Updating Password..."
@@ -305,7 +305,7 @@ const DeleteAccountModal: React.FC<{
                             <button type="submit" className={`${styles.btn} ${styles.btnDelete}`} disabled={isDeleting}>
                                 {isDeleting ? (
                                     <>
-                                        <LoadingIcon 
+                                        <LoadingIcon
                                             size={20}
                                             position="relative"
                                             message="Deleting..."
@@ -354,16 +354,13 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     const [showUpdatePasswordModal, setShowUpdatePasswordModal] = useState(false);
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
-    // تحسين: استخدام useMemo للحسابات المتكررة
     const memoizedTargetUserId = useMemo(() => targetUserId, [targetUserId]);
-    
-    // تحسين: دالة واحدة مبسطة لاستخراج الـ ID من التوكن
+
     const getCurrentUserIdFromToken = useCallback((): string | number | null => {
         try {
             const token = localStorage.getItem('token');
             if (!token) return null;
-            
-            // محاولة تحليل التوكن كـ JWT
+
             try {
                 const parts = token.split('.');
                 if (parts.length === 3) {
@@ -371,18 +368,16 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                     return payload.id || payload.user_id || payload.userId || payload.sub || payload.user?.id || null;
                 }
             } catch {
-                // Fallback: البحث عن الـ ID في النص
                 const match = token.match(/"id"\s*:\s*"?(\d+)/);
                 if (match) return match[1];
             }
-            
+
             return null;
         } catch {
             return null;
         }
     }, []);
 
-    // تحسين: استخدام useCallback للدوال
     const getCurrentUserId = useCallback(async (): Promise<string | number | null> => {
         const fromToken = getCurrentUserIdFromToken();
         if (fromToken) return fromToken;
@@ -443,14 +438,12 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, []);
 
-    // تحسين: استخدام useCallback لـ fetchProfileData
     const fetchProfileData = useCallback(async () => {
         if (!memoizedTargetUserId) return;
-        
-        // التحقق من الـ cache أولاً
+
         const cacheKey = `profile_${memoizedTargetUserId}`;
         const cached = profileCache.get(cacheKey);
-        
+
         if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
             setUser(cached.data.user);
             setStats(cached.data.stats);
@@ -515,7 +508,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(formattedUser);
             setStats(formattedStats);
 
-            // تخزين في الـ cache
+            // Stored in cache
             profileCache.set(cacheKey, {
                 data: { user: formattedUser, stats: formattedStats },
                 timestamp: Date.now()
@@ -530,7 +523,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, [memoizedTargetUserId, getCurrentUserId]);
 
-    // تحسين: استخدام useMemo للحسابات
     const genderOptions = useMemo(() => [
         { value: 'male', label: 'Male' },
         { value: 'female', label: 'Female' },
@@ -567,7 +559,6 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
         }
     }, []);
 
-    // تحسين: useEffect مبسطة
     useEffect(() => {
         const todayDate = new Date().toISOString().split('T')[0];
         setToday(todayDate);
@@ -628,10 +619,10 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
             setUser(response.data);
             setShowEditModal(false);
 
-            // إلغاء الـ cache بعد التحديث
+            // Clear cache after update
             const cacheKey = `profile_${user.id}`;
             profileCache.delete(cacheKey);
-            
+
             await fetchProfileData();
 
         } catch (err) {
@@ -664,7 +655,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     }, [router, getCurrentUserId]);
 
     const handlePostDeleted = useCallback((deletedPostId: number) => {
-        // إلغاء الـ cache عند حذف منشور
+        // Clear cache when deleting a post
         const cacheKey = `profile_${memoizedTargetUserId}`;
         profileCache.delete(cacheKey);
     }, [memoizedTargetUserId]);
@@ -672,7 +663,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
     if (loading) {
         return (
             <div>
-                <LoadingIcon 
+                <LoadingIcon
                     size={55}
                     message={memoizedTargetUserId ? "Loading Profile..." : "Loading Your Profile..."}
                     position="fixed"
@@ -1016,7 +1007,7 @@ const Profile: React.FC<ProfileProps> = ({ userId: propUserId, isOwnProfile: pro
                                 <button className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleSaveProfile} disabled={isSaving}>
                                     {isSaving ? (
                                         <>
-                                            <LoadingIcon 
+                                            <LoadingIcon
                                                 size={30}
                                                 position="absolute"
                                                 message="Saving..."

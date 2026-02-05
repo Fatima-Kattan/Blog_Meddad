@@ -138,7 +138,7 @@ export interface UserProfileResponse {
     };
 }
 
-// إضافة واجهة جديدة لتحديث كلمة السر
+// New interface for password update
 export interface UpdatePasswordData {
     current_password: string;
     new_password: string;
@@ -155,7 +155,7 @@ export interface UpdatePasswordResponse {
     };
 }
 
-// إضافة واجهة جديدة لحذف الحساب
+// New interface for account deletion
 export interface DeleteAccountData {
     password: string;
 }
@@ -166,13 +166,13 @@ export interface DeleteAccountResponse {
 }
 
 class ProfileService {
-    // الحصول على بيانات البروفايل للمستخدم الحالي
+    // Get current user profile data
     async getUserProfile(): Promise<ProfileResponse> {
         try {
             const response = await api.get('/user');
             return response.data;
         } catch (error) {
-            throw new Error('فشل في جلب بيانات البروفايل');
+            throw new Error('Failed to fetch profile data');
         }
     }
 
@@ -181,26 +181,26 @@ class ProfileService {
             const response = await api.get('/user');
             return response.data.data.user.id;
         } catch (error) {
-            console.error('❌ فشل في جلب الـ ID:', error);
+            console.error('❌ Failed to get ID:', error);
             return null;
         }
     }
 
-    // الحصول على بروفايل مستخدم محدد بالـ ID
+    // Get specific user profile by ID
     async getUserProfileById(userId: number | string): Promise<UserProfileResponse> {
         try {
             const response = await api.get(`/users/profile/${userId}`);
             return response.data;
         } catch (error: any) {
-            console.error('❌ فشل في جلب بروفايل المستخدم:', error);
+            console.error('❌ Failed to fetch user profile:', error);
             if (error.response?.status === 404) {
-                throw new Error('المستخدم غير موجود');
+                throw new Error('User not found');
             }
-            throw new Error('فشل في جلب بروفايل المستخدم');
+            throw new Error('Failed to fetch user profile');
         }
     }
 
-    // تحديث كلمة السر
+    // Update password
     async updatePassword(data: UpdatePasswordData): Promise<UpdatePasswordResponse> {
         try {
             const response = await api.put('/user/password', {
@@ -212,14 +212,14 @@ class ProfileService {
             return response.data;
             
         } catch (error: any) {
-            console.error('❌ فشل في تحديث كلمة السر:', error);
+            console.error('❌ Failed to update password:', error);
             
-            // التعامل مع أخطاء التحقق
+            // Handle validation errors
             if (error.response?.status === 422) {
                 const errors = error.response.data.errors;
                 
                 if (errors?.current_password) {
-                    throw new Error('كلمة السر الحالية غير صحيحة');
+                    throw new Error('Current password is incorrect');
                 }
                 
                 if (errors?.new_password) {
@@ -228,22 +228,22 @@ class ProfileService {
                 }
                 
                 if (errors?.new_password_confirmation) {
-                    throw new Error('كلمات السر الجديدة غير متطابقة');
+                    throw new Error('New passwords do not match');
                 }
                 
-                throw new Error('بيانات غير صحيحة');
+                throw new Error('Invalid data');
             }
             
-            // التعامل مع أخطاء أخرى
+            // Handle other errors
             if (error.response?.data?.message) {
                 throw new Error(error.response.data.message);
             }
             
-            throw new Error('فشل في تحديث كلمة السر. حاول مرة أخرى');
+            throw new Error('Failed to update password. Please try again');
         }
     }
 
-    // الحصول على تفاصيل منشور معين مع اللايكات والتعليقات
+    // Get specific post details with likes and comments
     async getPostDetails(postId: number): Promise<PostDetailResponse> {
         try {
             const endpoints = [
@@ -266,15 +266,15 @@ class ProfileService {
                 }
             }
             
-            // بيانات افتراضية
+            // Default data
             return {
                 success: true,
-                message: 'بيانات افتراضية',
+                message: 'Default data',
                 data: {
                     id: postId,
                     user_id: 0,
-                    title: 'عنوان المنشور',
-                    caption: 'وصف المنشور',
+                    title: 'Post title',
+                    caption: 'Post description',
                     images: [],
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
@@ -286,16 +286,16 @@ class ProfileService {
             };
             
         } catch (error: any) {
-            console.error(`❌ فشل في جلب تفاصيل المنشور ${postId}:`, error);
+            console.error(`❌ Failed to fetch post details ${postId}:`, error);
             
             return {
                 success: true,
-                message: 'بيانات افتراضية',
+                message: 'Default data',
                 data: {
                     id: postId,
                     user_id: 0,
-                    title: 'عنوان المنشور',
-                    caption: 'وصف المنشور',
+                    title: 'Post title',
+                    caption: 'Post description',
                     images: [],
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
@@ -308,17 +308,17 @@ class ProfileService {
         }
     }
 
-    // تحديث بيانات البروفايل
+    // Update profile data
     async updateProfile(data: UpdateProfileData): Promise<UpdateProfileResponse> {
         try {
             const response = await api.put('/user/profile', data);
             return response.data;
         } catch (error) {
-            throw new Error('فشل في تحديث البروفايل');
+            throw new Error('Failed to update profile');
         }
     }
 
-    // الحصول على جميع منشورات المستخدم مع تفاصيل اللايكات والمعجبين
+    // Get all user posts with details
     async getUserPostsWithDetails(userId?: number | string): Promise<Post[]> {
         try {
             let posts: Post[] = [];
@@ -350,7 +350,7 @@ class ProfileService {
                             caption: postDetail.data.caption || post.caption || ''
                         };
                     } catch (err) {
-                        console.error(`⚠️ فشل جلب تفاصيل المنشور ${post.id}:`, err);
+                        console.error(`⚠️ Failed to fetch post details ${post.id}:`, err);
                         return {
                             ...post,
                             likes: [],
@@ -368,12 +368,12 @@ class ProfileService {
             return postsWithDetails;
             
         } catch (error) {
-            console.error('❌ فشل في جلب المنشورات:', error);
-            throw new Error('فشل في جلب المنشورات');
+            console.error('❌ Failed to fetch posts:', error);
+            throw new Error('Failed to fetch posts');
         }
     }
 
-    // الحصول على جميع منشورات المستخدم بدون تفاصيل
+    // Get all user posts without details
     async getUserPosts(userId?: number | string): Promise<Post[]> {
         try {
             if (userId) {
@@ -384,33 +384,33 @@ class ProfileService {
                 return profileResponse.data.user.posts || [];
             }
         } catch (error) {
-            throw new Error('فشل في جلب المنشورات');
+            throw new Error('Failed to fetch posts');
         }
     }
 
-    // جلب المعجبين على منشور معين
+    // Get likes for specific post
     async getPostLikes(postId: number): Promise<Like[]> {
         try {
             const postDetail = await this.getPostDetails(postId);
             return postDetail.data.likes || [];
         } catch (error) {
-            console.error(`❌ فشل في جلب معجبي المنشور ${postId}:`, error);
+            console.error(`❌ Failed to fetch post likes ${postId}:`, error);
             return [];
         }
     }
 
-    // جلب تعليقات منشور معين
+    // Get comments for specific post
     async getPostComments(postId: number): Promise<Comment[]> {
         try {
             const postDetail = await this.getPostDetails(postId);
             return postDetail.data.comments || [];
         } catch (error) {
-            console.error(`❌ فشل في جلب تعليقات المنشور ${postId}:`, error);
+            console.error(`❌ Failed to fetch post comments ${postId}:`, error);
             return [];
         }
     }
 
-    // جلب الـ ID الحالي
+    // Get current ID
     async getCurrentUserId(): Promise<number | null> {
         try {
             const storedId = localStorage.getItem('user_id');
@@ -425,12 +425,12 @@ class ProfileService {
             
             return userId;
         } catch (error) {
-            console.error('❌ فشل في جلب الـ ID الحالي:', error);
+            console.error('❌ Failed to fetch current ID:', error);
             return null;
         }
     }
 
-    // دالة حذف الحساب
+    // Account deletion function
     async deleteAccount(password: string): Promise<DeleteAccountResponse> {
         try {
             const response = await api.delete('/user/account', {

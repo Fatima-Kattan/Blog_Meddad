@@ -115,7 +115,6 @@ export default function LikesModal({ postId, postTitle = '', isOpen, onClose }: 
             .slice(0, 2);
     }, []);
 
-    // إغلاق المودال عند الضغط على ESC
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && isOpen) {
@@ -125,7 +124,7 @@ export default function LikesModal({ postId, postTitle = '', isOpen, onClose }: 
 
         if (isOpen) {
             document.addEventListener('keydown', handleEscape);
-            document.body.style.overflow = 'hidden'; // منع التمرير خلف المودال
+            document.body.style.overflow = 'hidden';
         }
 
         return () => {
@@ -134,7 +133,7 @@ export default function LikesModal({ postId, postTitle = '', isOpen, onClose }: 
         };
     }, [isOpen, onClose]);
 
-    // إغلاق عند الضغط خارج المودال
+    // Closes when pressure is applied outside the modal
     const handleBackdropClick = (e: React.MouseEvent) => {
         if (e.target === e.currentTarget) {
             onClose();
@@ -171,7 +170,7 @@ export default function LikesModal({ postId, postTitle = '', isOpen, onClose }: 
                 <div className={styles.modalContent}>
                     {loading ? (
                         <div className={styles.loadingContainer}>
-                            <LoadingIcon 
+                            <LoadingIcon
                                 size={45}
                                 message="Loading likes..."
                                 position="absolute"
@@ -207,7 +206,7 @@ export default function LikesModal({ postId, postTitle = '', isOpen, onClose }: 
                                                 href={`/profile/${like.user?.id || ''}`}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    onClose(); // إغلاق المودال عند الذهاب للبروفايل
+                                                    onClose();// Close the module to go to profile
                                                 }}
                                                 className={styles.userAvatar}
                                             >

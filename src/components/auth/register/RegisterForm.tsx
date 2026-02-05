@@ -48,13 +48,6 @@ const RegisterForm: React.FC = () => {
         }
     };
 
-    /*  const handleImageChange = (file: File | null) => {
-         setFormData(prev => ({
-             ...prev,
-             image: file
-         }));
-     }; */
-
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {};
 
@@ -282,13 +275,6 @@ const RegisterForm: React.FC = () => {
                                 rows={4}
                             />
                         </div>
-
-                        {/* <FileUploadField
-                            label="Profile Picture (Optional)"
-                            name="image"
-                            onChange={handleImageChange}
-                            error={errors.image}
-                        /> */}
 
                     </div>
 

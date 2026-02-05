@@ -35,7 +35,7 @@ export interface LikesResponse {
 }
 
 class LikesService {
-    // جلب الإعجابات لمنشور محدد
+    // Get likes for a specific post
     async getPostLikes(postId: number, page: number = 1) {
         try {
             const response = await api.get<LikesResponse>(

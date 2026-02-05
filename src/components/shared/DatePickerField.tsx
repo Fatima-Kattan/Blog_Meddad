@@ -40,7 +40,7 @@ const DatePickerField: React.FC<DatePickerFieldProps> = ({
             />
             {error && <p className="error-message">{error}</p>}
 
-            <style jsx>{`
+            <style>{`
         .date-group {
           margin-bottom: 1rem;
           width: 100%;

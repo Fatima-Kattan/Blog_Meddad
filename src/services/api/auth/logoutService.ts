@@ -10,7 +10,7 @@ export interface LogoutResponse {
 export const logoutService = {
     async logout(): Promise<LogoutResponse> {
         try {
-            // جلب التوكن من localStorage
+            // Get token from localStorage
             const token = localStorage.getItem('token');
             
             if (!token) {
@@ -32,7 +32,7 @@ export const logoutService = {
                 }
             );
 
-            // مسح البيانات من localStorage بعد نجاح الـ API
+            // Clear data from localStorage after successful API call
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             localStorage.removeItem('rememberedEmail');
@@ -40,7 +40,7 @@ export const logoutService = {
             return response.data;
             
         } catch (error: any) {
-            // حتى لو حصل خطأ في الـ API، نمسح البيانات المحلية
+            // Even if API fails, clear local data
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             localStorage.removeItem('rememberedEmail');
@@ -52,18 +52,18 @@ export const logoutService = {
         }
     },
 
-    // دالة مساعدة للتحقق من وجود توكن
+    // Helper function to check if token exists
     isLoggedIn(): boolean {
         return !!localStorage.getItem('token');
     },
 
-    // دالة للحصول على بيانات المستخدم
+    // Function to get user data
     getUserData(): any {
         const userData = localStorage.getItem('user');
         return userData ? JSON.parse(userData) : null;
     },
 
-    // دالة للحصول على التوكن
+    // Function to get token
     getToken(): string | null {
         return localStorage.getItem('token');
     }

@@ -23,7 +23,7 @@ export default function LikeButton({
     const [isLiked, setIsLiked] = useState(isInitiallyLiked);
     const [isLoading, setIsLoading] = useState(false);
 
-    // تحديث مباشر مع القيم الأولية
+    // Live update with initial values
     useEffect(() => {
         setLikesCount(initialLikesCount);
         setIsLiked(isInitiallyLiked);
@@ -40,23 +40,23 @@ export default function LikeButton({
         try {
             const token = localStorage.getItem('token');
             if (!token) {
-                throw new Error('يجب تسجيل الدخول أولاً');
+                throw new Error('You must login first');
             }
 
-            // تحديث مباشر بدون انتظار
+            // Live update without waiting
             const newLiked = !isLiked;
             const newCount = newLiked ? likesCount + 1 : likesCount - 1;
 
-            // تحديث الواجهة فوراً
+            // Update the interface immediately
             setLikesCount(newCount);
             setIsLiked(newLiked);
 
-            // إعلام المكون الأب فوراً
+            // Inform the parent component immediately
             if (onLikeUpdate) {
                 onLikeUpdate(newCount, newLiked);
             }
 
-            // إرسال الطلب للـ API في الخلفية
+            // Sending the request to the API in the background
             sendLikeRequest(postId, token, newLiked, newCount);
 
         } catch (error: any) {
@@ -66,7 +66,7 @@ export default function LikeButton({
         }
     };
 
-    // دالة لإرسال الطلب للـ API في الخلفية
+    // Function to send the API request in the background
     const sendLikeRequest = async (postId: number, token: string, expectedLiked: boolean, expectedCount: number) => {
         try {
             const response = await fetch('http://localhost:8000/api/v1/likes/toggle', {
@@ -82,16 +82,16 @@ export default function LikeButton({
 
             if (!response.ok || !data.success) {
                 console.error('API request failed:', data.message);
-                // إذا فشل الـ API، ارجعي للتغيير
+                // If the API fails, revert the changes
                 revertChanges(postId, expectedLiked, expectedCount);
                 return;
             }
 
-            // إذا نجح الـ API، تأكدي من أن القيم متطابقة
+            // If the API succeeds, verify that the values match
             const apiLiked = data.action === 'added';
             const apiCount = data.data?.likes_count || expectedCount;
             if (apiLiked !== expectedLiked || apiCount !== expectedCount) {
-                // إذا في اختلاف، عدلي الواجهة لتتطابق مع الـ API
+                // If there is a difference, update the UI to match the API
                 console.log('Updating UI to match API');
                 setLikesCount(apiCount);
                 setIsLiked(apiLiked);
@@ -107,7 +107,7 @@ export default function LikeButton({
         }
     };
 
-    // دالة للتراجع عن التغييرات إذا فشل الـ API
+    // Function to revert changes if the API fails
     const revertChanges = (postId: number, expectedLiked: boolean, expectedCount: number) => {
         const revertedLiked = !expectedLiked;
         const revertedCount = revertedLiked ? expectedCount + 1 : expectedCount - 1;
@@ -122,17 +122,17 @@ export default function LikeButton({
 
     return (
         <div className={styles.likeContainer}>
-            {/* زر القلب - اللون يظهر فوراً بناءً على isLiked */}
+            {/* Heart button - color appears immediately based on isLiked */}
             <button
                 onClick={handleLikeToggle}
                 disabled={isLoading}
                 className={`${styles.heartButton} ${isLiked ? styles.liked : ''}`}
-                aria-label={isLiked ? 'Remove like': 'Add a like'}
+                aria-label={isLiked ? 'Remove like' : 'Add a like'}
                 title={isLiked ? 'Remove like' : 'Add a like'}
             >
                 {isLoading ? (
                     <div className={styles.loadingSpinner}>
-                        <LoadingIcon 
+                        <LoadingIcon
                             size={20}
                             message="Updating like..."
                             position="absolute"
@@ -145,7 +145,7 @@ export default function LikeButton({
                 )}
             </button>
 
-            {/* رابط العرض مع العدد - العدد يتحدث فوراً */}
+            {/* View link with count - count updates immediately */}
             <Link
                 href={`/post/${postId}/likes`}
                 className={styles.likesLink}

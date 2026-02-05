@@ -181,7 +181,6 @@ export default function MyPostsPage() {
         }
     };
 
-    // دالة لتحميل المزيد
     const handleLoadMore = async () => {
         if (postsData && hasMore && !loadingMore && !filterLoading) {
             const nextPage = postsData.current_page + 1;
@@ -189,7 +188,6 @@ export default function MyPostsPage() {
         }
     };
 
-    // دالة لتحميل كل البوستات مرة واحدة
     const handleLoadAll = async () => {
         if (postsData && hasMore && !loadingMore && !filterLoading) {
             const remainingPosts = postsData.total - postsData.data.length;
@@ -245,7 +243,6 @@ export default function MyPostsPage() {
         // Loading will be handled by the useEffect below
     };
 
-    // Update posts when filter or sort changes - بعد الانتهاء من التحميل الأولي
     useEffect(() => {
         if (initialLoadComplete && userId) {
             fetchFilteredPosts(1, false);

@@ -45,7 +45,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
       </select>
       {error && <p className="error-message">{error}</p>}
 
-      <style jsx>{`
+      <style>{`
         .select-group {
           margin-bottom: 1rem;
           width: 100%;
